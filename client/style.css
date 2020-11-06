@@ -1,0 +1,104 @@
+h1, h2, h3, h4, h5, h6{
+    margin: 0.5rem 0 !important;
+}
+
+.main{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.oneboard{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.moodboard{
+    overflow: hidden;
+    flex: 1;
+    border: solid 1px #333333;
+    background-color: #eeeeee;
+    position: relative;
+}
+
+.controller{
+    background-color: #333333;
+    border-radius: 10px;
+    padding: 5px;
+    color: white;
+}
+
+.moodboard_main_controller{
+    position: absolute;
+    width: 50px; 
+    height: 145px;
+    
+    left: 10px;
+    top: 10px;
+    
+}
+
+.moodboard_image_add_controller{
+    position: absolute;
+    width: 360px;
+    height: 150px;
+    left: 70px;
+    top: 10px;
+
+}
+
+.controller_button{
+    margin-bottom: 5px;
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
+    text-align: center;
+    color: white;
+    cursor: default;
+
+}
+
+.controller_button_icon{
+    font-size: 40px;
+    
+}
+
+.boardrender{
+    overflow: hidden;
+    background-color: white;
+    position: absolute;
+}
+
+.sketchpad{
+    overflow: hidden;
+    flex: 1;
+    border: solid 1px #333333;
+    background-color: #eeeeee;
+    position: relative;
+}
+
+.moodboard_textbox{
+    border: solid 0px transparent;
+    resize: none;
+    overflow: hidden;
+    padding: 0px;
+    white-space: nowrap;
+    /* overflow-wrap: unset; */
+    line-break: unset;
+    /* word-wrap: none; */
+}
+
+.select_disabled{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
+.select_disabled::selection{
+    background:transparent
+}
