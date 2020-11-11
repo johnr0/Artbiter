@@ -19,6 +19,9 @@ class SketchpadLayerController extends Component{
             //10-document.getElementById('sketchpad_layer_controller').getBoundingClientRect().top+document.getElementById('sketchpad_layer_'+_this.props.mother_state.current_layer).getBoundingClientRect().top
             console.log(ypos)
             _this.setState({layer_mouse_down: true, mouse_y_pos: ypos, y_init_pos: y_init_pos})
+            if(_this.props.mother_state.control_state=='move-layer'){
+                _this.props.mother_this.initializeMoveLayer()
+            }
         })
     }
 
