@@ -78,14 +78,24 @@ class MoodBoard extends ProtoBoard{
     }
 
     delete_object(){
-        if(this.state.current_image.length>0 && this.state.control_state=='control_object' && this.state.action=='idle'){
+        if((this.state.current_image.length>0||this.state.current_text.length>0) && this.state.control_state=='control_object' && this.state.action=='idle'){
             // this.setState({})
             var arts = this.state.arts
             for(var i in this.state.current_image){
                 var key = this.state.current_image[i]
                 delete arts[key]
             }
-            this.setState({current_selected_pos: undefined, current_selected_ratio:undefined, current_image:[], arts:arts})
+            var texts = this.state.texts
+            for(var i in this.state.current_text){
+                var key = this.state.current_text[i]
+                if(document.getElementById('textarea_'+key)!==document.activeElement){
+                    delete texts[key]
+                }else{
+                    return
+                }
+                
+            }
+            this.setState({current_selected_pos: undefined, current_selected_ratio:undefined, current_image:[], current_text:[], arts:arts, texts: texts})
         }
     }
     

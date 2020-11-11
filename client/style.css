@@ -102,3 +102,84 @@ h1, h2, h3, h4, h5, h6{
 .select_disabled::selection{
     background:transparent
 }
+
+.sketchpad_main_controller{
+    position: absolute;
+    width: 50px; 
+    height: 230px;
+    
+    left: 10px;
+    top: 10px;
+    
+}
+
+.sketchpad_layer_controller{
+    position: absolute;
+    width: 50px; 
+    height: 350px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    right: 10px;
+    top: 10px;
+    
+}
+
+.layer_box::-webkit-scrollbar {
+    display: none;
+  }
+  
+/* Hide scrollbar for IE, Edge and Firefox */
+.layer_box {
+-ms-overflow-style: none;  /* IE and Edge */
+scrollbar-width: none;  /* Firefox */
+}
+
+.sketchpad_brush_controller{
+    position: absolute;
+    width: 50px; 
+    height: 100px;
+    
+    left: 60px;
+    top: 0px;   
+}
+
+.sketchpad_brush_size_controller{
+    position: absolute;
+    width: 200px; 
+    height: 200px;
+    
+    left: 60px;
+    top: 0px;   
+}
+
+input[type=range][orient=vertical]
+{
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+
+    height: 184px;
+    padding: 0 0px;
+    margin: 0;
+}
+
+.sketchpad_erase_controller{
+    position: absolute;
+    width: 50px; 
+    height: 45px;
+    
+    left: 60px;
+    top: 0px;   
+}
+
+.sketchpad_erase_size_controller{
+    position: absolute;
+    width: 200px; 
+    height: 200px;
+    
+    left: 60px;
+    top: 0px;   
+}
+
+.brush_cursor{
+    /* cursor: url('/static/brush.png'), auto; */
+}
