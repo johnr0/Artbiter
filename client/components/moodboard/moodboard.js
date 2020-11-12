@@ -34,6 +34,7 @@ class MoodBoard extends ProtoBoard{
         texts: {},
 
         shift_down: false,
+        control_down: false,
     }
 
     // TODO: Getting images from clip board...
@@ -50,6 +51,12 @@ class MoodBoard extends ProtoBoard{
             }else if(e.key=="Backspace"){
                 console.log('delete')
                 _this.delete_object()
+            }else if(e.key=="Control"){
+                _this.setState({control_down: true})
+            }else if(e.key=='v'){
+                if(_this.state.control_down){
+                    _this.pasteImages(e)
+                }
             }
         })
 
@@ -59,7 +66,14 @@ class MoodBoard extends ProtoBoard{
             if(e.key=="Shift"){
                 _this.setState({shift_down: false})
                 console.log('shiftup')
+            }if(e.key=='Control'){
+                _this.setState({control_down:false})
             }
+        })
+
+        window.addEventListener('paste', function(e){
+            console.log('runnning?')
+            _this.pasteImages(e);
         })
     }
 
@@ -149,58 +163,149 @@ class MoodBoard extends ProtoBoard{
             // console.log(file)
             var reader = new FileReader();
             reader.onload = function(){
-                var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                var image = new Image();
+                _this.addAnImage(reader.result, pageX, pageY, arts, counter)
+                // var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                // var image = new Image();
                 
-                image.src = reader.result
-                image.onload = function(){
-                    var xpixo = pageX - document.getElementById(_this.state.boardname).offsetLeft+ counter*10
-                    var ypixo = pageY - document.getElementById(_this.state.boardname).offsetTop+counter*10
-                    var ypix = pageY - document.getElementById(_this.state.boardname).offsetTop+100+counter*10
-                    var xpix = pageX - document.getElementById(_this.state.boardname).offsetLeft+ 100/this.height*this.width+counter*10
-                    var cur = _this.getPositionOnBoard(xpix, ypix)
-                    var origin = _this.getPositionOnBoard(xpixo, ypixo)
-                    // console.log(xpixo, ypixo, xpix, ypix)
-                    // console.log([origin[0], origin[1], cur[0], cur[1]])
-                    arts[id]={
-                        file: reader.result,
-                        position: [origin[0], origin[1], cur[0], cur[1]], 
-                        ratio:  this.width/this.height,
-                    }
+                // image.src = reader.result
+                // image.onload = function(){
+                //     var xpixo = pageX - document.getElementById(_this.state.boardname).offsetLeft+ counter*10
+                //     var ypixo = pageY - document.getElementById(_this.state.boardname).offsetTop+counter*10
+                //     var ypix = pageY - document.getElementById(_this.state.boardname).offsetTop+100+counter*10
+                //     var xpix = pageX - document.getElementById(_this.state.boardname).offsetLeft+ 100/this.height*this.width+counter*10
+                //     var cur = _this.getPositionOnBoard(xpix, ypix)
+                //     var origin = _this.getPositionOnBoard(xpixo, ypixo)
+                //     // console.log(xpixo, ypixo, xpix, ypix)
+                //     // console.log([origin[0], origin[1], cur[0], cur[1]])
+                //     arts[id]={
+                //         file: reader.result,
+                //         position: [origin[0], origin[1], cur[0], cur[1]], 
+                //         ratio:  this.width/this.height,
+                //     }
                     
-                    var current_image = _this.state.current_image
-                    var current_image_pos = _this.state.current_selected_pos
-                    var current_selected_ratio = _this.state.current_selected_ratio
-                    console.log(current_image_pos)
-                    if(current_image_pos==undefined){
-                        current_image_pos = [origin[0], origin[1], cur[0], cur[1]]
-                        current_selected_ratio = Math.abs((cur[0]-origin[0])/(cur[1]-origin[1]))
-                    }else{
-                        if(current_image_pos[2]<cur[0]){
-                            current_image_pos[2]=cur[0]
-                        }
-                        if(current_image_pos[3]<cur[1]){
-                            current_image_pos[3]=cur[1]
-                        }
-                        if(current_image_pos[0]>origin[0]){
-                            current_image_pos[0]=origin[0]
-                        }
-                        if(current_image_pos[1]>origin[1]){
-                            current_image_pos[1]=origin[1]
-                        }
-                        current_selected_ratio = Math.abs((current_image_pos[2]-current_image_pos[0])/(current_image_pos[3]-current_image_pos[1]))
-                    }
-                    current_image.push(id)
-                    console.log(current_image_pos)
-                    console.log('image ratio', current_selected_ratio, this.width/this.height)
-                    _this.setState({arts:arts, current_image: current_image, current_text: [], current_selected_pos:current_image_pos, current_selected_ratio: current_selected_ratio})
-                    // console.log('uyay', this.width, this.height)
-                }
+                //     var current_image = _this.state.current_image
+                //     var current_image_pos = _this.state.current_selected_pos
+                //     var current_selected_ratio = _this.state.current_selected_ratio
+                //     console.log(current_image_pos)
+                //     if(current_image_pos==undefined){
+                //         current_image_pos = [origin[0], origin[1], cur[0], cur[1]]
+                //         current_selected_ratio = Math.abs((cur[0]-origin[0])/(cur[1]-origin[1]))
+                //     }else{
+                //         if(current_image_pos[2]<cur[0]){
+                //             current_image_pos[2]=cur[0]
+                //         }
+                //         if(current_image_pos[3]<cur[1]){
+                //             current_image_pos[3]=cur[1]
+                //         }
+                //         if(current_image_pos[0]>origin[0]){
+                //             current_image_pos[0]=origin[0]
+                //         }
+                //         if(current_image_pos[1]>origin[1]){
+                //             current_image_pos[1]=origin[1]
+                //         }
+                //         current_selected_ratio = Math.abs((current_image_pos[2]-current_image_pos[0])/(current_image_pos[3]-current_image_pos[1]))
+                //     }
+                //     current_image.push(id)
+                //     console.log(current_image_pos)
+                //     console.log('image ratio', current_selected_ratio, this.width/this.height)
+                //     _this.setState({arts:arts, current_image: current_image, current_text: [], current_selected_pos:current_image_pos, current_selected_ratio: current_selected_ratio})
+                //     // console.log('uyay', this.width, this.height)
+                // }
             }
             reader.readAsDataURL(file)
 
             }
         }
+    }
+
+    addAnImage(imgsrc, pageX, pageY, arts, counter){
+        var _this = this
+        var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        var image = new Image();
+        
+        image.src = imgsrc
+        image.onload = function(){
+            var xpixo = pageX - document.getElementById(_this.state.boardname).offsetLeft+ counter*10
+            var ypixo = pageY - document.getElementById(_this.state.boardname).offsetTop+counter*10
+            var ypix = pageY - document.getElementById(_this.state.boardname).offsetTop+100+counter*10
+            var xpix = pageX - document.getElementById(_this.state.boardname).offsetLeft+ 100/this.height*this.width+counter*10
+            var cur = _this.getPositionOnBoard(xpix, ypix)
+            var origin = _this.getPositionOnBoard(xpixo, ypixo)
+            // console.log(xpixo, ypixo, xpix, ypix)
+            // console.log([origin[0], origin[1], cur[0], cur[1]])
+            arts[id]={
+                file: imgsrc,
+                position: [origin[0], origin[1], cur[0], cur[1]], 
+                ratio:  this.width/this.height,
+            }
+            
+            var current_image = _this.state.current_image
+            var current_image_pos = _this.state.current_selected_pos
+            var current_selected_ratio = _this.state.current_selected_ratio
+            console.log(current_image_pos)
+            if(current_image_pos==undefined){
+                current_image_pos = [origin[0], origin[1], cur[0], cur[1]]
+                current_selected_ratio = Math.abs((cur[0]-origin[0])/(cur[1]-origin[1]))
+            }else{
+                if(current_image_pos[2]<cur[0]){
+                    current_image_pos[2]=cur[0]
+                }
+                if(current_image_pos[3]<cur[1]){
+                    current_image_pos[3]=cur[1]
+                }
+                if(current_image_pos[0]>origin[0]){
+                    current_image_pos[0]=origin[0]
+                }
+                if(current_image_pos[1]>origin[1]){
+                    current_image_pos[1]=origin[1]
+                }
+                current_selected_ratio = Math.abs((current_image_pos[2]-current_image_pos[0])/(current_image_pos[3]-current_image_pos[1]))
+            }
+            current_image.push(id)
+            console.log(current_image_pos)
+            console.log('image ratio', current_selected_ratio, this.width/this.height)
+            _this.setState({arts:arts, current_image: current_image, current_text: [], current_selected_pos:current_image_pos, current_selected_ratio: current_selected_ratio})
+            // console.log('uyay', this.width, this.height)
+        }
+    }
+
+    pasteImages(e){
+        // console.log(e.clipboardData.items)
+        var _this = this
+        navigator.clipboard.read().then((items)=>{
+            console.log(items)
+            var promises = []
+            var counter = 0
+            for(var i=0; i<items.length; i++){
+                var item = items[i]
+                for (var j=0; j<item.types.length; j++){
+                    var type = item.types[j]
+                    if(type.startsWith('image/')){
+                        promises.push(_this.pasteImage(item, type, counter))
+                        counter = counter+1
+                    }
+                }
+                console.log(i)
+            }
+            Promise.all(promises)
+        })
+        // var items = e.clipboardData.items
+        
+    }
+
+    pasteImage(item, type, counter){ 
+        var _this = this
+        item.getType(type).then((it)=>{
+            console.log(it);
+            var reader = new FileReader();
+            reader.onload = function(){
+                _this.addAnImage(reader.result, document.getElementById(_this.state.boardname).offsetLeft,document.getElementById(_this.state.boardname).offsetTop+100, 
+                _this.state.arts, counter)
+            }
+            reader.readAsDataURL(it)
+            
+        })
+        
     }
 
     dropenter(e){
