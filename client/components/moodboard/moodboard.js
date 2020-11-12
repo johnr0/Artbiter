@@ -36,7 +36,7 @@ class MoodBoard extends ProtoBoard{
         shift_down: false,
     }
 
-    // TODO: Selection, Deletion, 
+    // TODO: Getting images from clip board...
 
     componentDidMount(){
         super.componentDidMount();

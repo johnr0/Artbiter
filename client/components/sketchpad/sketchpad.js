@@ -46,6 +46,7 @@ class SketchPad extends ProtoBoard {
 
         init_nonlasso_ret: undefined,
 
+        lasso_rot_deg: 0,
         
 
 
@@ -69,8 +70,10 @@ class SketchPad extends ProtoBoard {
     }
 
     getCurrentMouseOnBoard(e){
+        
         var xpix = e.pageX - document.getElementById(this.state.boardname).offsetLeft
         var ypix = e.pageY - document.getElementById(this.state.boardname).offsetTop
+        
         // console.log(xpix, ypix)
         
         // console.log(xpos, ypos)
@@ -79,10 +82,14 @@ class SketchPad extends ProtoBoard {
     }
 
     moveBoardEnd(){
+        // console.log('thiss?')
         if(this.state.control_state=='brush' && this.state.action=='size'){
             return
         }
         if(this.state.control_state=='erase' && this.state.action=='size'){
+            return
+        }
+        if(this.state.control_state=='move-layer' && this.state.action=='rotate-layer'){
             return
         }
         super.moveBoardEnd();
@@ -115,6 +122,8 @@ class SketchPad extends ProtoBoard {
             this.lassoMove(e)
         }else if(this.state.control_state=='move-layer' && this.state.action=='move-layer'){
             this.moveLayerMove(e)
+        }else if(this.state.control_state=='move-layer' && this.state.action=='rotate-layer'){
+            this.rotateLayerMove(e)
         }
 
     }
@@ -130,6 +139,8 @@ class SketchPad extends ProtoBoard {
             this.lassoEnd(e)
         }else if(this.state.control_state=='move-layer' && this.state.action=='move-layer'){
             this.moveLayerEnd(e)
+        }else if(this.state.control_state=='move-layer' && this.state.action=='rotate-layer'){
+            this.rotateLayerEnd(e)
         }
     }
 
@@ -409,6 +420,126 @@ class SketchPad extends ProtoBoard {
         
     }
 
+    rotateLayerInit(e){
+        var adjust_pre_canvas = document.createElement('canvas')
+        adjust_pre_canvas.width = 1000
+        adjust_pre_canvas.height = 1000
+
+        var rotateCenter = []
+
+        if(this.state.lasso.length>0){
+            var xmax=Number.MIN_VALUE
+            var ymax = Number.MIN_VALUE
+            var xmin = Number.MAX_VALUE
+            var ymin = Number.MAX_VALUE
+            for(var i in this.state.lasso){
+                var cur_p = this.state.lasso[i]
+                if(cur_p[0]>xmax){
+                    xmax = cur_p[0]
+                }else if(cur_p[0]<xmin){
+                    xmin = cur_p[0]
+                }
+
+                if(cur_p[1]>ymax){
+                    ymax = cur_p[1]
+                }else if(cur_p[1]<ymin){
+                    ymin = cur_p[1]
+                }
+            }
+            rotateCenter.push((xmin+xmax)/2)
+            rotateCenter.push((ymin+ymax)/2)
+        }
+
+        this.setState({action: 'rotate-layer', rotateCenter: rotateCenter, adjust_pre_canvas: adjust_pre_canvas})
+    }
+
+    rotateLayerMove(e){
+        e.stopPropagation()
+        var pos = this.getCurrentMouseOnBoard(e)
+
+        var deg = this.angleBetween(pos, this.state.rotateCenter)
+        console.log(deg)
+
+        var adjust_pre_canvas = this.state.adjust_pre_canvas
+        var adjust_pre_ctx = adjust_pre_canvas.getContext('2d')
+        adjust_pre_ctx.clearRect(0,0,1000,1000)
+        // var lassoed_canvas = this.state.lassoed_canvas
+        // var lassoed_ctx = lassoed_canvas.getContext('2d')
+
+
+        var pos = this.getCurrentMouseOnBoard(e)
+
+        adjust_pre_ctx.drawImage(this.state.unlassoed_canvas, 0, 0)
+
+        adjust_pre_ctx.translate(this.state.rotateCenter[0], this.state.rotateCenter[1])
+        adjust_pre_ctx.rotate(-deg)
+        adjust_pre_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
+        adjust_pre_ctx.drawImage(this.state.lassoed_canvas, 0, 0)
+        adjust_pre_ctx.translate(this.state.rotateCenter[0], this.state.rotateCenter[1])
+        adjust_pre_ctx.rotate(deg)
+        adjust_pre_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
+
+        var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
+        var ctx = el.getContext('2d');
+        ctx.clearRect(0,0,1000,1000)
+
+        ctx.drawImage(adjust_pre_canvas, 0, 0)
+
+        this.setState({lasso_rot_deg: -deg*180/Math.PI})
+
+        // rotate drawing, lasso img
+        
+    }
+
+    rotateLayerEnd(e){
+        var lassoed_canvas = document.createElement('canvas')
+        var lassoed_ctx = lassoed_canvas.getContext('2d')
+        lassoed_canvas.width = this.state.lassoed_canvas.width
+        lassoed_canvas.height = this.state.lassoed_canvas.height
+        // lassoed_ctx.drawImage(this.state.lassoed_canvas, 0, 0)
+        lassoed_ctx.translate(this.state.rotateCenter[0], this.state.rotateCenter[1])
+        lassoed_ctx.rotate(this.state.lasso_rot_deg*Math.PI/180)
+        lassoed_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
+        lassoed_ctx.drawImage(this.state.lassoed_canvas, 0, 0)
+        lassoed_ctx.translate(this.state.rotateCenter[0], this.state.rotateCenter[1])
+        lassoed_ctx.rotate(-this.state.lasso_rot_deg*Math.PI/180)
+        lassoed_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
+
+        var lasso_img = document.createElement('canvas')
+        var lasso_ctx = lasso_img.getContext('2d')
+        lasso_img.width = this.state.lasso_img.width
+        lasso_img.height = this.state.lasso_img.height
+
+        lasso_ctx.translate(this.state.rotateCenter[0], this.state.rotateCenter[1])
+        lasso_ctx.rotate(this.state.lasso_rot_deg*Math.PI/180)
+        lasso_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
+        lasso_ctx.drawImage(this.state.lasso_img, 0, 0)
+        lasso_ctx.translate(this.state.rotateCenter[0], this.state.rotateCenter[1])
+        lasso_ctx.rotate(-this.state.lasso_rot_deg*Math.PI/180)
+        lasso_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
+
+        
+
+
+        // console.image(lassoed_canvas.toDataURL())
+
+        if(this.state.lasso.length>0){
+            var deg = this.state.lasso_rot_deg/-180*Math.PI
+            var new_lasso = []
+            for(var i in this.state.lasso){
+                var p = this.state.lasso[i]
+                var dx = (p[0]-this.state.rotateCenter[0])
+                var dy = (p[1]-this.state.rotateCenter[1])
+
+                var nx = dx*Math.cos(deg)+dy*Math.sin(deg)+this.state.rotateCenter[0]
+                var ny = -dx*Math.sin(deg)+dy*Math.cos(deg)+this.state.rotateCenter[1]
+                new_lasso.push([nx, ny])
+            }
+            this.setState({action:'idle', rotateCenter:undefined, lasso_rot_deg: 0, lasso: new_lasso, lassoed_canvas, lasso_img: lasso_img})
+        }
+        // this.setState({action:'idle', rotateCenter:undefined, init_lasso:undefined})
+    }
+
     renderCanvas(){
         return this.state.layers.map((layer, idx)=>{
             return <SketchpadCanvas key={'sketchpad_canvas'+layer['layer_id']} canvas_id={layer['layer_id']} mother_state={this.state}></SketchpadCanvas>
@@ -438,18 +569,48 @@ class SketchPad extends ProtoBoard {
                     }
                 }
                 console.log(xmin, ymin)
-                return (<g>
+                var xcenter = (xmin+xmax)/2000*this.state.boardlength*this.state.boardzoom
+                var ycenter = (ymin+ymax)/2000*this.state.boardlength*this.state.boardzoom
+                return (<g style={{transformOrigin: xcenter+'px '+ycenter+'px', transform: 'rotate('+this.state.lasso_rot_deg+'deg)'}}>
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
-                     style={{fill:'transparent', stroke:'#333333', strokeDasharray:"5,5"}}
+                     style={{fill:'transparent', stroke:'#333333', strokeDasharray:"5,5", cursor: 'move'}}
                      onMouseDown={this.moveLayerInit.bind(this)}>
-
                     </rect>
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
+                    style={{fill:'transparent', cursor:'n-resize'}}
+                    ></rect> 
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
+                    style={{fill:'transparent', cursor:'s-resize'}}
+                    ></rect> 
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
+                    style={{fill:'transparent', cursor:'w-resize'}}
+                    ></rect>
+                    <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
+                    style={{fill:'transparent', cursor:'e-resize'}}
+                    ></rect> 
+
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={10}
+                    style={{fill:'transparent', cursor:'nw-resize'}}
+                    ></rect> 
+                    <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={10}
+                    style={{fill:'transparent', cursor:'ne-resize'}}
+                    ></rect> 
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={10} height={10}
+                    style={{fill:'transparent', cursor:'sw-resize'}}
+                    ></rect> 
+                    <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={10} height={10}
+                    style={{fill:'transparent', cursor:'se-resize'}}
+                    ></rect> 
+
+                    <rect x={(xmax+xmin)/2000*this.state.boardlength*this.state.boardzoom-5} y={ymin/1000*this.state.boardlength*this.state.boardzoom-30} width={10} height={10}
+                        style={{fill:'white', stroke:'#333333', cursor:'rotate'}} onMouseDown={this.rotateLayerInit.bind(this)}
+                    ></rect> 
                 </g>)
             }else if(this.state.nonlasso_ret!=undefined){
                 var ret = this.state.nonlasso_ret
                 return (<g>
                     <rect x={ret.left/1000*this.state.boardlength*this.state.boardzoom} y={ret.top/1000*this.state.boardlength*this.state.boardzoom} width={ret.width/1000*this.state.boardlength*this.state.boardzoom} height={ret.height/1000*this.state.boardlength*this.state.boardzoom}
-                     style={{fill:'transparent', stroke:'#333333', strokeDasharray:"5,5"}}
+                     style={{fill:'transparent', stroke:'#333333', strokeDasharray:"5,5", cursor: 'move'}}
                      onMouseDown={this.moveLayerInit.bind(this)}>
     
                     </rect>
@@ -471,7 +632,18 @@ class SketchPad extends ProtoBoard {
                     path = path+' Z'
                 }
             }
-            return (<path d={path} fill='transparent' stroke='#333333' strokeDasharray='5, 5'></path>)
+            if(this.state.lasso_rot_deg!=0){
+
+                return (<g style={{transformOrigin: this.state.rotateCenter[0]/1000*this.state.boardlength*this.state.boardzoom+'px '+this.state.rotateCenter[1]/1000*this.state.boardlength*this.state.boardzoom+'px', transform: 'rotate('+this.state.lasso_rot_deg+'deg)'}}>
+                    <path 
+                    d={path} fill='transparent' stroke='#333333' strokeDasharray='5, 5'></path>
+                </g>
+                )
+            }else{
+                return (<path 
+                d={path} fill='transparent' stroke='#333333' strokeDasharray='5, 5'></path>)
+            }
+            
         }
     }
 
@@ -613,8 +785,9 @@ class SketchPad extends ProtoBoard {
         <h2>SketchPad</h2>
         <div id='sketchpad' className='sketchpad' onWheel={this.zoom_board_wheel.bind(this)} 
             onMouseOut={this.moveBoardEnd.bind(this)}
-            onMouseMove={this.sketchPadMouseMove.bind(this)}> 
+            onMouseMove={this.sketchPadMouseMove.bind(this)} onTouchMove={this.sketchPadMouseMove.bind(this)}> 
             <div className={'boardrender'} onMouseDown={this.sketchPadMouseMoveInit.bind(this)} onMouseUp={this.sketchPadMouseMoveEnd.bind(this)} 
+                onTouchStart={this.sketchPadMouseMoveInit.bind(this)} onTouchMove={this.sketchPadMouseMoveEnd.bind(this)} 
             
             style={{
                 width:this.state.boardzoom*this.state.boardlength, 
