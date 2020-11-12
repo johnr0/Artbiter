@@ -31,7 +31,8 @@ class SketchpadMainController extends Component{
             </div>
             <div  className='controller_button' style={{color: (this.props.mother_state.control_state=='area')?'white':'#888888'}}
                 onClick={this.changeControlState.bind(this, 'area')}>
-                <div style={{width: '38px', height: '38px', border: (this.props.mother_state.control_state=='area')?'dashed 4px white':'dashed 4px #888888'}}></div>
+                <span className="iconify" data-icon="mdi-lasso" data-inline="false"></span>
+                {/* < style={{width: '38px', height: '38px', border: (this.props.mother_state.control_state=='area')?'dashed 4px white':'dashed 4px #888888'}}></div> */}
    
             </div>
             {/* <div  className='controller_button' style={{color: (this.props.mother_state.control_state=='copy_content')?'white':'#888888'}}>

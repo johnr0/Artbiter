@@ -47,12 +47,14 @@ class SketchPad extends ProtoBoard {
         init_nonlasso_ret: undefined,
 
         lasso_rot_deg: 0,
-        
 
+        lasso_resize_direction: undefined,
+        resize_layer_init_pos: undefined, 
+        resize_ret: undefined, 
 
     }
 
-    // TODO lasso tool - lasso-based/nonlasso-based resize / rotation
+    // TODO lasso tool - nonlasso-based resize
 
     componentDidMount(){
         super.componentDidMount()
@@ -92,6 +94,9 @@ class SketchPad extends ProtoBoard {
         if(this.state.control_state=='move-layer' && this.state.action=='rotate-layer'){
             return
         }
+        if(this.state.control_state=='move-layer' && this.state.action=='resize-layer'){
+            return
+        }
         super.moveBoardEnd();
     }
 
@@ -124,6 +129,8 @@ class SketchPad extends ProtoBoard {
             this.moveLayerMove(e)
         }else if(this.state.control_state=='move-layer' && this.state.action=='rotate-layer'){
             this.rotateLayerMove(e)
+        }else if(this.state.control_state=='move-layer' && this.state.action=='resize-layer'){
+            this.resizeLayerMove(e)
         }
 
     }
@@ -141,6 +148,8 @@ class SketchPad extends ProtoBoard {
             this.moveLayerEnd(e)
         }else if(this.state.control_state=='move-layer' && this.state.action=='rotate-layer'){
             this.rotateLayerEnd(e)
+        }else if(this.state.control_state=='move-layer' && this.state.action=='resize-layer'){
+            this.resizeLayerEnd(e)
         }
     }
 
@@ -448,6 +457,9 @@ class SketchPad extends ProtoBoard {
             }
             rotateCenter.push((xmin+xmax)/2)
             rotateCenter.push((ymin+ymax)/2)
+        }else{
+            rotateCenter.push(this.state.nonlasso_ret.left+this.state.nonlasso_ret.width/2)
+            rotateCenter.push(this.state.nonlasso_ret.top+this.state.nonlasso_ret.height/2)
         }
 
         this.setState({action: 'rotate-layer', rotateCenter: rotateCenter, adjust_pre_canvas: adjust_pre_canvas})
@@ -505,18 +517,7 @@ class SketchPad extends ProtoBoard {
         lassoed_ctx.rotate(-this.state.lasso_rot_deg*Math.PI/180)
         lassoed_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
 
-        var lasso_img = document.createElement('canvas')
-        var lasso_ctx = lasso_img.getContext('2d')
-        lasso_img.width = this.state.lasso_img.width
-        lasso_img.height = this.state.lasso_img.height
-
-        lasso_ctx.translate(this.state.rotateCenter[0], this.state.rotateCenter[1])
-        lasso_ctx.rotate(this.state.lasso_rot_deg*Math.PI/180)
-        lasso_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
-        lasso_ctx.drawImage(this.state.lasso_img, 0, 0)
-        lasso_ctx.translate(this.state.rotateCenter[0], this.state.rotateCenter[1])
-        lasso_ctx.rotate(-this.state.lasso_rot_deg*Math.PI/180)
-        lasso_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
+        
 
         
 
@@ -524,6 +525,19 @@ class SketchPad extends ProtoBoard {
         // console.image(lassoed_canvas.toDataURL())
 
         if(this.state.lasso.length>0){
+            var lasso_img = document.createElement('canvas')
+            var lasso_ctx = lasso_img.getContext('2d')
+            lasso_img.width = this.state.lasso_img.width
+            lasso_img.height = this.state.lasso_img.height
+
+            lasso_ctx.translate(this.state.rotateCenter[0], this.state.rotateCenter[1])
+            lasso_ctx.rotate(this.state.lasso_rot_deg*Math.PI/180)
+            lasso_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
+            lasso_ctx.drawImage(this.state.lasso_img, 0, 0)
+            lasso_ctx.translate(this.state.rotateCenter[0], this.state.rotateCenter[1])
+            lasso_ctx.rotate(-this.state.lasso_rot_deg*Math.PI/180)
+            lasso_ctx.translate(-this.state.rotateCenter[0], -this.state.rotateCenter[1])
+
             var deg = this.state.lasso_rot_deg/-180*Math.PI
             var new_lasso = []
             for(var i in this.state.lasso){
@@ -536,8 +550,291 @@ class SketchPad extends ProtoBoard {
                 new_lasso.push([nx, ny])
             }
             this.setState({action:'idle', rotateCenter:undefined, lasso_rot_deg: 0, lasso: new_lasso, lassoed_canvas, lasso_img: lasso_img})
+        }else{
+            var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
+            var ctx = el.getContext('2d');
+            var ret = this.getCanvasBoundingBox(ctx)
+            this.setState({action:'idle', rotateCenter:undefined, lasso_rot_deg: 0, nonlasso_ret:ret, lassoed_canvas: lassoed_canvas})
         }
-        // this.setState({action:'idle', rotateCenter:undefined, init_lasso:undefined})
+    }
+
+    resizeLayerInit(direction, e){
+        var ret
+        var adjust_pre_canvas = document.createElement('canvas')
+        adjust_pre_canvas.width = 1000
+        adjust_pre_canvas.height = 1000
+        if(this.state.lasso.length>0){
+            var xmax=Number.MIN_VALUE
+            var ymax = Number.MIN_VALUE
+            var xmin = Number.MAX_VALUE
+            var ymin = Number.MAX_VALUE
+
+            for(var i in this.state.lasso){
+                var cur_p = this.state.lasso[i]
+                if(cur_p[0]>xmax){
+                    xmax = cur_p[0]
+                }else if(cur_p[0]<xmin){
+                    xmin = cur_p[0]
+                }
+
+                if(cur_p[1]>ymax){
+                    ymax = cur_p[1]
+                }else if(cur_p[1]<ymin){
+                    ymin = cur_p[1]
+                }
+            }
+            ret = {left: xmin, right: xmax, width: xmax-xmin, top: ymin, bottom: ymax, height: ymax-ymin}
+        
+
+            this.setState({lasso_resize_direction: direction, action: 'resize-layer', resize_layer_init_pos: this.getCurrentMouseOnBoard(e), 
+                resize_ret: ret, init_lasso: this.state.lasso.slice(0), adjust_pre_canvas: adjust_pre_canvas})
+        }else{
+            ret = JSON.parse(JSON.stringify(this.state.nonlasso_ret))
+            this.setState({lasso_resize_direction: direction, action: 'resize-layer', resize_layer_init_pos: this.getCurrentMouseOnBoard(e), 
+                resize_ret: ret, adjust_pre_canvas: adjust_pre_canvas})
+        }
+        
+    }
+
+    resizeLayerMove(e){
+        e.stopPropagation()
+        var pos = this.getCurrentMouseOnBoard(e)
+        var init_pos = this.state.resize_layer_init_pos
+        var resize_ret = this.state.resize_ret
+
+        // change what is drawn on the canvas
+        var adjust_pre_canvas = this.state.adjust_pre_canvas
+        var adjust_pre_ctx = adjust_pre_canvas.getContext('2d')
+        adjust_pre_ctx.clearRect(0,0,1000,1000)
+        
+
+        
+        if(this.state.lasso_resize_direction.indexOf('n')!=-1){
+            var scale = (resize_ret['height']-pos[1]+init_pos[1])/resize_ret['height']
+            adjust_pre_ctx.scale(1, scale)
+            adjust_pre_ctx.translate(0, this.state.resize_ret['bottom']*(1/scale-1))
+        }
+
+        if(this.state.lasso_resize_direction.indexOf('s')!=-1){
+            var scale = (resize_ret['height']+pos[1]-init_pos[1])/resize_ret['height']
+            adjust_pre_ctx.scale(1, scale)
+            adjust_pre_ctx.translate(0, this.state.resize_ret['top']*(1/scale-1))
+        }
+        if(this.state.lasso_resize_direction.indexOf('w')!=-1){
+            var scale = (resize_ret['width']-pos[0]+init_pos[0])/resize_ret['width']
+            adjust_pre_ctx.scale(scale, 1)
+            adjust_pre_ctx.translate(this.state.resize_ret['right']*(1/scale-1), 0)
+        }
+        if(this.state.lasso_resize_direction.indexOf('e')!=-1){
+            var scale = (resize_ret['width']+pos[0]-init_pos[0])/resize_ret['width']
+            adjust_pre_ctx.scale(scale, 1)
+            adjust_pre_ctx.translate(this.state.resize_ret['left']*(1/scale-1), 0)
+        }
+        adjust_pre_ctx.drawImage(this.state.lassoed_canvas, 0, 0)
+        if(this.state.lasso_resize_direction.indexOf('n')!=-1){
+            var scale = (resize_ret['height']-pos[1]+init_pos[1])/resize_ret['height']
+            adjust_pre_ctx.translate(0, -this.state.resize_ret['bottom']*(1/scale-1))
+            adjust_pre_ctx.scale(1, 1/scale);
+        }
+        if(this.state.lasso_resize_direction.indexOf('s')!=-1){
+            var scale = (resize_ret['height']+pos[1]-init_pos[1])/resize_ret['height']
+            adjust_pre_ctx.translate(0, -this.state.resize_ret['top']*(1/scale-1))
+            adjust_pre_ctx.scale(1, 1/scale);
+        }
+        if(this.state.lasso_resize_direction.indexOf('w')!=-1){
+            var scale = (resize_ret['width']-pos[0]+init_pos[0])/resize_ret['width']
+            adjust_pre_ctx.translate(-this.state.resize_ret['right']*(1/scale-1),0)
+            adjust_pre_ctx.scale(1/scale,1);
+        }
+        if(this.state.lasso_resize_direction.indexOf('e')!=-1){
+            var scale = (resize_ret['width']+pos[0]-init_pos[0])/resize_ret['width']
+            adjust_pre_ctx.translate(-this.state.resize_ret['left']*(1/scale-1),0)
+            adjust_pre_ctx.scale(1/scale,1);
+        }
+
+        adjust_pre_ctx.globalCompositeOperation='destination-over'
+        adjust_pre_ctx.drawImage(this.state.unlassoed_canvas, 0, 0)
+        adjust_pre_ctx.globalCompositeOperation='source-over'
+
+
+        var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
+        var ctx = el.getContext('2d');
+        ctx.clearRect(0,0,1000,1000)
+        ctx.drawImage(adjust_pre_canvas, 0, 0)
+
+        if(this.state.lasso.length>0){
+            // change lasso pos
+            var lasso = []
+            
+            for (i in this.state.lasso){
+                lasso.push([this.state.lasso[i][0], this.state.lasso[i][1]])
+            }
+            console.log(lasso[0][1], resize_ret)
+            if(this.state.lasso_resize_direction.indexOf('n')!=-1){
+                for(var i in lasso){
+                    var new_height = resize_ret['height']-pos[1]+init_pos[1]
+                    lasso[i][1] = resize_ret['bottom']-(new_height)/resize_ret['height']*(resize_ret['bottom']-this.state.init_lasso[i][1])
+                }
+            }
+
+            if(this.state.lasso_resize_direction.indexOf('s')!=-1){
+                for(var i in lasso){
+                    var new_height = resize_ret['height']+pos[1]-init_pos[1]
+                    lasso[i][1] = resize_ret['top']-(new_height)/resize_ret['height']*(resize_ret['top']-this.state.init_lasso[i][1])
+                }
+            }
+
+            if(this.state.lasso_resize_direction.indexOf('e')!=-1){
+                for(var i in lasso){
+                    var new_height = resize_ret['width']+pos[0]-init_pos[0]
+                    lasso[i][0] = resize_ret['left']-(new_height)/resize_ret['width']*(resize_ret['left']-this.state.init_lasso[i][0])
+                }
+            }
+
+            if(this.state.lasso_resize_direction.indexOf('w')!=-1){
+                for(var i in lasso){
+                    var new_height = resize_ret['width']-pos[0]+init_pos[0]
+                    lasso[i][0] = resize_ret['right']-(new_height)/resize_ret['width']*(resize_ret['right']-this.state.init_lasso[i][0])
+                }
+            }
+
+            this.setState({lasso:lasso})
+        }else{
+            // change ret pos
+            var ret = this.state.nonlasso_ret
+            if(this.state.lasso_resize_direction.indexOf('n')!=-1){
+                ret['height'] = resize_ret['height']-pos[1]+init_pos[1]
+                ret['top'] = resize_ret['top']+pos[1]-init_pos[1]
+            }
+            if(this.state.lasso_resize_direction.indexOf('s')!=-1){
+                ret['height'] = resize_ret['height']+pos[1]-init_pos[1]
+                ret['bottom'] = resize_ret['bottom']-pos[1]+init_pos[1]
+            }
+            if(this.state.lasso_resize_direction.indexOf('e')!=-1){
+                ret['width'] = resize_ret['width']+pos[0]-init_pos[0]
+                ret['right'] = resize_ret['right']-pos[0]+init_pos[0]
+            }
+            if(this.state.lasso_resize_direction.indexOf('w')!=-1){
+                ret['width'] = resize_ret['width']-pos[0]+init_pos[0]
+                ret['left'] = resize_ret['left']+pos[0]-init_pos[0]
+            }
+            this.setState({nonlasso_ret:ret})
+        }
+
+        
+        
+    }
+
+    resizeLayerEnd(e){
+        var pos = this.getCurrentMouseOnBoard(e)
+        var init_pos = this.state.resize_layer_init_pos
+        var resize_ret = this.state.resize_ret
+        var lassoed_canvas = document.createElement('canvas')
+        var lassoed_ctx = lassoed_canvas.getContext('2d')
+        lassoed_canvas.width = this.state.lassoed_canvas.width
+        lassoed_canvas.height = this.state.lassoed_canvas.height
+
+        if(this.state.lasso_resize_direction.indexOf('n')!=-1){
+            var scale = (resize_ret['height']-pos[1]+init_pos[1])/resize_ret['height']
+            lassoed_ctx.scale(1, scale)
+            lassoed_ctx.translate(0, this.state.resize_ret['bottom']*(1/scale-1))
+        }
+
+        if(this.state.lasso_resize_direction.indexOf('s')!=-1){
+            var scale = (resize_ret['height']+pos[1]-init_pos[1])/resize_ret['height']
+            lassoed_ctx.scale(1, scale)
+            lassoed_ctx.translate(0, this.state.resize_ret['top']*(1/scale-1))
+        }
+        if(this.state.lasso_resize_direction.indexOf('w')!=-1){
+            var scale = (resize_ret['width']-pos[0]+init_pos[0])/resize_ret['width']
+            lassoed_ctx.scale(scale, 1)
+            lassoed_ctx.translate(this.state.resize_ret['right']*(1/scale-1), 0)
+        }
+        if(this.state.lasso_resize_direction.indexOf('e')!=-1){
+            var scale = (resize_ret['width']+pos[0]-init_pos[0])/resize_ret['width']
+            lassoed_ctx.scale(scale, 1)
+            lassoed_ctx.translate(this.state.resize_ret['left']*(1/scale-1), 0)
+        }
+        lassoed_ctx.drawImage(this.state.lassoed_canvas, 0, 0)
+        if(this.state.lasso_resize_direction.indexOf('n')!=-1){
+            var scale = (resize_ret['height']-pos[1]+init_pos[1])/resize_ret['height']
+            lassoed_ctx.translate(0, -this.state.resize_ret['bottom']*(1/scale-1))
+            lassoed_ctx.scale(1, 1/scale);
+        }
+        if(this.state.lasso_resize_direction.indexOf('s')!=-1){
+            var scale = (resize_ret['height']+pos[1]-init_pos[1])/resize_ret['height']
+            lassoed_ctx.translate(0, -this.state.resize_ret['top']*(1/scale-1))
+            lassoed_ctx.scale(1, 1/scale);
+        }
+        if(this.state.lasso_resize_direction.indexOf('w')!=-1){
+            var scale = (resize_ret['width']-pos[0]+init_pos[0])/resize_ret['width']
+            lassoed_ctx.translate(-this.state.resize_ret['right']*(1/scale-1),0)
+            lassoed_ctx.scale(1/scale,1);
+        }
+        if(this.state.lasso_resize_direction.indexOf('e')!=-1){
+            var scale = (resize_ret['width']+pos[0]-init_pos[0])/resize_ret['width']
+            lassoed_ctx.translate(-this.state.resize_ret['left']*(1/scale-1),0)
+            lassoed_ctx.scale(1/scale,1);
+        }
+
+
+        if(this.state.lasso.length>0){
+            var lasso_img = document.createElement('canvas')
+            var lasso_ctx = lasso_img.getContext('2d')
+            lasso_img.width = this.state.lasso_img.width
+            lasso_img.height = this.state.lasso_img.height
+
+            if(this.state.lasso_resize_direction.indexOf('n')!=-1){
+                var scale = (resize_ret['height']-pos[1]+init_pos[1])/resize_ret['height']
+                lasso_ctx.scale(1, scale)
+                lasso_ctx.translate(0, this.state.resize_ret['bottom']*(1/scale-1))
+            }
+    
+            if(this.state.lasso_resize_direction.indexOf('s')!=-1){
+                var scale = (resize_ret['height']+pos[1]-init_pos[1])/resize_ret['height']
+                lasso_ctx.scale(1, scale)
+                lasso_ctx.translate(0, this.state.resize_ret['top']*(1/scale-1))
+            }
+            if(this.state.lasso_resize_direction.indexOf('w')!=-1){
+                var scale = (resize_ret['width']-pos[0]+init_pos[0])/resize_ret['width']
+                lasso_ctx.scale(scale, 1)
+                lasso_ctx.translate(this.state.resize_ret['right']*(1/scale-1), 0)
+            }
+            if(this.state.lasso_resize_direction.indexOf('e')!=-1){
+                var scale = (resize_ret['width']+pos[0]-init_pos[0])/resize_ret['width']
+                lasso_ctx.scale(scale, 1)
+                lasso_ctx.translate(this.state.resize_ret['left']*(1/scale-1), 0)
+            }
+            lasso_ctx.drawImage(this.state.lasso_img, 0, 0)
+            if(this.state.lasso_resize_direction.indexOf('n')!=-1){
+                var scale = (resize_ret['height']-pos[1]+init_pos[1])/resize_ret['height']
+                lasso_ctx.translate(0, -this.state.resize_ret['bottom']*(1/scale-1))
+                lasso_ctx.scale(1, 1/scale);
+            }
+            if(this.state.lasso_resize_direction.indexOf('s')!=-1){
+                var scale = (resize_ret['height']+pos[1]-init_pos[1])/resize_ret['height']
+                lasso_ctx.translate(0, -this.state.resize_ret['top']*(1/scale-1))
+                lasso_ctx.scale(1, 1/scale);
+            }
+            if(this.state.lasso_resize_direction.indexOf('w')!=-1){
+                var scale = (resize_ret['width']-pos[0]+init_pos[0])/resize_ret['width']
+                lasso_ctx.translate(-this.state.resize_ret['right']*(1/scale-1),0)
+                lasso_ctx.scale(1/scale,1);
+            }
+            if(this.state.lasso_resize_direction.indexOf('e')!=-1){
+                var scale = (resize_ret['width']+pos[0]-init_pos[0])/resize_ret['width']
+                lasso_ctx.translate(-this.state.resize_ret['left']*(1/scale-1),0)
+                lasso_ctx.scale(1/scale,1);
+            }
+
+
+            this.setState({action: 'idle', lassoed_canvas: lassoed_canvas, lasso_img:lasso_img,
+            lasso_resize_direction:undefined,resize_layer_init_pos:undefined, resize_ret:undefined, init_lasso:undefined, adjust_pre_canvas:undefined})
+        }else{
+            this.setState({action: 'idle', lassoed_canvas: lassoed_canvas,
+            lasso_resize_direction:undefined,resize_layer_init_pos:undefined, resize_ret:undefined, init_lasso:undefined, adjust_pre_canvas:undefined})
+        }
+
     }
 
     renderCanvas(){
@@ -568,7 +865,7 @@ class SketchPad extends ProtoBoard {
                         ymin = cur_p[1]
                     }
                 }
-                console.log(xmin, ymin)
+                // console.log(xmin, ymin)
                 var xcenter = (xmin+xmax)/2000*this.state.boardlength*this.state.boardzoom
                 var ycenter = (ymin+ymax)/2000*this.state.boardlength*this.state.boardzoom
                 return (<g style={{transformOrigin: xcenter+'px '+ycenter+'px', transform: 'rotate('+this.state.lasso_rot_deg+'deg)'}}>
@@ -577,29 +874,29 @@ class SketchPad extends ProtoBoard {
                      onMouseDown={this.moveLayerInit.bind(this)}>
                     </rect>
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
-                    style={{fill:'transparent', cursor:'n-resize'}}
+                    style={{fill:'transparent', cursor:'n-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'n')}
                     ></rect> 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
-                    style={{fill:'transparent', cursor:'s-resize'}}
+                    style={{fill:'transparent', cursor:'s-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 's')}
                     ></rect> 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
-                    style={{fill:'transparent', cursor:'w-resize'}}
+                    style={{fill:'transparent', cursor:'w-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'w')}
                     ></rect>
                     <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
-                    style={{fill:'transparent', cursor:'e-resize'}}
+                    style={{fill:'transparent', cursor:'e-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'e')}
                     ></rect> 
 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={10}
-                    style={{fill:'transparent', cursor:'nw-resize'}}
+                    style={{fill:'transparent', cursor:'nw-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'nw')}
                     ></rect> 
                     <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={10}
-                    style={{fill:'transparent', cursor:'ne-resize'}}
+                    style={{fill:'transparent', cursor:'ne-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'ne')}
                     ></rect> 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={10} height={10}
-                    style={{fill:'transparent', cursor:'sw-resize'}}
+                    style={{fill:'transparent', cursor:'sw-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'sw')}
                     ></rect> 
                     <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={10} height={10}
-                    style={{fill:'transparent', cursor:'se-resize'}}
+                    style={{fill:'transparent', cursor:'se-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'se')}
                     ></rect> 
 
                     <rect x={(xmax+xmin)/2000*this.state.boardlength*this.state.boardzoom-5} y={ymin/1000*this.state.boardlength*this.state.boardzoom-30} width={10} height={10}
@@ -608,12 +905,51 @@ class SketchPad extends ProtoBoard {
                 </g>)
             }else if(this.state.nonlasso_ret!=undefined){
                 var ret = this.state.nonlasso_ret
-                return (<g>
+                var xmin = ret.left
+                var xmax = ret.left+ret.width
+                var ymin = ret.top
+                var ymax = ret.top+ret.height
+                var xcenter = (xmin+xmax)/2000*this.state.boardlength*this.state.boardzoom
+                var ycenter = (ymin+ymax)/2000*this.state.boardlength*this.state.boardzoom
+                return (<g style={{transformOrigin: xcenter+'px '+ycenter+'px', transform: 'rotate('+this.state.lasso_rot_deg+'deg)'}}>
                     <rect x={ret.left/1000*this.state.boardlength*this.state.boardzoom} y={ret.top/1000*this.state.boardlength*this.state.boardzoom} width={ret.width/1000*this.state.boardlength*this.state.boardzoom} height={ret.height/1000*this.state.boardlength*this.state.boardzoom}
                      style={{fill:'transparent', stroke:'#333333', strokeDasharray:"5,5", cursor: 'move'}}
                      onMouseDown={this.moveLayerInit.bind(this)}>
-    
                     </rect>
+
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
+                     style={{fill:'transparent', stroke:'#333333', strokeDasharray:"5,5", cursor: 'move'}}
+                     onMouseDown={this.moveLayerInit.bind(this)}>
+                    </rect>
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
+                    style={{fill:'transparent', cursor:'n-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'n')}
+                    ></rect> 
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
+                    style={{fill:'transparent', cursor:'s-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 's')}
+                    ></rect> 
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
+                    style={{fill:'transparent', cursor:'w-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'w')}
+                    ></rect>
+                    <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
+                    style={{fill:'transparent', cursor:'e-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'e')}
+                    ></rect> 
+
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={10}
+                    style={{fill:'transparent', cursor:'nw-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'nw')}
+                    ></rect> 
+                    <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={10}
+                    style={{fill:'transparent', cursor:'ne-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'ne')}
+                    ></rect> 
+                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={10} height={10}
+                    style={{fill:'transparent', cursor:'sw-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'sw')}
+                    ></rect> 
+                    <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={10} height={10}
+                    style={{fill:'transparent', cursor:'se-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'se')}
+                    ></rect> 
+
+                    <rect x={(xmax+xmin)/2000*this.state.boardlength*this.state.boardzoom-5} y={ymin/1000*this.state.boardlength*this.state.boardzoom-30} width={10} height={10}
+                        style={{fill:'white', stroke:'#333333', cursor:'rotate'}} onMouseDown={this.rotateLayerInit.bind(this)}
+                    ></rect> 
                 </g>)
             }
     
@@ -734,7 +1070,7 @@ class SketchPad extends ProtoBoard {
                     console.log('first', r);
                     first = r-1;
                     ret.top = r-1;
-                    ret.height = last - first - 1;
+                    ret.height = last - first;
                     break;
                 }
             }
@@ -764,7 +1100,7 @@ class SketchPad extends ProtoBoard {
                     console.log('left', c-1);
                     left = c;
                     ret.left = c;
-                    ret.width = right - left - 1;
+                    ret.width = right - left;
                     break;
                 }
             }
