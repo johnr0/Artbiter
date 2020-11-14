@@ -2,6 +2,7 @@ import { createStore, combineReducers, compose, applyMiddleware } from 'redux';
 import ReduxThunk from 'redux-thunk'
 import { syncHistoryWithStore, routerReducer, routerMiddleware } from 'react-router-redux'
 import { browserHistory } from 'react-router'
+import { createBrowserHistory } from 'history';
 
 import * as reducers from './reducers';
 
@@ -34,6 +35,6 @@ const configureStore = (reducer, enhancer) => {
 
 const store = configureStore(reducer, enhancer);
 
-export const history = syncHistoryWithStore(baseHistory, store);
+export const history = syncHistoryWithStore(createBrowserHistory(), store);
 
 export default store;

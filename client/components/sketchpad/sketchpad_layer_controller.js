@@ -61,7 +61,7 @@ class SketchpadLayerController extends Component{
                 }
             }
             return (<div id={'sketchpad_layer_'+idx} style={{opacity: opacity, border: border, position: 'absolute', left: 1, top: top, width: '38px', height: '38px', marginBottom:'5px', backgroundColor: 'white'}} 
-                    onMouseDown={this.selectLayer.bind(this, idx)} onMouseUp={this.layerDone.bind(this)} 
+                    onPointerDown={this.selectLayer.bind(this, idx)} onPointerUp={this.layerDone.bind(this)} 
                     onDragOver={this.layerMove.bind(this)}
                     onDragEnd={this.layerDone.bind(this)}>
                 <img src={item.image} style={{width: '100%', height: '100%'}}></img>
@@ -160,16 +160,16 @@ class SketchpadLayerController extends Component{
 
     render(){
         return (<div  onWheel={this.controllerWheel.bind(this)} className='controller sketchpad_layer_controller'>
-            <div id='sketchpad_layer_controller' className='layer_box' style={{position:'relative', overflowY:'auto', height: '250px'}} onMouseMove={this.layerMove.bind(this)} onMouseUp={this.layerDone.bind(this)}
+            <div id='sketchpad_layer_controller' className='layer_box' style={{position:'relative', overflowY:'auto', height: '250px'}} onPointerMove={this.layerMove.bind(this)} onPointerUp={this.layerDone.bind(this)}
             onDragOver={this.layerMove.bind(this)}
 
             onDrop={this.layerDone.bind(this)}>
                 {this.renderLayerIcon()}
             </div>
-            <div onMouseDown={this.addNewLayer.bind(this)} style={{textAlign: 'center', fontSize: 30}}>
+            <div onPointerDown={this.addNewLayer.bind(this)} style={{textAlign: 'center', fontSize: 30}}>
                 +
             </div>
-            <div onMouseDown={this.deletelayer.bind(this)} style={{textAlign: 'center', fontSize: 30, color:(this.props.mother_state.layers.length>1)?'white':'#888888'}}>
+            <div onPointerDown={this.deletelayer.bind(this)} style={{textAlign: 'center', fontSize: 30, color:(this.props.mother_state.layers.length>1)?'white':'#888888'}}>
                 <i className="fa fa-trash"></i>
             </div>
         </div>)

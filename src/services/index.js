@@ -1,14 +1,7 @@
-'use strict';
+const users = require('./users/users.service.js');
+const boards = require('./boards/boards.service.js');
 
-const authentication = require('./authentication');
-const user = require('./user');
-const mongoose = require('mongoose');
-module.exports = function() {
-  const app = this;
-
-  mongoose.connect(app.get('mongodb'));
-  mongoose.Promise = global.Promise;
-
-  app.configure(authentication);
-  app.configure(user);
+module.exports = function (app) {
+  app.configure(users);
+  app.configure(boards);
 };

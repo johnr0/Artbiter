@@ -139,7 +139,7 @@ class MoodBoardText extends Component{
             {this.props.edit && <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#aaaaff' fill='transparent' strokeWidth='2'></rect>}
             <foreignObject x={x} y={y} width={width} height={height}>
                 <div  style={{margin: 0, height: '100%', width: '100%'}} xmlns="http://www.w3.org/1999/xhtml">
-                <textarea onMouseDown={this.nullifyMouse.bind(this)} placeholder='type something...' id={'textarea_'+this.props.text_key} onChange={this.updateText.bind(this)} value={this.props.text.text} 
+                <textarea onPointerDown={this.nullifyMouse.bind(this)} placeholder='type something...' id={'textarea_'+this.props.text_key} onChange={this.updateText.bind(this)} value={this.props.text.text} 
                 className={'moodboard_textbox '+((this.props.edit)?"":" select_disabled")} type='text' 
                 style={{margin:0, width:'100%', height: '100%', fontSize:fontSize, userSelect: (this.props.edit)?'':'none' }}></textarea>
                     </div>
@@ -151,15 +151,15 @@ class MoodBoardText extends Component{
 
             {this.props.edit && this.props.mother_state.action=='idle' &&
                 <g>
-                    <rect x={x-2} y={y-2} width={10} height={height+4} stroke='transparent' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onMouseDown={this.object_moving_init.bind(this)}></rect>
-                    <rect x={x+width-6} y={y-2} width={10} height={height+4} stroke='transparent' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onMouseDown={this.object_moving_init.bind(this)}></rect>
-                    <rect x={x-2} y={y-2} width={width+4} height={10} stroke='transparent' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onMouseDown={this.object_moving_init.bind(this)}></rect>
-                    <rect x={x-2} y={y+height-6} width={width+4} height={10} stroke='transparent' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onMouseDown={this.object_moving_init.bind(this)}></rect>
+                    <rect x={x-2} y={y-2} width={10} height={height+4} stroke='transparent' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onPointerDown={this.object_moving_init.bind(this)}></rect>
+                    <rect x={x+width-6} y={y-2} width={10} height={height+4} stroke='transparent' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onPointerDown={this.object_moving_init.bind(this)}></rect>
+                    <rect x={x-2} y={y-2} width={width+4} height={10} stroke='transparent' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onPointerDown={this.object_moving_init.bind(this)}></rect>
+                    <rect x={x-2} y={y+height-6} width={width+4} height={10} stroke='transparent' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onPointerDown={this.object_moving_init.bind(this)}></rect>
                 </g>
             }
 
             {!this.props.edit && <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='transparent' fill='transparent' strokeWidth='2'
-                onMouseDown={this.choose_text.bind(this)}></rect>}
+                onPointerDown={this.choose_text.bind(this)}></rect>}
             
         </g>)
     }

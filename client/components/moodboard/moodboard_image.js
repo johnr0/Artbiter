@@ -93,8 +93,8 @@ class MoodboardImage extends Component{
         var width = (bigx-smallx)* this.props.boardlength
         var height = (bigy-smally)* this.props.boardlength
         // console.log(this.props.art_key)
-        return (<g onMouseDown={this.test.bind(this)}>
-            <image href={this.props.art.file} x={x} y={y} width={width} height={height} onMouseDown={this.choose_image.bind(this)}></image>
+        return (<g onPointerDown={this.test.bind(this)}>
+            <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)}></image>
             {this.props.current_image.indexOf(this.props.art_key)!=-1 && <g>
             <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#aaaaff' fill='transparent' strokeWidth='2'></rect>
             {/* <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#333333' fill='transparent' strokeWidth='2'></rect>

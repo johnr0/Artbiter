@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import feathers from 'feathers-client';
+import feathers from '@feathersjs/client';
 
 class API {
   constructor() {
@@ -9,7 +9,7 @@ class API {
     // with hooks and authentication.
     this.app = feathers()
       .configure(feathers.socketio(socket))
-      .configure(feathers.hooks())
+      // .configure(feathers.hooks())
       // Use localStorage to store our login token
       .configure(feathers.authentication({
         type: 'local',
@@ -21,13 +21,36 @@ class API {
     return this.app.service(serviceName)
   }
 
+  reAuthenticate(){
+    return this.app.reAuthenticate()
+  }
+
   authenticate(user) {
     const { email, password } = user
-    return this.app.authenticate(
-      Object.assign({}, { type: 'local' }, {
-      email,
-      password,
-    }))
+    return this.app.authenticate({
+      strategy: 'local',
+      email: email,
+      password: password
+    }).then(()=>{
+      console.log('success..')
+      window.location.href = '/boardlist'
+    }).catch((err)=>{
+      alert('Incorrect Login Info')
+    })
+  }
+
+  createUser(user){
+    const { email, password } = user
+    return this.app.service('users').create({
+        email,
+        password,
+      }
+    ).then(function(){
+      alert('Please login with created account!')
+      location.reload();
+    }).catch((err)=>{
+      alert('User already exists')
+    })
   }
 
   signOut() {

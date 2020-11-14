@@ -1,19 +1,27 @@
 const path = require('path');
-const serveStatic = require('feathers').static;
 const favicon = require('serve-favicon');
 const compress = require('compression');
+const helmet = require('helmet');
 const cors = require('cors');
-const feathers = require('feathers');
-const configuration = require('feathers-configuration');
-const hooks = require('feathers-hooks');
-const rest = require('feathers-rest');
-const bodyParser = require('body-parser');
-const socketio = require('feathers-socketio');
-const middleware = require('./middleware');
-const services = require('./services');
+const logger = require('./logger');
+
+const feathers = require('@feathersjs/feathers');
+const configuration = require('@feathersjs/configuration');
+const express = require('@feathersjs/express');
+const socketio = require('@feathersjs/socketio');
 const webpack = require('webpack');
 
-const app = feathers();
+
+const middleware = require('./middleware');
+const services = require('./services');
+const appHooks = require('./app.hooks');
+const channels = require('./channels');
+
+const authentication = require('./authentication');
+
+const mongodb = require('./mongodb');
+
+const app = express(feathers());
 
 const configType = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
 const config = require(`../webpack.config.${configType}.js`);
@@ -26,19 +34,46 @@ app.use(require('webpack-dev-middleware')(compiler, {
 
 app.use(require('webpack-hot-middleware')(compiler));
 
-app.configure(configuration(path.join(__dirname, '..')));
+// Load app configuration
+app.configure(configuration());
+// Enable security, CORS, compression, favicon and body parsing
+// app.use(helmet());
+app.use(cors());
+app.use(compress());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
+// Host the public folder
+console.log(app.get('public'))
+app.use('/static/', express.static(app.get('public')+'/static'));
+app.use('/', express.static(app.get('public')));
+app.use('/boardlist', express.static(app.get('public')));
+app.use('/boards', express.static(app.get('public')));
 
-app.use(compress())
-  .options('*', cors())
-  .use(cors())
-  .use(favicon( path.join(app.get('public'), 'favicon.ico') ))
-  .use('/', serveStatic( app.get('public') ))
-  .use(bodyParser.json())
-  .use(bodyParser.urlencoded({ extended: true }))
-  .configure(hooks())
-  .configure(rest())
-  .configure(socketio())
-  .configure(services)
-  .configure(middleware);
+
+// Set up Plugins and providers
+app.configure(express.rest());
+app.configure(socketio())
+
+app.configure(mongodb);
+
+// Configure other middleware (see `middleware/index.js`)
+app.configure(middleware);
+app.configure(authentication);
+// Set up our services (see `services/index.js`)
+app.configure(services);
+// Set up event channels (see channels.js)
+app.configure(channels);
+
+// Configure a middleware for 404s and the error handler
+app.use(express.notFound());
+app.use(express.errorHandler({ logger }));
+
+app.hooks(appHooks);
+
+
+
+// console.log(app.post)
+
 
 module.exports = app;

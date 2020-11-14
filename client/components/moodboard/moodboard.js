@@ -336,6 +336,9 @@ class MoodBoard extends ProtoBoard{
     }
 
     moodBoardMouseMove(e){
+        var pos = this.getCurrentMouseOnBoard(e)
+        this.props.board_this.setMoodboardPosition(pos[0], pos[1]);
+
         if(this.state.control_state=='control_object' && this.state.action=='move_board'){
             this.moveMouse(e)
         }else if(this.state.control_state=='control_object' && this.state.action=='object_resizing'){
@@ -344,6 +347,8 @@ class MoodBoard extends ProtoBoard{
             this.object_moving(e)
         }
     }
+
+
 
     moodBoardMouseEnd(e){
         if(this.state.control_state=='control_object' && this.state.action=='move_board'){
@@ -683,19 +688,22 @@ class MoodBoard extends ProtoBoard{
         var width = (bigx-smallx)* this.state.boardlength*this.state.boardzoom
         var height = (bigy-smally)* this.state.boardlength*this.state.boardzoom
         return (<g>
-            <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#333333' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onMouseDown={this.object_moving_init.bind(this)}></rect>
+            <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#333333' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onPointerDown={this.object_moving_init.bind(this)}></rect>
             
-            <rect x={x-8} y={y+4} width={12} height={height-8} fill='transparent' strokeWidth='0' style={{cursor:'ew-resize'}} onMouseDown={this.object_resizing_init.bind(this, 'bottom-right')}></rect>
-            <rect x={x+width-4} y={y+4} width={12} height={height-8} fill='transparent' strokeWidth='0' style={{cursor:'ew-resize'}} onMouseDown={this.object_resizing_init.bind(this, 'top-left')}></rect>
-            <rect x={x+4} y={y-8} width={width-8} height={12} fill='transparent' strokeWidth='0' style={{cursor:'ns-resize'}} onMouseDown={this.object_resizing_init.bind(this, 'bottom-right')}></rect>
-            <rect x={x+4} y={y+height-4} width={width-8} height={12} fill='transparent' strokeWidth='0' style={{cursor:'ns-resize'}} onMouseDown={this.object_resizing_init.bind(this, 'top-left')}></rect>
+            <rect x={x-8} y={y+4} width={12} height={height-8} fill='transparent' strokeWidth='0' style={{cursor:'ew-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-right')}></rect>
+            <rect x={x+width-4} y={y+4} width={12} height={height-8} fill='transparent' strokeWidth='0' style={{cursor:'ew-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></rect>
+            <rect x={x+4} y={y-8} width={width-8} height={12} fill='transparent' strokeWidth='0' style={{cursor:'ns-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-right')}></rect>
+            <rect x={x+4} y={y+height-4} width={width-8} height={12} fill='transparent' strokeWidth='0' style={{cursor:'ns-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></rect>
 
-            <circle className='bottom-right' cx={x} cy={y} r='6' stroke='#333333' fill='white' style={{cursor:'nw-resize'}} onMouseDown={this.object_resizing_init.bind(this, 'bottom-right')}></circle>
-            <circle cx={x+width} cy={y} r='6' stroke='#333333' fill='white' style={{cursor:'ne-resize'}} onMouseDown={this.object_resizing_init.bind(this, 'bottom-left')}></circle>
-            <circle cx={x} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'sw-resize'}} onMouseDown={this.object_resizing_init.bind(this, 'top-right')}></circle>
-            <circle cx={x+width} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'se-resize'}} onMouseDown={this.object_resizing_init.bind(this, 'top-left')}></circle>
+            <circle className='bottom-right' cx={x} cy={y} r='6' stroke='#333333' fill='white' style={{cursor:'nw-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-right')}></circle>
+            <circle cx={x+width} cy={y} r='6' stroke='#333333' fill='white' style={{cursor:'ne-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-left')}></circle>
+            <circle cx={x} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'sw-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-right')}></circle>
+            <circle cx={x+width} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'se-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></circle>
         </g>)
     }
+
+
+    
 
     // TODO add image through url
     // TODO make the image manipulatable
@@ -719,13 +727,14 @@ class MoodBoard extends ProtoBoard{
         return (<div className='col s6 oneboard'>
             <h2>Moodboard</h2>
             <div id='moodboard' className='moodboard' onWheel={this.zoom_board_wheel.bind(this)} 
-                //onMouseOut={this.moveBoardEnd.bind(this)}
+                //onPointerOut={this.moveBoardEnd.bind(this)}
                 
                 
-                onMouseMove={this.moodBoardMouseMove.bind(this)}> 
+                onPointerMove={this.moodBoardMouseMove.bind(this)}> 
                 
-                <div className='boardrender' onMouseDown={this.moodBoardMouseInit.bind(this)} onMouseUp={this.moodBoardMouseEnd.bind(this)} 
-                
+                <div className='boardrender' onPointerDown={this.moodBoardMouseInit.bind(this)} onPointerUp={this.moodBoardMouseEnd.bind(this)} 
+                onPointerOut={this.props.board_this.setMoodboardPosition.bind(this.props.board_this, -1, -1)}
+
                 onDrop={this.dropImage.bind(this)}
                 onDragEnter={this.dropenter.bind(this)}
                 onDragLeave={this.dropout.bind(this)}
@@ -739,6 +748,7 @@ class MoodBoard extends ProtoBoard{
 
                     cursor: boardrender_cursor,
                 }}>
+                    
                     <svg width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength}>
                         {this.renderImages()}
                         {this.renderTexts()}
@@ -749,6 +759,7 @@ class MoodBoard extends ProtoBoard{
                         
                         
                     </svg>
+                    {this.props.board_this.renderCollaboratorsOnMoodBoard()}
                     
 
                 </div>
@@ -756,6 +767,7 @@ class MoodBoard extends ProtoBoard{
                 <MoodBoardMainController mother_this={this} mother_state={this.state}></MoodBoardMainController>
                 {this.state.control_state=='add_image' && this.state.action=='idle' && 
                     <MoodBoardImageAddController mother_this={this} mother_state={this.state}></MoodBoardImageAddController>}
+                
             </div>
         </div>)
     }

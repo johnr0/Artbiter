@@ -4,8 +4,39 @@
 // see http://docs.feathersjs.com/hooks/readme.html for more details
 // on hooks.
 
-exports.myHook = function(options) {
-  return function(hook) {
-    console.log('My custom global hook ran. Feathers is awesome!');
-  };
-};
+// exports.myHook = function(options) {
+//   return function(hook) {
+//     console.log('My custom global hook ran. Feathers is awesome!');
+//   };
+// };
+module.exports = {
+  before: {
+    all: [],
+    find: [],
+    get: [],
+    create: [],
+    update: [],
+    patch: [],
+    remove: []
+  },
+
+  after: {
+    all: [],
+    find: [],
+    get: [],
+    create: [],
+    update: [],
+    patch: [],
+    remove: []
+  },
+
+  error: {
+    all: [],
+    find: [],
+    get: [],
+    create: [],
+    update: [],
+    patch: [],
+    remove: []
+  }
+}; 

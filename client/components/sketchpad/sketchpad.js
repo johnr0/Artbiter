@@ -72,7 +72,7 @@ class SketchPad extends ProtoBoard {
     }
 
     getCurrentMouseOnBoard(e){
-        
+        console.log(e.pageX, e.pageY)
         var xpix = e.pageX - document.getElementById(this.state.boardname).offsetLeft
         var ypix = e.pageY - document.getElementById(this.state.boardname).offsetTop
         
@@ -117,6 +117,10 @@ class SketchPad extends ProtoBoard {
     }
 
     sketchPadMouseMove(e){
+        console.log(this.state.action)
+        var pos = this.getCurrentMouseOnBoard(e)
+        this.props.board_this.setSketchpadPosition(pos[0], pos[1]);
+
         if(this.state.control_state=='move' && this.state.action=='move_board'){
             this.moveMouse(e)
         }else if(this.state.control_state=='brush' && this.state.action=='brush'){
@@ -202,6 +206,7 @@ class SketchPad extends ProtoBoard {
 
         var brush_cur = this.getCurrentMouseOnBoard(e)
         console.log(brush_cur, this.state.brush_cur)
+
         var dist = this.distanceBetween(brush_cur, this.state.brush_cur)
         var angle = this.angleBetween(brush_cur, this.state.brush_cur)
         console.log(dist, angle)
@@ -229,6 +234,7 @@ class SketchPad extends ProtoBoard {
     }
 
     brushEnd(e){
+        // console.log('thiss?')
         var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
         var cur_image = el.toDataURL()
         var layers = this.state.layers
@@ -871,36 +877,36 @@ class SketchPad extends ProtoBoard {
                 return (<g style={{transformOrigin: xcenter+'px '+ycenter+'px', transform: 'rotate('+this.state.lasso_rot_deg+'deg)'}}>
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
                      style={{fill:'transparent', stroke:'#333333', strokeDasharray:"5,5", cursor: 'move'}}
-                     onMouseDown={this.moveLayerInit.bind(this)}>
+                     onPointerDown={this.moveLayerInit.bind(this)}>
                     </rect>
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
-                    style={{fill:'transparent', cursor:'n-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'n')}
+                    style={{fill:'transparent', cursor:'n-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'n')}
                     ></rect> 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
-                    style={{fill:'transparent', cursor:'s-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 's')}
+                    style={{fill:'transparent', cursor:'s-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 's')}
                     ></rect> 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
-                    style={{fill:'transparent', cursor:'w-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'w')}
+                    style={{fill:'transparent', cursor:'w-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'w')}
                     ></rect>
                     <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
-                    style={{fill:'transparent', cursor:'e-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'e')}
+                    style={{fill:'transparent', cursor:'e-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'e')}
                     ></rect> 
 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={10}
-                    style={{fill:'transparent', cursor:'nw-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'nw')}
+                    style={{fill:'transparent', cursor:'nw-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'nw')}
                     ></rect> 
                     <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={10}
-                    style={{fill:'transparent', cursor:'ne-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'ne')}
+                    style={{fill:'transparent', cursor:'ne-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'ne')}
                     ></rect> 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={10} height={10}
-                    style={{fill:'transparent', cursor:'sw-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'sw')}
+                    style={{fill:'transparent', cursor:'sw-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'sw')}
                     ></rect> 
                     <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={10} height={10}
-                    style={{fill:'transparent', cursor:'se-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'se')}
+                    style={{fill:'transparent', cursor:'se-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'se')}
                     ></rect> 
 
                     <rect x={(xmax+xmin)/2000*this.state.boardlength*this.state.boardzoom-5} y={ymin/1000*this.state.boardlength*this.state.boardzoom-30} width={10} height={10}
-                        style={{fill:'white', stroke:'#333333', cursor:'rotate'}} onMouseDown={this.rotateLayerInit.bind(this)}
+                        style={{fill:'white', stroke:'#333333', cursor:'rotate'}} onPointerDown={this.rotateLayerInit.bind(this)}
                     ></rect> 
                 </g>)
             }else if(this.state.nonlasso_ret!=undefined){
@@ -914,41 +920,41 @@ class SketchPad extends ProtoBoard {
                 return (<g style={{transformOrigin: xcenter+'px '+ycenter+'px', transform: 'rotate('+this.state.lasso_rot_deg+'deg)'}}>
                     <rect x={ret.left/1000*this.state.boardlength*this.state.boardzoom} y={ret.top/1000*this.state.boardlength*this.state.boardzoom} width={ret.width/1000*this.state.boardlength*this.state.boardzoom} height={ret.height/1000*this.state.boardlength*this.state.boardzoom}
                      style={{fill:'transparent', stroke:'#333333', strokeDasharray:"5,5", cursor: 'move'}}
-                     onMouseDown={this.moveLayerInit.bind(this)}>
+                     onPointerDown={this.moveLayerInit.bind(this)}>
                     </rect>
 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
                      style={{fill:'transparent', stroke:'#333333', strokeDasharray:"5,5", cursor: 'move'}}
-                     onMouseDown={this.moveLayerInit.bind(this)}>
+                     onPointerDown={this.moveLayerInit.bind(this)}>
                     </rect>
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
-                    style={{fill:'transparent', cursor:'n-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'n')}
+                    style={{fill:'transparent', cursor:'n-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'n')}
                     ></rect> 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
-                    style={{fill:'transparent', cursor:'s-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 's')}
+                    style={{fill:'transparent', cursor:'s-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 's')}
                     ></rect> 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
-                    style={{fill:'transparent', cursor:'w-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'w')}
+                    style={{fill:'transparent', cursor:'w-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'w')}
                     ></rect>
                     <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
-                    style={{fill:'transparent', cursor:'e-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'e')}
+                    style={{fill:'transparent', cursor:'e-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'e')}
                     ></rect> 
 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={10}
-                    style={{fill:'transparent', cursor:'nw-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'nw')}
+                    style={{fill:'white', cursor:'nw-resize', stroke:'#333333'}} onPointerDown={this.resizeLayerInit.bind(this, 'nw')}
                     ></rect> 
                     <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={10} height={10}
-                    style={{fill:'transparent', cursor:'ne-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'ne')}
+                    style={{fill:'white', cursor:'ne-resize',stroke:'#333333'}} onPointerDown={this.resizeLayerInit.bind(this, 'ne')}
                     ></rect> 
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={10} height={10}
-                    style={{fill:'transparent', cursor:'sw-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'sw')}
+                    style={{fill:'white', cursor:'sw-resize',stroke:'#333333'}} onPointerDown={this.resizeLayerInit.bind(this, 'sw')}
                     ></rect> 
                     <rect x={xmax/1000*this.state.boardlength*this.state.boardzoom-10} y={ymax/1000*this.state.boardlength*this.state.boardzoom-10} width={10} height={10}
-                    style={{fill:'transparent', cursor:'se-resize'}} onMouseDown={this.resizeLayerInit.bind(this, 'se')}
+                    style={{fill:'white', cursor:'se-resize',stroke:'#333333'}} onPointerDown={this.resizeLayerInit.bind(this, 'se')}
                     ></rect> 
 
                     <rect x={(xmax+xmin)/2000*this.state.boardlength*this.state.boardzoom-5} y={ymin/1000*this.state.boardlength*this.state.boardzoom-30} width={10} height={10}
-                        style={{fill:'white', stroke:'#333333', cursor:'rotate'}} onMouseDown={this.rotateLayerInit.bind(this)}
+                        style={{fill:'white', stroke:'#333333', cursor:'rotate'}} onPointerDown={this.rotateLayerInit.bind(this)}
                     ></rect> 
                 </g>)
             }
@@ -1120,10 +1126,11 @@ class SketchPad extends ProtoBoard {
         return (<div className='col s6 oneboard'>
         <h2>SketchPad</h2>
         <div id='sketchpad' className='sketchpad' onWheel={this.zoom_board_wheel.bind(this)} 
-            onMouseOut={this.moveBoardEnd.bind(this)}
-            onMouseMove={this.sketchPadMouseMove.bind(this)} onTouchMove={this.sketchPadMouseMove.bind(this)}> 
-            <div className={'boardrender'} onMouseDown={this.sketchPadMouseMoveInit.bind(this)} onMouseUp={this.sketchPadMouseMoveEnd.bind(this)} 
-                onTouchStart={this.sketchPadMouseMoveInit.bind(this)} onTouchMove={this.sketchPadMouseMoveEnd.bind(this)} 
+            onPointerOut={this.moveBoardEnd.bind(this)}
+            onPointerMove={this.sketchPadMouseMove.bind(this)}> 
+            <div className={'boardrender'} onPointerDown={this.sketchPadMouseMoveInit.bind(this)} onPointerUp={this.sketchPadMouseMoveEnd.bind(this)} 
+                onPointerOut={this.props.board_this.setSketchpadPosition.bind(this.props.board_this, -1, -1)}
+
             
             style={{
                 width:this.state.boardzoom*this.state.boardlength, 
@@ -1140,7 +1147,7 @@ class SketchPad extends ProtoBoard {
                     {this.renderAdjuster()}
                     {/* {this.renderLasso()} */}
                 </svg>
-
+                {this.props.board_this.renderCollaboratorsOnSketchpad()}
             </div>
             <SketchpadMainController mother_state={this.state} mother_this={this}></SketchpadMainController>
             <SketchpadLayerController mother_state={this.state} mother_this={this}></SketchpadLayerController>
