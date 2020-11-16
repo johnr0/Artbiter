@@ -1,3 +1,4 @@
+import { setManager } from '@feathersjs/hooks/lib'
 import React, {Component} from 'react'
 import Api from '../../middleware/api'
 import MoodBoard from '../moodboard/moodboard'
@@ -42,6 +43,7 @@ class Board extends Component{
         var _this = this
         Api.app.reAuthenticate().then((res)=>{
             var user_id = res.user['_id']
+            var user_email = res.user['email']
             Api.app.service('boards').find({query: {_id: board_id}})
             .then((res)=>{
                 if(res.length==0){
@@ -66,6 +68,7 @@ class Board extends Component{
                     current_collaborators[user_id] = {
                         sketch_pos:[-1,-1],
                         moodboard_pos: [-1, -1],
+                        active: true
                     }
                     var set = {}
                     set['current_collaborators.'+user_id] = current_collaborators[user_id]
@@ -74,8 +77,14 @@ class Board extends Component{
                     console.log(layers, arts, texts)
                     Api.app.service('boards').update(board_id, {$set: set})
                     .then((res)=>{
-                        _this.setState({current_collaborators: current_collaborators, board_id: board_id, user_id: user_id}, function(){
-                            _this.refs.sketchpad.setState({layers: layers})
+                        _this.setState({current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email}, function(){
+                            _this.refs.sketchpad.setState({layers: layers}, function(){
+                                var promises = []
+                                for(var i in layers){
+                                    promises.push(_this.loadALayer(layers[i]))
+                                }
+                                Promise.all(promises)
+                            })
                             _this.refs.moodboard.setState({arts: arts, texts:texts})
                         })
                     })
@@ -91,20 +100,250 @@ class Board extends Component{
         })
 
         Api.app.service('boards').on('updated',data=>{
-            // console.log(data)
-            
             var updated = data.updated
             if(updated.indexOf('current_collaborators')!=-1){
-                var current_collaborators = this.state.current_collaborators
+                var current_collaborators = _this.state.current_collaborators
                 current_collaborators[updated.split('.')[1]] = data.current_collaborators[updated.split('.')[1]]
-                // var moodboard_pos = data.current_collaborators[updated.split('.')[1]].moodboard_pos
-                // var sketch_pos = data.current_collaborators[updated.split('.')[1]].sketch_pos
                 this.setState({current_collaborators})
             }
-            // var current_collaborators = res[0]['current_collaborators']
+        })
+
+        Api.app.service('boards').on('patched', data=>{
+            var updated = data.updated
+            console.log(updated)
+            if(updated.indexOf('sketchpad_update_a_layer')!=-1){
+                var updated_layer_id = updated.split('.')[1]
+                var layers = _this.refs.sketchpad.state.layers
+                console.log(updated_layer_id, layers, data.layers)
+                for (var i in layers){
+                    if(layers[i].layer_id==updated_layer_id){
+                        console.log('1')
+                        for(var j in data.layers){
+                            if(data.layers[j].layer_id==updated_layer_id){
+                                console.log('2')
+                                layers[i] = data.layers[j]
+                                var el = document.getElementById('sketchpad_canvas_'+updated_layer_id)
+                                var ctx = el.getContext('2d')
+                                var temp_el = document.getElementById('temp_canvas')
+                                var temp_ctx = temp_el.getContext('2d')
+                                // 
+                                var im = new Image()
+                                im.src = data.layers[j].image
+                                im.onload=function(){
+                                    temp_ctx.drawImage(im, 0,0,1000,1000)
+                                    ctx.clearRect(0,0,1000,1000)
+                                    ctx.drawImage(im, 0,0,1000,1000)
+                                    temp_ctx.clearRect(0,0,1000,1000)
+                                }   
+                                // ctx.drawImage(data.layers[j].image, 0, 0, 1000, 1000)
+                                _this.refs.sketchpad.setState({layers: layers})
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }   
+            }else if(updated.indexOf('sketchpad_add_a_layer')!=-1 || updated.indexOf('sketchpad_remove_a_layer')!=-1){
+                var layers = data.layers
+                _this.refs.sketchpad.setState({layers})
+            }else if(updated.indexOf('sketchpad_reorder_layers')!=-1){
+                var layers = data.layers
+                var current_layer_id = _this.refs.sketchpad.state.layers[_this.refs.sketchpad.state.current_layer].layer_id
+                var current_layer = 0
+                for(var i in layers){
+                    if(layers[i].layer_id==current_layer_id){
+                        current_layer = i
+                    }
+                }
+                console.log(current_layer, layers)
+                _this.refs.sketchpad.setState({layers, current_layer})
+            }else if(updated.indexOf('moodboard_add_arts')!=-1){
+                var arts = data.arts
+                var art_ids = updated.split('.')
+                var md_arts = _this.refs.moodboard.state.arts
+                // var art = arts[art_id]
+                for(var i in art_ids){
+                    if(i==0){
+                        continue
+                    }
+                    var art = arts[art_ids[i]]
+                    md_arts[art_ids[i]]=art
+                }
+                _this.refs.moodboard.setState({arts:md_arts})
+            }else if(updated.indexOf('moodboard_update_arts_texts')!=-1){
+                var arts = data.arts
+                var texts = data.texts
+                var ids = updated.split('.')
+
+                var md_arts = _this.refs.moodboard.state.arts
+                var md_texts = _this.refs.moodboard.state.texts
+                // var art = arts[art_id]
+                for(var i in ids){
+                    if(i==0){
+                        continue
+                    }
+                    if(ids[i].indexOf('art')!=-1){
+                        var art_id = ids[i].split('_')[1]
+                        var art = arts[art_id]
+                        md_arts[art_id].position=art['position']
+                    }if(ids[i].indexOf('text')!=-1){
+                        var text_id = ids[i].split('_')[1]
+                        var text = texts[text_id]
+                        md_texts[text_id].position=text['position']
+                        md_texts[text_id].fontsize=text['fontsize']
+                        md_texts[text_id].text=text['text']
+                    }
+                    
+                }
+                _this.refs.moodboard.setState({arts:md_arts, texts:md_texts})
+            }else if(updated.indexOf('moodboard_remove_arts_texts')!=-1){
+                var arts = data.arts
+                var texts = data.texts
+                var md_arts = _this.refs.moodboard.state.arts
+                var md_texts = _this.refs.moodboard.state.texts
+                for(var key in md_arts){
+                    if(arts[key]==undefined){
+                        delete md_arts[key]
+                    }
+                }
+                for(var key in md_texts){
+                    if(texts[key]==undefined){
+                        delete md_texts[key]
+                    }
+                }
+                _this.refs.moodboard.setState({arts:md_arts, texts:md_texts})
+
+            }
+        })
+
+        window.addEventListener("beforeunload", function (e) {
+            _this.updateCollaboratorStatus(false);
+          
+            (e || window.event).returnValue = null;
+            return null;
+          });
+
+    }
+
+    loadALayer(layer){
+        var el = document.getElementById('sketchpad_canvas_'+layer.layer_id)
+        var ctx = el.getContext('2d')
+        var im = new Image()
+        im.src = layer.image
+        im.onload=function(){
+            ctx.drawImage(im, 0,0,1000,1000)
+        }  
+
+    }
+
+    updateALayerImage(layer_idx, layer_id, image){
+        var set = {}
+        set['layers.'+layer_idx+'.image'] = image
+        set['updated'] = 'sketchpad_update_a_layer.'+layer_id
+        Api.app.service('boards').patch(this.state.board_id, set)
+    }
+
+    AddALayer(layer_idx, layer){
+        var set = {}
+        set['layers.'+layer_idx] = layer
+        set['updated'] = 'sketchpad_add_a_layer'
+        Api.app.service('boards').patch(this.state.board_id, set)
+    }
+
+    RemoveALayer(layer_idx){
+        var _this = this
+        var set={}
+        set['layers.'+layer_idx] = 1
+        Api.app.service('boards').update(this.state.board_id, {$unset: set, $set:{updated:''}})
+        .then(()=>{
+            Api.app.service('boards').update(this.state.board_id, {$pull: {layers: null}})
+            .then(()=>{
+                Api.app.service('boards').patch(_this.state.board_id, {updated: 'sketchpad_remove_a_layer'})
+            })
+            
         })
     }
 
+    ReorderLayers(new_layer){
+        var _this = this
+        var patch={}
+        patch['layers']=new_layer
+        patch['updated']='sketchpad_reorder_layers'
+        Api.app.service('boards').patch(this.state.board_id, patch)
+    }
+
+    AddArts(arts, art_ids){
+        var patch = {}
+        patch['updated'] = 'moodboard_add_arts'
+        for(var i in art_ids){
+            patch['arts.'+art_ids[i]] = arts[i]
+            patch['updated'] = patch['updated']+'.'+art_ids[i]
+        }
+        
+        Api.app.service('boards').patch(this.state.board_id, {$set:patch})
+
+    }
+
+    UpdateArtsTexts(arts, art_ids, texts, text_ids){
+        var patch = {}
+        patch['updated'] = 'moodboard_update_arts_texts'
+        
+        for(var i in art_ids){
+            patch['arts.'+art_ids[i]+'.position'] = arts[i].position
+            patch['updated'] = patch['updated']+'.art_'+art_ids[i]
+        }
+        for(var i in text_ids){
+            patch['texts.'+text_ids[i]+'.position'] = texts[i].position
+            patch['texts.'+text_ids[i]+'.fontsize'] = texts[i].fontsize
+            patch['updated'] = patch['updated']+'.text_'+text_ids[i]
+        }
+        console.log(patch)
+        
+        Api.app.service('boards').patch(this.state.board_id, {$set:patch})
+
+    }
+
+
+    RemoveArtsTexts(arts, texts){
+        console.log(arts, texts)
+        var unset = {}
+        for(var i in arts){
+            unset['arts.'+arts[i]]=1
+        }
+        for(var i in texts){
+            unset['texts.'+texts[i]]=1
+        }
+        var set={}
+        set['updated'] = 'moodboard_remove_arts_texts'
+        Api.app.service('boards').patch(this.state.board_id, {$unset: unset, $set: set})
+        
+
+    }
+
+    AddAtext(){
+
+    }
+
+    UpdateAText(){
+
+    }
+
+    RemoveAText(){
+
+    }
+
+
+    updateCollaboratorStatus(tf){
+        // var pull = {}
+        // pull['current_collaborators.'+user_id] = current_collaborators[user_id]
+        
+        var set = {}
+        set['current_collaborators.'+this.state.user_id+'.active'] = tf
+        set['updated'] = 'current_collaborators.'+this.state.user_id
+        // console.log('leaaave', this.state.board_id, pull)
+        Api.app.service('boards').update(this.state.board_id, {$set: set})
+        
+    }
 
 
     gup( name, url ) {
@@ -120,10 +359,11 @@ class Board extends Component{
         // if(new Date()-this.state.lastmouseupdate>500){
             var current_collaborators = this.state.current_collaborators
             // console.log(this.state.user_id)
-            current_collaborators[this.state.user_id]['moodboard_pos'] = [x, y]
+            var now = new Date()
+            current_collaborators[this.state.user_id]['moodboard_pos'] = [x, y, now]
             var set = {}
             var _this = this
-            set['current_collaborators.'+this.state.user_id+'.moodboard_pos'] = [x, y]
+            set['current_collaborators.'+this.state.user_id+'.moodboard_pos'] = [x, y, now]
             set['updated']='current_collaborators.'+this.state.user_id
             // console.log('running?')
             Api.app.service('boards').update(this.state.board_id, {$set: set, })
@@ -136,7 +376,7 @@ class Board extends Component{
 
     renderCollaboratorsOnMoodBoard(){
         return Object.keys(this.state.current_collaborators).map((current_collaborator, idx)=>{
-            if(current_collaborator!=this.state.user_id){
+            if(current_collaborator!=this.state.user_id && this.state.current_collaborators[current_collaborator]!=undefined){
                 var moodboard_pos = this.state.current_collaborators[current_collaborator].moodboard_pos
                 // console.log(moodboard_pos)
                 if(moodboard_pos[0]>=0 && moodboard_pos[1]>=0){
@@ -159,10 +399,11 @@ class Board extends Component{
         // if(new Date()-this.state.lastmouseupdate>500){
             var current_collaborators = this.state.current_collaborators
             // console.log(this.state.user_id)
-            current_collaborators[this.state.user_id]['sketch_pos'] = [x, y]
+            var now = new Date()
+            current_collaborators[this.state.user_id]['sketch_pos'] = [x, y, now]
             var set = {}
             var _this = this
-            set['current_collaborators.'+this.state.user_id+'.sketch_pos'] = [x, y]
+            set['current_collaborators.'+this.state.user_id+'.sketch_pos'] = [x, y, now]
             set['updated']='current_collaborators.'+this.state.user_id
             // console.log('running?')
             Api.app.service('boards').update(this.state.board_id, {$set: set, })
@@ -173,15 +414,48 @@ class Board extends Component{
         
     }
 
+    renderCollaboartorStatus(){
+        return Object.keys(this.state.current_collaborators).map((col, idx)=>{
+            if(this.state.collaborator_dict[col]!=undefined||col==this.state.user_id){
+                if(this.state.current_collaborators[col].active){
+                    var name, color
+                    if(col!=this.state.user_id){
+                        name = this.state.collaborator_dict[col]['email'].split('@')[0]
+                        name = name.substring(0,3)
+                        color = this.state.collaborator_dict[col].color
+                    }else{
+                        name = this.state.user_email.split('@')[0].substring(0,3)
+                        color = 'black'
+                    }
+                    
+                    var placement_idx = idx
+                    if(idx<Object.keys(this.state.current_collaborators).indexOf(this.state.user_id)){
+                        placement_idx = placement_idx+1
+                    }else if(col==this.state.user_id){
+                        placement_idx = 0
+                    }
+
+                    var zIndex = 0
+                    if(col==this.state.user_id){
+                        zIndex= 1
+                    }
+                    
+                    return (<div key={'collaborator_indicator_'+col} style={{position:'absolute', right: placement_idx*40, border: 'solid 4px '+color, backgroundColor:'white',
+                    width: 50, height: 50, borderRadius:'50%', textAlign: 'center', lineHeight:'40px', zIndex: zIndex}}>{name}</div>)
+                }
+            }
+        })
+    }
+
     renderCollaboratorsOnSketchpad(){
         return Object.keys(this.state.current_collaborators).map((current_collaborator, idx)=>{
-            if(current_collaborator!=this.state.user_id){
+            if(current_collaborator!=this.state.user_id && this.state.current_collaborators[current_collaborator]!=undefined){
                 var sketch_pos = this.state.current_collaborators[current_collaborator].sketch_pos
                 // console.log(moodboard_pos)
                 if(sketch_pos[0]>=0 && sketch_pos[1]>=0){
                     var name = this.state.collaborator_dict[current_collaborator]['email'].split('@')[0]
                     name = name.substring(0,3)
-                    return (<div className='collaboratorCursor' style={{left: sketch_pos[0]/1000*this.refs.sketchpad.state.boardzoom*this.refs.sketchpad.state.boardlength, 
+                    return (<div key={'sketchpad_collaborator_'+current_collaborator} className='collaboratorCursor' style={{left: sketch_pos[0]/1000*this.refs.sketchpad.state.boardzoom*this.refs.sketchpad.state.boardlength, 
                         top: sketch_pos[1]/1000*this.refs.sketchpad.state.boardzoom*this.refs.sketchpad.state.boardlength, 
                         color:this.state.collaborator_dict[current_collaborator]['color']}}>
                             <span style={{fontSize:20}}><i className={"fas fa-mouse-pointer"}></i></span>
@@ -195,9 +469,14 @@ class Board extends Component{
     }
 
     render(){
-        return (<div style={{flex: 'auto', width: '100%'}} className='row'>
+        return (
+        <div id='board_whole' style={{flex: 'auto', width: '100%'}} className='row'>
+
             <SketchPad board_this={this} board_state={this.state} ref='sketchpad'></SketchPad>
             <MoodBoard board_this={this} board_state={this.state} ref='moodboard'></MoodBoard>
+            <div style={{position:'absolute', right: '10px', top: '10px'}}>
+                {this.renderCollaboartorStatus()}
+            </div>
         </div>)
     }
 }

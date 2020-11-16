@@ -46,7 +46,11 @@ class MoodBoardImageAddController extends Component {
                 position: undefined, 
                 ratio:  this.width/this.height,
             }
-            _this.props.mother_this.setState({arts:arts, action:'add_image', current_image: [id], current_text:[]})
+            Promise.all([
+                _this.props.mother_this.props.board_this.AddArts([arts[id]],[id]),
+                _this.props.mother_this.setState({arts:arts, action:'add_image', current_image: [id], current_text:[]})
+            ])
+            
             console.log('uyay', this.width, this.height)
         }
         

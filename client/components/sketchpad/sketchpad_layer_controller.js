@@ -29,12 +29,17 @@ class SketchpadLayerController extends Component{
 
         var layers = this.props.mother_state.layers
         if(layers.length>1){
-            layers.splice(this.props.mother_state.current_layer,1)
+            var remove_idx = this.props.mother_state.current_layer
+            layers.splice(remove_idx,1)
             var current_layer = this.props.mother_state.current_layer-1
             if(current_layer<0){
                 current_layer =0
             }
-            this.props.mother_this.setState({layers:layers, current_layer: current_layer})
+            Promise.all([
+                this.props.mother_this.props.board_this.RemoveALayer(remove_idx),
+                this.props.mother_this.setState({layers:layers, current_layer: current_layer})
+            ])
+            
         }
         
     }
@@ -77,12 +82,16 @@ class SketchpadLayerController extends Component{
         e.stopPropagation()
        
         var layers = this.props.mother_state.layers
+        
         layers.push({
             layer_id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15), 
             image: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
             opacity: 1,
         })
-        this.props.mother_this.setState({layers:layers})
+        Promise.all([
+            this.props.mother_this.props.board_this.AddALayer(layers.length-1, layers[layers.length-1]),
+            this.props.mother_this.setState({layers:layers})
+        ])
     }
 
     layerMove(e){
@@ -149,9 +158,13 @@ class SketchpadLayerController extends Component{
             }
             Promise.all(promises)
             var _this = this
-            this.props.mother_this.setState({layers:new_layer, current_layer: new_index}, function(){
-                _this.setState({layer_mouse_down: false, mouse_y_pos:undefined, y_init_pos:undefined})
-            })
+            Promise.all([
+                this.props.mother_this.props.board_this.ReorderLayers(new_layer),
+                // this.props.mother_this.setState({layers:new_layer, current_layer: new_index}, function(){
+                    _this.setState({layer_mouse_down: false, mouse_y_pos:undefined, y_init_pos:undefined})
+                // })
+            ])
+            
         }else{
             this.setState({layer_mouse_down: false, mouse_y_pos:undefined, y_init_pos:undefined})
         }

@@ -3,7 +3,7 @@ const onBoardUpdate = async context =>{
     context.app.service('boards').emit('changed', {
         data: context.arguments[1]
     })
-    console.log(context.app.service('boards').emit)
+    // console.log(context.app.service('boards').emit)
     return context
 }
 
@@ -24,7 +24,7 @@ module.exports = {
       find: [],
       get: [],
       create: [],
-      update: [onBoardUpdate],
+      update: [],
       patch: [],
       remove: []
     },

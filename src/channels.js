@@ -12,7 +12,7 @@ module.exports = function(app) {
     app.on('login', (authResult, { connection }) => {
       // connection can be undefined if there is no
       // real-time connection, e.g. when logging in via REST
-      console.log('isthis?', connection.user._id)
+    //   console.log('isthis?', connection.user._id)
       if(connection) {
         // Obtain the logged in user from the connection
         const user = connection.user;

@@ -1,3 +1,4 @@
+import { keys } from '@feathersjs/transport-commons/lib/channels'
 import React, {Component} from 'react'
 import ProtoBoard from '../proto/protoboard'
 import MoodboardImage from './moodboard_image'
@@ -94,21 +95,27 @@ class MoodBoard extends ProtoBoard{
     delete_object(){
         if((this.state.current_image.length>0||this.state.current_text.length>0) && this.state.control_state=='control_object' && this.state.action=='idle'){
             // this.setState({})
+            var art_ids = []
+            var text_ids = []
             var arts = this.state.arts
             for(var i in this.state.current_image){
                 var key = this.state.current_image[i]
+                art_ids.push(key)
                 delete arts[key]
             }
             var texts = this.state.texts
             for(var i in this.state.current_text){
                 var key = this.state.current_text[i]
+                
                 if(document.getElementById('textarea_'+key)!==document.activeElement){
+                    text_ids.push(key)
                     delete texts[key]
                 }else{
                     return
                 }
                 
             }
+            this.props.board_this.RemoveArtsTexts(art_ids, text_ids)
             this.setState({current_selected_pos: undefined, current_selected_ratio:undefined, current_image:[], current_text:[], arts:arts, texts: texts})
         }
     }
@@ -264,7 +271,10 @@ class MoodBoard extends ProtoBoard{
             current_image.push(id)
             console.log(current_image_pos)
             console.log('image ratio', current_selected_ratio, this.width/this.height)
-            _this.setState({arts:arts, current_image: current_image, current_text: [], current_selected_pos:current_image_pos, current_selected_ratio: current_selected_ratio})
+            Promise.all([
+                _this.props.board_this.AddArts([arts[id]],[id]),
+                _this.setState({current_image: current_image, current_text: [], current_selected_pos:current_image_pos, current_selected_ratio: current_selected_ratio})
+            ])
             // console.log('uyay', this.width, this.height)
         }
     }
@@ -336,8 +346,8 @@ class MoodBoard extends ProtoBoard{
     }
 
     moodBoardMouseMove(e){
-        var pos = this.getCurrentMouseOnBoard(e)
-        this.props.board_this.setMoodboardPosition(pos[0], pos[1]);
+        // var pos = this.getCurrentMouseOnBoard(e)
+        // this.props.board_this.setMoodboardPosition(pos[0], pos[1]);
 
         if(this.state.control_state=='control_object' && this.state.action=='move_board'){
             this.moveMouse(e)
@@ -464,7 +474,29 @@ class MoodBoard extends ProtoBoard{
     }
 
     object_moving_end(e){
+        var cur_mouse_pos = this.getCurrentMouseOnBoard(e)
+        
         e.stopPropagation()
+        
+        if(this.state.init_mouse_pos[0] != cur_mouse_pos[0] && this.state.init_mouse_pos[1]!=cur_mouse_pos[1]){
+            
+            var arts_to_push=[]
+            var art_ids_to_push = []
+            var arts = this.state.arts
+            for(var i=0; i<this.state.current_image.length; i++){
+                arts_to_push.push(arts[this.state.current_image[i]])
+                art_ids_to_push.push(this.state.current_image[i])
+            }
+            var texts_to_push=[]
+            var text_ids_to_push = []
+            var texts = this.state.texts
+            for(var i=0; i<this.state.current_text.length; i++){
+                texts_to_push.push(texts[this.state.current_text[i]])
+                text_ids_to_push.push(this.state.current_text[i])
+            }
+            this.props.board_this.UpdateArtsTexts(arts_to_push, art_ids_to_push, texts_to_push, text_ids_to_push)
+        }
+
         this.setState({action:'idle', init_mouse_pos: undefined, init_image_pos: undefined, init_text_pos: undefined, init_group_pos: undefined})
     }
 
@@ -588,6 +620,8 @@ class MoodBoard extends ProtoBoard{
     
     end_object_resizing(e){
         var arts = this.state.arts
+        var arts_to_push = []
+        var art_ids_to_push = []
         for(var i=0; i<this.state.current_image.length; i++){
             var arts_pos = arts[this.state.current_image[i]]['position']
             if(arts_pos[0]>arts_pos[2]){
@@ -604,9 +638,14 @@ class MoodBoard extends ProtoBoard{
                 
             }
             arts[this.state.current_image[i]]['position'] = arts_pos
+            arts_to_push.push(arts[this.state.current_image[i]])
+            art_ids_to_push.push(this.state.current_image[i])
+            
         }
-
+             
         var texts = this.state.texts
+        var texts_to_push = []
+        var text_ids_to_push = []
         for(var i=0; i<this.state.current_text.length; i++){
             var texts_pos = texts[this.state.current_text[i]]['position']
             console.log(texts_pos)
@@ -625,7 +664,11 @@ class MoodBoard extends ProtoBoard{
             }
             texts[this.state.current_text[i]]['position'] = texts_pos
             console.log(texts_pos, this.state.current_selected_pos)
+            texts_to_push.push(texts[this.state.current_text[i]])
+            text_ids_to_push.push(this.state.current_text[i])
         }
+
+        this.props.board_this.UpdateArtsTexts(arts_to_push, art_ids_to_push, texts_to_push, text_ids_to_push)
         var current_selected_pos =this.state.current_selected_pos.slice()
         if(current_selected_pos[0]>current_selected_pos[2]){
             var t = current_selected_pos[0]
@@ -639,7 +682,7 @@ class MoodBoard extends ProtoBoard{
         }
         console.log(current_selected_pos)
         
-        this.setState({arts: arts, texts: texts, action:'idle',current_selected_pos: current_selected_pos})
+        this.setState({texts: texts, action:'idle',current_selected_pos: current_selected_pos})
     }
 
 
@@ -733,7 +776,7 @@ class MoodBoard extends ProtoBoard{
                 onPointerMove={this.moodBoardMouseMove.bind(this)}> 
                 
                 <div className='boardrender' onPointerDown={this.moodBoardMouseInit.bind(this)} onPointerUp={this.moodBoardMouseEnd.bind(this)} 
-                onPointerOut={this.props.board_this.setMoodboardPosition.bind(this.props.board_this, -1, -1)}
+                // onPointerOut={this.props.board_this.setMoodboardPosition.bind(this.props.board_this, -1, -1)}
 
                 onDrop={this.dropImage.bind(this)}
                 onDragEnter={this.dropenter.bind(this)}
