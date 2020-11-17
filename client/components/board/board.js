@@ -100,17 +100,22 @@ class Board extends Component{
         })
 
         Api.app.service('boards').on('updated',data=>{
+            console.log(data)
             var updated = data.updated
-            if(updated.indexOf('current_collaborators')!=-1){
+            if(updated.indexOf('current_collaborators.')!=-1){
                 var current_collaborators = _this.state.current_collaborators
                 current_collaborators[updated.split('.')[1]] = data.current_collaborators[updated.split('.')[1]]
+                this.setState({current_collaborators})
+            }else if(updated.indexOf('current_collaborators_pos')!=-1){
+                var current_collaborators = _this.state.current_collaborators
+                current_collaborators[updated.split('.')[1]].pos = data.pos//.current_collaborators[updated.split('.')[1]]
                 this.setState({current_collaborators})
             }
         })
 
         Api.app.service('boards').on('patched', data=>{
             var updated = data.updated
-            console.log(updated)
+            console.log(data, updated)
             if(updated.indexOf('sketchpad_update_a_layer')!=-1){
                 var updated_layer_id = updated.split('.')[1]
                 var layers = _this.refs.sketchpad.state.layers
@@ -170,6 +175,12 @@ class Board extends Component{
                     md_arts[art_ids[i]]=art
                 }
                 _this.refs.moodboard.setState({arts:md_arts})
+            }else if(updated.indexOf('moodboard_add_texts')!=-1){
+                var texts = data.texts
+                var text_id = updated.split('.')[1]
+                var md_texts = _this.refs.moodboard.state.texts
+                md_texts[text_id] = texts[text_id]
+                _this.refs.moodboard.setState({texts:md_texts})
             }else if(updated.indexOf('moodboard_update_arts_texts')!=-1){
                 var arts = data.arts
                 var texts = data.texts
@@ -213,6 +224,12 @@ class Board extends Component{
                 }
                 _this.refs.moodboard.setState({arts:md_arts, texts:md_texts})
 
+            }else if(updated.indexOf('moodboard_edit_text')!=-1){
+                var texts = data.texts
+                var text_id = updated.split('.')[1]
+                var md_texts = _this.refs.moodboard.state.texts
+                md_texts[text_id] = texts[text_id]
+                _this.refs.moodboard.setState({texts:md_texts})
             }
         })
 
@@ -253,15 +270,19 @@ class Board extends Component{
     RemoveALayer(layer_idx){
         var _this = this
         var set={}
-        set['layers.'+layer_idx] = 1
-        Api.app.service('boards').update(this.state.board_id, {$unset: set, $set:{updated:''}})
-        .then(()=>{
-            Api.app.service('boards').update(this.state.board_id, {$pull: {layers: null}})
-            .then(()=>{
-                Api.app.service('boards').patch(_this.state.board_id, {updated: 'sketchpad_remove_a_layer'})
-            })
+        var layers = this.refs.sketchpad.state.layers.slice()
+        console.log(layers)
+        set['updated'] = 'sketchpad_remove_a_layer'
+        
+        set['layers'] = layers
+        Api.app.service('boards').patch(this.state.board_id, {$set: set})
+        // .then(()=>{
+        //     Api.app.service('boards').update(this.state.board_id, {$pull: {layers: null}})
+        //     .then(()=>{
+        //         Api.app.service('boards').patch(_this.state.board_id, {updated: 'sketchpad_remove_a_layer'})
+        //     })
             
-        })
+        // })
     }
 
     ReorderLayers(new_layer){
@@ -295,6 +316,7 @@ class Board extends Component{
         for(var i in text_ids){
             patch['texts.'+text_ids[i]+'.position'] = texts[i].position
             patch['texts.'+text_ids[i]+'.fontsize'] = texts[i].fontsize
+            patch['texts.'+text_ids[i]+'.text'] = texts[i].text
             patch['updated'] = patch['updated']+'.text_'+text_ids[i]
         }
         console.log(patch)
@@ -320,17 +342,21 @@ class Board extends Component{
 
     }
 
-    AddAtext(){
-
+    AddAText(text_id, text){
+        var patch = {}
+        patch['updated'] = 'moodboard_add_texts.'+text_id
+        patch['texts.'+text_id] = text
+        
+        Api.app.service('boards').patch(this.state.board_id, {$set:patch})
     }
 
-    UpdateAText(){
-
+    UpdateAText(text_id, new_text){
+        var patch= {}
+        patch['updated'] ='moodboard_edit_text.'+text_id
+        patch['texts.'+text_id] = new_text
+        Api.app.service('boards').patch(this.state.board_id, {$set:patch})
     }
 
-    RemoveAText(){
-
-    }
 
 
     updateCollaboratorStatus(tf){
@@ -364,7 +390,7 @@ class Board extends Component{
             var set = {}
             var _this = this
             set['current_collaborators.'+this.state.user_id+'.moodboard_pos'] = [x, y, now]
-            set['updated']='current_collaborators.'+this.state.user_id
+            set['updated']='current_collaborators_moodboard_pos.'+this.state.user_id
             // console.log('running?')
             Api.app.service('boards').update(this.state.board_id, {$set: set, })
             .then(()=>{
@@ -399,12 +425,12 @@ class Board extends Component{
         // if(new Date()-this.state.lastmouseupdate>500){
             var current_collaborators = this.state.current_collaborators
             // console.log(this.state.user_id)
-            var now = new Date()
-            current_collaborators[this.state.user_id]['sketch_pos'] = [x, y, now]
+            // var now = new Date()
+            // current_collaborators[this.state.user_id]['sketch_pos'] = [x, y]
             var set = {}
             var _this = this
-            set['current_collaborators.'+this.state.user_id+'.sketch_pos'] = [x, y, now]
-            set['updated']='current_collaborators.'+this.state.user_id
+            set['current_collaborators.'+this.state.user_id+'.sketch_pos'] = [x, y]
+            set['updated']='current_collaborators_sketch_pos.'+this.state.user_id
             // console.log('running?')
             Api.app.service('boards').update(this.state.board_id, {$set: set, })
             .then(()=>{
@@ -419,6 +445,9 @@ class Board extends Component{
             if(this.state.collaborator_dict[col]!=undefined||col==this.state.user_id){
                 if(this.state.current_collaborators[col].active){
                     var name, color
+                    if(col==this.state.user_id){
+                        return
+                    }
                     if(col!=this.state.user_id){
                         name = this.state.collaborator_dict[col]['email'].split('@')[0]
                         name = name.substring(0,3)
@@ -429,8 +458,8 @@ class Board extends Component{
                     }
                     
                     var placement_idx = idx
-                    if(idx<Object.keys(this.state.current_collaborators).indexOf(this.state.user_id)){
-                        placement_idx = placement_idx+1
+                    if(idx>Object.keys(this.state.current_collaborators).indexOf(this.state.user_id)){
+                        placement_idx = placement_idx-1
                     }else if(col==this.state.user_id){
                         placement_idx = 0
                     }

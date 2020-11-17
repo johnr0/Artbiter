@@ -10,6 +10,7 @@ class MoodBoardText extends Component{
 
         texts[this.props.text_key].text = e.target.value;
         var _this = this
+        var new_text = texts[this.props.text_key]
         this.props.mother_this.setState({texts:texts}, function(){
             // resize textbox
             console.log(_this.props.text_key)
@@ -29,6 +30,7 @@ class MoodBoardText extends Component{
             document.getElementById('textarea_'+_this.props.text_key).style.width='100%'
             // console.log(_this.state.current_selected_pos)
             _this.props.mother_this.setState({texts: texts, current_selected_pos: [smallx, smally, smallx+innerWidth, smally+innerHeight], current_selected_ratio: innerWidth/innerHeight})
+        
         })
         console.log(texts[this.props.text_key].text)
     }

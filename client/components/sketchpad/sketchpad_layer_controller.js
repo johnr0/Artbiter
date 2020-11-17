@@ -30,6 +30,7 @@ class SketchpadLayerController extends Component{
         var layers = this.props.mother_state.layers
         if(layers.length>1){
             var remove_idx = this.props.mother_state.current_layer
+            var layer_id = layers[remove_idx].layer_id
             layers.splice(remove_idx,1)
             var current_layer = this.props.mother_state.current_layer-1
             if(current_layer<0){
@@ -160,9 +161,9 @@ class SketchpadLayerController extends Component{
             var _this = this
             Promise.all([
                 this.props.mother_this.props.board_this.ReorderLayers(new_layer),
-                // this.props.mother_this.setState({layers:new_layer, current_layer: new_index}, function(){
+                this.props.mother_this.setState({layers:new_layer, current_layer: new_index}, function(){
                     _this.setState({layer_mouse_down: false, mouse_y_pos:undefined, y_init_pos:undefined})
-                // })
+                })
             ])
             
         }else{

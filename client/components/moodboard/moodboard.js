@@ -372,14 +372,27 @@ class MoodBoard extends ProtoBoard{
 
     moveBoardEnd(e){
         if(this.state.move_board_init[0]==this.state.boardcenter[0] && this.state.move_board_init[1]==this.state.boardcenter[1]){
+            var del_texts = []
+            var replace_texts = []
+            var replace_text_ids = []
             for(var i in this.state.current_text){
                 var key = this.state.current_text[i]
                 if(this.state.texts[key].text==''){
+                    del_texts.push(key)
                     delete this.state.texts[key]
+                }else{
+                    replace_text_ids.push(key)
+                    replace_texts.push(this.state.texts[key])
                 }
             }
-            this.setState({action:'idle', current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined, 
-            move_board_init: undefined, move_board_mouse_init: undefined})
+            var promises = [this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids)]
+            if(del_texts.length>0){
+                promises.push(this.props.board_this.RemoveArtsTexts([], del_texts))
+            }
+            promises.push(this.setState({action:'idle', current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined, 
+            move_board_init: undefined, move_board_mouse_init: undefined}))
+            Promise.all(promises)
+            
         }else{
             super.moveBoardEnd(e)
         }
@@ -399,11 +412,15 @@ class MoodBoard extends ProtoBoard{
             height_font_ratio: 0.02/0.023, 
         }
         texts[id] = text
-        this.setState({control_state: 'control_object', texts: texts, current_text:[id], current_image: [],
-        current_selected_pos:[pos[0], pos[1], pos[0]+0.2, pos[1]+0.023], current_selected_ratio:1/3}, function(){
-            setTimeout(function(){
-                document.getElementById('textarea_'+id).focus()}, 50);
-        })
+        Promise.all([
+            this.props.board_this.AddAText(id, text),
+            this.setState({control_state: 'control_object', texts: texts, current_text:[id], current_image: [],
+            current_selected_pos:[pos[0], pos[1], pos[0]+0.2, pos[1]+0.023], current_selected_ratio:1/3}, function(){
+                setTimeout(function(){
+                    document.getElementById('textarea_'+id).focus()}, 50);
+            })
+        ])
+        
     }
 
     add_image_init(e){
