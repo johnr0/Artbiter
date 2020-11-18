@@ -46,14 +46,22 @@ class MoodBoardText extends Component{
     }
 
     select_new_text(e){
+        
         var texts = this.props.mother_state.texts
-        var pos = texts[this.props.text_key].position.slice()
-        var ratio = texts[this.props.text_key].ratio
-        console.log(ratio)
-        var _this = this
-        this.props.mother_this.setState({current_text:[this.props.text_key], current_image:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
-            _this.props.mother_this.object_moving_init(e)
-        })
+            if(texts[this.props.text_key].choosen_by==''){
+                var pos = texts[this.props.text_key].position.slice()
+            var ratio = texts[this.props.text_key].ratio
+            console.log(ratio)
+            var _this = this
+            Promise.all([
+                this.props.mother_this.props.board_this.ChooseArtsTexts([],[this.props.text_key],this.props.mother_state.current_image.slice(0),this.props.mother_state.current_text.slice(0)),
+                this.props.mother_this.setState({current_text:[this.props.text_key], current_image:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
+                    _this.props.mother_this.object_moving_init(e)
+                })
+            ])
+            
+        }
+        
     }
 
     add_a_text(e){
@@ -98,10 +106,13 @@ class MoodBoardText extends Component{
         }
         var ratio = (pos[2]-pos[0])/(pos[3]-pos[1])
         
-        // var ratio = arts[this.props.art_key].ratio
-        this.props.mother_this.setState({current_text:current_text, current_selected_pos: pos, current_selected_ratio: ratio}, function(){
-            _this.props.mother_this.object_moving_init(e)
-        })
+        Promise.all([
+            this.props.mother_this.props.board_this.ChooseArtsTexts([],[this.props.text_key], [],[]),
+            this.props.mother_this.setState({current_text:current_text, current_selected_pos: pos, current_selected_ratio: ratio}, function(){
+                _this.props.mother_this.object_moving_init(e)
+            })
+        ])
+        
 
     }
 
@@ -137,8 +148,16 @@ class MoodBoardText extends Component{
 
         var fontSize = this.props.text.fontsize*this.props.boardlength
 
+        var color = ''
+        if(this.props.text.choosen_by==this.props.mother_this.props.board_this.state.user_id){
+            color = '#aaaaff'
+        }else if(this.props.text.choosen_by!=''){
+            color = this.props.mother_this.props.board_this.state.collaborator_dict[this.props.text.choosen_by].color
+        }
+
         return (<g >
             {this.props.edit && <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#aaaaff' fill='transparent' strokeWidth='2'></rect>}
+            {color!='' && <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>}
             <foreignObject x={x} y={y} width={width} height={height}>
                 <div  style={{margin: 0, height: '100%', width: '100%'}} xmlns="http://www.w3.org/1999/xhtml">
                 <textarea onPointerDown={this.nullifyMouse.bind(this)} placeholder='type something...' id={'textarea_'+this.props.text_key} onChange={this.updateText.bind(this)} value={this.props.text.text} 

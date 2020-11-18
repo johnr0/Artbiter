@@ -45,6 +45,7 @@ class MoodBoardImageAddController extends Component {
                 file: src,
                 position: undefined, 
                 ratio:  this.width/this.height,
+                choosen_by: _this.props.mother_this.props.board_this.state.user_id,
             }
             Promise.all([
                 _this.props.mother_this.props.board_this.AddArts([arts[id]],[id]),

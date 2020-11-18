@@ -197,10 +197,12 @@ class Board extends Component{
                         var art_id = ids[i].split('_')[1]
                         var art = arts[art_id]
                         md_arts[art_id].position=art['position']
+                        md_arts[art_id].choosen_by=art['choosen_by']
                     }if(ids[i].indexOf('text')!=-1){
                         var text_id = ids[i].split('_')[1]
                         var text = texts[text_id]
                         md_texts[text_id].position=text['position']
+                        md_texts[text_id].choosen_by=text['choosen_by']
                         md_texts[text_id].fontsize=text['fontsize']
                         md_texts[text_id].text=text['text']
                     }
@@ -230,6 +232,24 @@ class Board extends Component{
                 var md_texts = _this.refs.moodboard.state.texts
                 md_texts[text_id] = texts[text_id]
                 _this.refs.moodboard.setState({texts:md_texts})
+            }else if(updated.indexOf('moodboard_arts_texts_choosen')!=-1){
+                var arts = data.arts
+                var texts = data.texts
+                var md_arts = _this.refs.moodboard.state.arts
+                var md_texts = _this.refs.moodboard.state.texts
+                var list =updated.split('.')
+                for(var i in list){
+                    if(i==0){continue}
+                    var item = list[i]
+                    if(item.indexOf('art_')!=-1){
+                        item = item.split('_')[1]
+                        md_arts[item].choosen_by = arts[item].choosen_by
+                    }else if(item.indexOf('text_')!=-1){
+                        item = item.split('_')[1]
+                        md_texts[item].choosen_by = texts[item].choosen_by
+                    }
+                }
+                _this.refs.moodboard.setState({texts:md_texts, arts:md_arts})
             }
         })
 
@@ -320,8 +340,11 @@ class Board extends Component{
             patch['updated'] = patch['updated']+'.text_'+text_ids[i]
         }
         console.log(patch)
+        if(Object.keys(patch).length>1){
+            Api.app.service('boards').patch(this.state.board_id, {$set:patch})
+        }
         
-        Api.app.service('boards').patch(this.state.board_id, {$set:patch})
+        
 
     }
 
@@ -357,11 +380,46 @@ class Board extends Component{
         Api.app.service('boards').patch(this.state.board_id, {$set:patch})
     }
 
+    ChooseArtsTexts(art_ids, text_ids, d_art_ids, d_text_ids){
+        console.log('chooseartstexts')
+        var patch={}
+
+        patch['updated'] = 'moodboard_arts_texts_choosen'
+        var unset={}
+        for(var i in art_ids){
+            var art_id = art_ids[i]
+            patch['updated'] = patch['updated']+'.art_'+art_id
+            patch['arts.'+art_id+'.choosen_by'] = this.state.user_id   
+        }
+        for (var i in text_ids){
+            var text_id = text_ids[i]
+            patch['updated'] = patch['updated']+'.text_'+text_id
+            patch['texts.'+text_id+'.choosen_by'] = this.state.user_id
+        }
+        for(var i in d_art_ids){
+            var art_id = d_art_ids[i]
+            patch['updated'] = patch['updated']+'.art_'+art_id
+            patch['arts.'+art_id+'.choosen_by'] = ''  
+        }
+        for (var i in d_text_ids){
+            var text_id = d_text_ids[i]
+            patch['updated'] = patch['updated']+'.text_'+text_id
+            patch['texts.'+text_id+'.choosen_by'] = ''
+        }
+        console.log(patch)
+        if(Object.keys(patch).length>1){
+            Api.app.service('boards').patch(this.state.board_id, {$set:patch})
+        }   
+    }
+
+
 
 
     updateCollaboratorStatus(tf){
         // var pull = {}
         // pull['current_collaborators.'+user_id] = current_collaborators[user_id]
+        // unset everyithing that are selected
+        this.ChooseArtsTexts([],[], this.refs.moodboard.state.current_image.slice(0), this.refs.moodboard.state.current_text.slice(0))
         
         var set = {}
         set['current_collaborators.'+this.state.user_id+'.active'] = tf

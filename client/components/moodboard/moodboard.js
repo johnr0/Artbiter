@@ -21,6 +21,8 @@ class MoodBoard extends ProtoBoard{
         current_selected_pos: undefined,
         current_selected_ratio: undefined,
 
+        images_to_add: [],
+
         current_image_resize_direction: undefined, //top-left, top-right, bottom-left, bottom-right
 
         init_mouse_pos: undefined, 
@@ -147,7 +149,7 @@ class MoodBoard extends ProtoBoard{
         var pageX = e.pageX
         var pageY = e.pageY
         var current_image = []
-        this.setState({current_image:[], current_selected_pos: undefined, current_selected_ratio: undefined}, function(){
+        this.setState({current_image:[], current_text: [], current_selected_pos: undefined, current_selected_ratio: undefined}, function(){
             console.log(files)
             var counter=0
             var promises = []
@@ -156,8 +158,12 @@ class MoodBoard extends ProtoBoard{
                 var file = files[i]
                 promises.push(this.dropOneImage(file, pageX, pageY, arts, counter))
                 counter = counter+1
+                
             }
-            return Promise.all(promises)
+            // promises.push(this.addImages())
+            return Promise.all(promises).then(()=>{
+                console.log('haechi?')
+            })
         })
         
     }
@@ -170,7 +176,14 @@ class MoodBoard extends ProtoBoard{
             // console.log(file)
             var reader = new FileReader();
             reader.onload = function(){
+
+                // var images_to_add = _this.state.images_to_add
+                // images_to_add.push([reader.result, pageX, pageY, arts, counter])
+                // console.log(reader.result)
+                // _this.setState({images_to_add})
+                // return
                 _this.addAnImage(reader.result, pageX, pageY, arts, counter)
+
                 // var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
                 // var image = new Image();
                 
@@ -223,9 +236,12 @@ class MoodBoard extends ProtoBoard{
 
             }
         }
+        return
     }
 
     addAnImage(imgsrc, pageX, pageY, arts, counter){
+        // console.log(this.state.current_image, this.state.images_to_add)
+        // return
         var _this = this
         var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         var image = new Image();
@@ -244,12 +260,13 @@ class MoodBoard extends ProtoBoard{
                 file: imgsrc,
                 position: [origin[0], origin[1], cur[0], cur[1]], 
                 ratio:  this.width/this.height,
+                choosen_by: _this.props.board_this.state.user_id, 
             }
             
             var current_image = _this.state.current_image
             var current_image_pos = _this.state.current_selected_pos
             var current_selected_ratio = _this.state.current_selected_ratio
-            console.log(current_image_pos)
+            // console.log(current_image_pos)
             if(current_image_pos==undefined){
                 current_image_pos = [origin[0], origin[1], cur[0], cur[1]]
                 current_selected_ratio = Math.abs((cur[0]-origin[0])/(cur[1]-origin[1]))
@@ -275,6 +292,7 @@ class MoodBoard extends ProtoBoard{
                 _this.props.board_this.AddArts([arts[id]],[id]),
                 _this.setState({current_image: current_image, current_text: [], current_selected_pos:current_image_pos, current_selected_ratio: current_selected_ratio})
             ])
+            
             // console.log('uyay', this.width, this.height)
         }
     }
@@ -282,23 +300,27 @@ class MoodBoard extends ProtoBoard{
     pasteImages(e){
         // console.log(e.clipboardData.items)
         var _this = this
-        navigator.clipboard.read().then((items)=>{
-            console.log(items)
-            var promises = []
-            var counter = 0
-            for(var i=0; i<items.length; i++){
-                var item = items[i]
-                for (var j=0; j<item.types.length; j++){
-                    var type = item.types[j]
-                    if(type.startsWith('image/')){
-                        promises.push(_this.pasteImage(item, type, counter))
-                        counter = counter+1
+        this.setState({current_image:[], current_text: [],current_selected_pos: undefined, current_selected_ratio: undefined},function(){
+            navigator.clipboard.read().then((items)=>{
+                console.log(items)
+                var promises = []
+                var counter = 0
+                for(var i=0; i<items.length; i++){
+                    var item = items[i]
+                    for (var j=0; j<item.types.length; j++){
+                        var type = item.types[j]
+                        if(type.startsWith('image/')){
+                            promises.push(_this.pasteImage(item, type, counter))
+                            counter = counter+1
+                        }
                     }
+                    console.log(i)
                 }
-                console.log(i)
-            }
-            Promise.all(promises)
+                // promises.push(this.addImages())
+                Promise.all(promises)
+            })
         })
+        
         // var items = e.clipboardData.items
         
     }
@@ -309,6 +331,11 @@ class MoodBoard extends ProtoBoard{
             console.log(it);
             var reader = new FileReader();
             reader.onload = function(){
+
+                // var images_to_add = _this.state.images_to_add
+                // images_to_add.push([reader.result, document.getElementById(_this.state.boardname).offsetLeft,document.getElementById(_this.state.boardname).offsetTop+100, 
+                //     _this.state.arts, counter])
+                // _this.setState({images_to_add})
                 _this.addAnImage(reader.result, document.getElementById(_this.state.boardname).offsetLeft,document.getElementById(_this.state.boardname).offsetTop+100, 
                 _this.state.arts, counter)
             }
@@ -385,7 +412,10 @@ class MoodBoard extends ProtoBoard{
                     replace_texts.push(this.state.texts[key])
                 }
             }
-            var promises = [this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids)]
+            var promises = [ 
+                this.props.board_this.ChooseArtsTexts([],[],this.state.current_image.slice(0), this.state.current_text.slice(0)),
+                this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids)
+            ]
             if(del_texts.length>0){
                 promises.push(this.props.board_this.RemoveArtsTexts([], del_texts))
             }
@@ -410,6 +440,7 @@ class MoodBoard extends ProtoBoard{
             position: [pos[0], pos[1], pos[0]+0.2, pos[1]+0.023],
             ratio: 0.2/0.023,
             height_font_ratio: 0.02/0.023, 
+            choosen_by: this.props.board_this.state.user_id, 
         }
         texts[id] = text
         Promise.all([

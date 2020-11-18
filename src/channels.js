@@ -110,6 +110,7 @@ module.exports = function(app) {
               var _id = arts_texts_list[i].split('_')[1]
               data_to_return['arts'][_id] = {
                 position: data.arts[_id].position,
+                choosen_by: data.arts[_id].choosen_by,
               }
             }else if(arts_texts_list[i].indexOf('text_')!=-1){
               var _id = arts_texts_list[i].split('_')[1]
@@ -117,6 +118,7 @@ module.exports = function(app) {
                 position: data.texts[_id].position,
                 fontsize: data.texts[_id].fontsize,
                 text: data.texts[_id].text,
+                choosen_by: data.texts[_id].choosen_by,
               }
             }
           }
@@ -131,11 +133,35 @@ module.exports = function(app) {
           for(var key in data.texts){
             data_to_return.texts[key]=1
           }
-        }else if(data.updated.indexof('moodboard_edit_text')!=-1){
+        }else if(data.updated.indexOf('moodboard_edit_text')!=-1){
           data_to_return['updated'] = data.updated
           data_to_return['texts'] = {}
           data_to_return['texts'][data.updated.split('.')[1]] = data.texts[data.updated.split('.')[1]]
 
+        }else if(data.updated.indexOf('moodboard_arts_texts_choosen')!=-1){
+          console.log('here')
+          data_to_return['updated'] = data.updated
+          data_to_return['arts'] = {}
+          data_to_return['texts']={}
+          var arts_texts_list = data.updated.split('.')
+          for(var i in arts_texts_list){
+            if(i==0){
+              continue
+            }
+            if(arts_texts_list[i].indexOf('art_')!=-1){
+              var _id = arts_texts_list[i].split('_')[1]
+              // console.log(data.arts[_id])
+              data_to_return['arts'][_id] = {
+                choosen_by: data.arts[_id]['choosen_by']
+              }
+            }else if(arts_texts_list[i].indexOf('text_')!=-1){
+              var _id = arts_texts_list[i].split('_')[1]
+              data_to_return['texts'][_id] = {
+                choosen_by: data.texts[_id]['choosen_by']
+              }
+            }
+          }
+          console.log(data_to_return)
         }else if(data.updated.indexOf('current_collaborators_sketch_pos')!=-1){
           data_to_return['updated'] = data.updated
 
@@ -150,7 +176,7 @@ module.exports = function(app) {
           data_to_return = data
           
         }
-        
+        // console.log(data_to_return)
         var return_list = [app.channel(`userIds/${data.owner}`).send(data_to_return)]
         // console.log('collaborators', data.collaborators)
         for(var i in data.collaborators){
