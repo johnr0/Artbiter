@@ -14,17 +14,45 @@ class SketchpadLayerController extends Component{
     selectLayer(idx,e){
         var ypos = e.pageY
         var _this = this
-        this.props.mother_this.setState({current_layer: idx}, function(){
+        var prev_current_layer = this.props.mother_state.current_layer
+        var layers = this.props.mother_state.layers
+        var layerChanged = false
+        if(layers[idx].choosen_by!='' && layers[idx].choosen_by != this.props.mother_this.props.board_this.state.user_id){
+            console.log('reeturn')
+            return
+        }
+        if(layers[idx].choosen_by != this.props.mother_this.props.board_this.state.user_id){
+            layers[idx].choosen_by = this.props.mother_this.props.board_this.state.user_id
+            layerChanged = true
+        }
+        
+
+
+        this.props.mother_this.setState({current_layer: idx, layers: layers}, function(){
             var y_init_pos = ypos
             //10-document.getElementById('sketchpad_layer_controller').getBoundingClientRect().top+document.getElementById('sketchpad_layer_'+_this.props.mother_state.current_layer).getBoundingClientRect().top
             console.log(ypos)
-            _this.setState({layer_mouse_down: true, mouse_y_pos: ypos, y_init_pos: y_init_pos})
+            var promises = []
+            if(layerChanged){
+                if(prev_current_layer!=-1){
+                    promises.push(_this.props.mother_this.props.board_this.ChooseLayers([idx],[prev_current_layer]))
+                }else{
+                    promises.push(_this.props.mother_this.props.board_this.ChooseLayers([idx],[]))
+                }
+            }
+            promises.push(_this.setState({layer_mouse_down: true, mouse_y_pos: ypos, y_init_pos: y_init_pos, prev_current_layer: prev_current_layer}))
+            Promise.all(promises)
+
+            
             if(_this.props.mother_state.control_state=='move-layer'){
                 _this.props.mother_this.initializeMoveLayer()
             }
         })
+        
+        
     }
 
+  
     deletelayer(){
 
         var layers = this.props.mother_state.layers
@@ -47,12 +75,19 @@ class SketchpadLayerController extends Component{
 
     renderLayerIcon(){
         return this.props.mother_state.layers.map((item, idx) => {
-            var border = 'solid 2px #888888'
+            var border = 'solid 4px transparent'
             var opacity = '50%'
             // console.log(idx)
             if(idx==this.props.mother_state.current_layer){
-                border = 'solid 2px white'
+                border = 'solid 4px transparent'
                 opacity='100%'
+            }else if(item.choosen_by!=''){
+                // if(this.props.mother_this.props.borad_this!=undefined){
+                    if(this.props.mother_this.props.board_this.state.collaborator_dict[item.choosen_by]!=undefined){
+                        border = 'solid 4px '+this.props.mother_this.props.board_this.state.collaborator_dict[item.choosen_by].color
+                        opacity='80%'
+                    } 
+                // }    
             }
             var top = idx*43
             if(this.state.layer_mouse_down && this.props.mother_state.current_layer==idx){
@@ -88,6 +123,7 @@ class SketchpadLayerController extends Component{
             layer_id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15), 
             image: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
             opacity: 1,
+            choosen_by: '',
         })
         Promise.all([
             this.props.mother_this.props.board_this.AddALayer(layers.length-1, layers[layers.length-1]),
@@ -97,9 +133,9 @@ class SketchpadLayerController extends Component{
 
     layerMove(e){
         e.stopPropagation()
-        console.log('move?')
+        // console.log('move?')
         if(this.state.layer_mouse_down && this.state.mouse_y_pos!=e.pageY){
-            // console.log('move')
+            console.log('move')
             var ypos= e.pageY//-document.getElementById('sketchpad_layer_controller').getBoundingClientRect().top
             this.setState({mouse_y_pos: ypos})
         }
@@ -107,6 +143,7 @@ class SketchpadLayerController extends Component{
     }
 
     layerDone(e){
+        console.log(this.state.mouse_y_pos, this.state.y_init_pos, idx, this.props.mother_state.current_layer)
         e.stopPropagation()
         if(this.state.mouse_y_pos!=this.state.y_init_pos && this.props.mother_state.layers.length>1){
             var new_layer = []
@@ -166,9 +203,24 @@ class SketchpadLayerController extends Component{
                 })
             ])
             
-        }else{
+        }
+        else if(this.state.mouse_y_pos==this.state.y_init_pos && this.state.prev_current_layer!=-1 && this.state.prev_current_layer==this.props.mother_state.current_layer){
+            var cl = this.props.mother_state.current_layer
+            var _this = this
+            console.log('uppy')
+            Promise.all([this.props.mother_this.props.board_this.ChooseLayers([],[cl]),
+                this.setState({layer_mouse_down: false, mouse_y_pos:undefined, y_init_pos:undefined}, function(){
+                    _this.props.mother_this.setState({current_layer:-1, control_state: 'move'})
+                })
+
+        
+            ])
+            
+        }
+        else{
             this.setState({layer_mouse_down: false, mouse_y_pos:undefined, y_init_pos:undefined})
         }
+        
         
     }
 

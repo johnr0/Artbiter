@@ -28,9 +28,10 @@ class SketchPad extends ProtoBoard {
                 layer_id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
                 image: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
                 opacity: 1,
+                choosen_by:'',
             }
         ],
-        current_layer: 0,
+        current_layer: -1,
 
         lasso: [],
         lasso_img: undefined, 
@@ -158,6 +159,9 @@ class SketchPad extends ProtoBoard {
     }
 
     brushInit(e){
+        if(this.state.current_layer==-1){
+            return
+        }
         console.log(this.state.layers)
         var brush_canvas = document.createElement('canvas')
         brush_canvas.width = this.state.brush_size
@@ -248,6 +252,9 @@ class SketchPad extends ProtoBoard {
     }
 
     eraseInit(e){
+        if(this.state.current_layer==-1){
+            return
+        }
         var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
         var ctx = el.getContext('2d');
         ctx.globalCompositeOperation ='destination-out'
@@ -310,6 +317,9 @@ class SketchPad extends ProtoBoard {
 
 
     lassoInit(e){
+        if(this.state.current_layer==-1){
+            return
+        }
         var pos = this.getCurrentMouseOnBoard(e)
         console.log(pos)
         this.setState({action:'lasso', lasso:[[pos[0], pos[1]]]})
@@ -352,6 +362,9 @@ class SketchPad extends ProtoBoard {
     }
 
     moveLayerInit(e){
+        if(this.state.current_layer==-1){
+            return
+        }
         var pos = this.getCurrentMouseOnBoard(e)
         var adjust_pre_canvas = document.createElement('canvas')
         adjust_pre_canvas.width = 1000
@@ -444,6 +457,9 @@ class SketchPad extends ProtoBoard {
     }
 
     rotateLayerInit(e){
+        if(this.state.current_layer==-1){
+            return
+        }
         var adjust_pre_canvas = document.createElement('canvas')
         adjust_pre_canvas.width = 1000
         adjust_pre_canvas.height = 1000
@@ -578,6 +594,9 @@ class SketchPad extends ProtoBoard {
     }
 
     resizeLayerInit(direction, e){
+        if(this.state.current_layer==-1){
+            return
+        }
         var ret
         var adjust_pre_canvas = document.createElement('canvas')
         adjust_pre_canvas.width = 1000

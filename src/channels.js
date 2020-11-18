@@ -75,6 +75,18 @@ module.exports = function(app) {
           data_to_return['updated']=data.updated
           data_to_return['layers']=data.layers
           
+        }else if(data.updated.indexOf('sketchpad_layers_choosen')!=-1){
+          data_to_return['layers'] = []
+          data_to_return['updated']=data.updated
+          var list = data.updated.split('.')
+          for(var i in list){
+            if(i==0){continue}
+            for(var j in data.layers){
+              if(data.layers[j].layer_id==list[i]){
+                data_to_return['layers'][j]={choosen_by:data.layers[j].choosen_by}
+              }
+            }
+          }
         }else if(data.updated.indexOf('moodboard_add_arts')!=-1){
           data_to_return['arts'] = {}
           data_to_return['updated']=data.updated

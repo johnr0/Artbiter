@@ -1,4 +1,5 @@
 import { keys } from '@feathersjs/transport-commons/lib/channels'
+import { resolve } from 'path'
 import React, {Component} from 'react'
 import ProtoBoard from '../proto/protoboard'
 import MoodboardImage from './moodboard_image'
@@ -161,8 +162,9 @@ class MoodBoard extends ProtoBoard{
                 
             }
             // promises.push(this.addImages())
-            return Promise.all(promises).then(()=>{
-                console.log('haechi?')
+            return Promise.all(promises).then((value)=>{
+                console.log('haechi?', value)
+                this.addImages(_this, value)
             })
         })
         
@@ -172,74 +174,61 @@ class MoodBoard extends ProtoBoard{
         var _this=this
         if(file && file['type']){
             if(file['type'].split('/')[0]==='image'){
-            // add image...
-            // console.log(file)
-            var reader = new FileReader();
-            reader.onload = function(){
-
-                // var images_to_add = _this.state.images_to_add
-                // images_to_add.push([reader.result, pageX, pageY, arts, counter])
-                // console.log(reader.result)
-                // _this.setState({images_to_add})
-                // return
-                _this.addAnImage(reader.result, pageX, pageY, arts, counter)
-
-                // var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                // var image = new Image();
-                
-                // image.src = reader.result
-                // image.onload = function(){
-                //     var xpixo = pageX - document.getElementById(_this.state.boardname).offsetLeft+ counter*10
-                //     var ypixo = pageY - document.getElementById(_this.state.boardname).offsetTop+counter*10
-                //     var ypix = pageY - document.getElementById(_this.state.boardname).offsetTop+100+counter*10
-                //     var xpix = pageX - document.getElementById(_this.state.boardname).offsetLeft+ 100/this.height*this.width+counter*10
-                //     var cur = _this.getPositionOnBoard(xpix, ypix)
-                //     var origin = _this.getPositionOnBoard(xpixo, ypixo)
-                //     // console.log(xpixo, ypixo, xpix, ypix)
-                //     // console.log([origin[0], origin[1], cur[0], cur[1]])
-                //     arts[id]={
-                //         file: reader.result,
-                //         position: [origin[0], origin[1], cur[0], cur[1]], 
-                //         ratio:  this.width/this.height,
-                //     }
-                    
-                //     var current_image = _this.state.current_image
-                //     var current_image_pos = _this.state.current_selected_pos
-                //     var current_selected_ratio = _this.state.current_selected_ratio
-                //     console.log(current_image_pos)
-                //     if(current_image_pos==undefined){
-                //         current_image_pos = [origin[0], origin[1], cur[0], cur[1]]
-                //         current_selected_ratio = Math.abs((cur[0]-origin[0])/(cur[1]-origin[1]))
-                //     }else{
-                //         if(current_image_pos[2]<cur[0]){
-                //             current_image_pos[2]=cur[0]
-                //         }
-                //         if(current_image_pos[3]<cur[1]){
-                //             current_image_pos[3]=cur[1]
-                //         }
-                //         if(current_image_pos[0]>origin[0]){
-                //             current_image_pos[0]=origin[0]
-                //         }
-                //         if(current_image_pos[1]>origin[1]){
-                //             current_image_pos[1]=origin[1]
-                //         }
-                //         current_selected_ratio = Math.abs((current_image_pos[2]-current_image_pos[0])/(current_image_pos[3]-current_image_pos[1]))
-                //     }
-                //     current_image.push(id)
-                //     console.log(current_image_pos)
-                //     console.log('image ratio', current_selected_ratio, this.width/this.height)
-                //     _this.setState({arts:arts, current_image: current_image, current_text: [], current_selected_pos:current_image_pos, current_selected_ratio: current_selected_ratio})
-                //     // console.log('uyay', this.width, this.height)
-                // }
-            }
-            reader.readAsDataURL(file)
-
+                return new Promise((resolve, reject)=>{
+                    var reader = new FileReader();
+                    reader.onload = function(){
+                        _this.addAnImage(reader.result, pageX, pageY, arts, counter, resolve)
+                    }
+                    reader.readAsDataURL(file)
+                })    
             }
         }
         return
     }
 
-    addAnImage(imgsrc, pageX, pageY, arts, counter){
+    addImages(_this, value){
+        var add_arts = []
+        var add_art_ids = []
+        var current_image_pos = _this.state.current_selected_pos
+        var current_selected_ratio = _this.state.current_selected_ratio
+        
+        for(var i in value){
+            if(value[i]!=undefined){
+                add_art_ids.push(value[i][0])
+                add_arts.push(value[i][1])
+                var originx = value[i][1]['position'][0]
+                var originy = value[i][1]['position'][1]
+                var curx = value[i][1]['position'][2]
+                var cury = value[i][1]['position'][3]
+                if(current_image_pos==undefined){
+                    current_image_pos = [originx, originy, curx, cury]
+                    current_selected_ratio = Math.abs((curx-originx)/(cury-originy))
+                }else{
+                    if(current_image_pos[2]<curx){
+                        current_image_pos[2]=curx
+                    }
+                    if(current_image_pos[3]<cury){
+                        current_image_pos[3]=cury
+                    }
+                    if(current_image_pos[0]>originx){
+                        current_image_pos[0]=originx
+                    }
+                    if(current_image_pos[1]>originy){
+                        current_image_pos[1]=originy
+                    }
+                    current_selected_ratio = Math.abs((current_image_pos[2]-current_image_pos[0])/(current_image_pos[3]-current_image_pos[1]))
+                }
+            }
+        }
+        console.log(_this.state.current_image, current_image_pos, current_selected_ratio)
+        Promise.all([
+            _this.props.board_this.AddArts(add_arts, add_art_ids),
+            _this.setState({control_state: 'control_object', current_selected_pos: current_image_pos, current_selected_ratio})
+        ])
+
+    }
+
+    addAnImage(imgsrc, pageX, pageY, arts, counter, resolve){
         // console.log(this.state.current_image, this.state.images_to_add)
         // return
         var _this = this
@@ -262,7 +251,8 @@ class MoodBoard extends ProtoBoard{
                 ratio:  this.width/this.height,
                 choosen_by: _this.props.board_this.state.user_id, 
             }
-            
+            resolve([id, arts[id]])
+                        
             var current_image = _this.state.current_image
             var current_image_pos = _this.state.current_selected_pos
             var current_selected_ratio = _this.state.current_selected_ratio
@@ -286,12 +276,12 @@ class MoodBoard extends ProtoBoard{
                 current_selected_ratio = Math.abs((current_image_pos[2]-current_image_pos[0])/(current_image_pos[3]-current_image_pos[1]))
             }
             current_image.push(id)
-            console.log(current_image_pos)
-            console.log('image ratio', current_selected_ratio, this.width/this.height)
-            Promise.all([
-                _this.props.board_this.AddArts([arts[id]],[id]),
-                _this.setState({current_image: current_image, current_text: [], current_selected_pos:current_image_pos, current_selected_ratio: current_selected_ratio})
-            ])
+            // console.log(current_image_pos)
+            // console.log('image ratio', current_selected_ratio, this.width/this.height)
+            // Promise.all([
+            //     _this.props.board_this.AddArts([arts[id]],[id]),
+            //     _this.setState({current_image: current_image, current_text: [], current_selected_pos:current_image_pos, current_selected_ratio: current_selected_ratio})
+            // ])
             
             // console.log('uyay', this.width, this.height)
         }
@@ -317,7 +307,10 @@ class MoodBoard extends ProtoBoard{
                     console.log(i)
                 }
                 // promises.push(this.addImages())
-                Promise.all(promises)
+                return Promise.all(promises).then((value)=>{
+                    console.log('haechi?', value)
+                    this.addImages(_this, value)
+                })
             })
         })
         
@@ -327,20 +320,16 @@ class MoodBoard extends ProtoBoard{
 
     pasteImage(item, type, counter){ 
         var _this = this
-        item.getType(type).then((it)=>{
-            console.log(it);
-            var reader = new FileReader();
-            reader.onload = function(){
-
-                // var images_to_add = _this.state.images_to_add
-                // images_to_add.push([reader.result, document.getElementById(_this.state.boardname).offsetLeft,document.getElementById(_this.state.boardname).offsetTop+100, 
-                //     _this.state.arts, counter])
-                // _this.setState({images_to_add})
-                _this.addAnImage(reader.result, document.getElementById(_this.state.boardname).offsetLeft,document.getElementById(_this.state.boardname).offsetTop+100, 
-                _this.state.arts, counter)
-            }
-            reader.readAsDataURL(it)
+        return new Promise((resolve, reject)=>{
+            item.getType(type).then((it)=>{
             
+                var reader = new FileReader();
+                reader.onload = function(){
+                    _this.addAnImage(reader.result, document.getElementById(_this.state.boardname).offsetLeft,document.getElementById(_this.state.boardname).offsetTop+100,
+                    _this.state.arts, counter, resolve)
+                }
+                reader.readAsDataURL(it)
+            })    
         })
         
     }

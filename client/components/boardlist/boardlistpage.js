@@ -110,6 +110,7 @@ class BoardListPage extends Component{
                 layer_id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
                 image: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
                 opacity: 1,
+                choosen_by: '',
             }
         ]
         var _id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)

@@ -4,11 +4,13 @@ import SketchpadEraserController from './sketchpad_eraser_controller'
 
 class SketchpadMainController extends Component{
     changeControlState(control_state){
-        console.log(control_state)
-        if(control_state=='move-layer'){
-            this.props.mother_this.initializeMoveLayer();
-        }
-        this.props.mother_this.setState({control_state: control_state})
+        if(this.props.mother_state.current_layer!=-1){
+            console.log(control_state)
+            if(control_state=='move-layer'){
+                this.props.mother_this.initializeMoveLayer();
+            }
+            this.props.mother_this.setState({control_state: control_state})
+        } 
     }
 
     render(){

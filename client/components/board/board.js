@@ -153,15 +153,35 @@ class Board extends Component{
                 _this.refs.sketchpad.setState({layers})
             }else if(updated.indexOf('sketchpad_reorder_layers')!=-1){
                 var layers = data.layers
-                var current_layer_id = _this.refs.sketchpad.state.layers[_this.refs.sketchpad.state.current_layer].layer_id
+                var current_layer_id=undefined
+                if(_this.refs.sketchpad.state.current_layer!=-1){
+                    current_layer_id = _this.refs.sketchpad.state.layers[_this.refs.sketchpad.state.current_layer].layer_id
+                }
                 var current_layer = 0
                 for(var i in layers){
                     if(layers[i].layer_id==current_layer_id){
                         current_layer = i
                     }
                 }
+                if(current_layer_id==undefined){
+                    current_layer = -1
+                }
                 console.log(current_layer, layers)
                 _this.refs.sketchpad.setState({layers, current_layer})
+            }else if(updated.indexOf('sketchpad_layers_choosen')!=-1){
+                var list = updated.split('.')
+                var layers = _this.refs.sketchpad.state.layers
+                for(var i in list){
+                    if(i==0){continue}
+                    var layer_id = list[i]
+                    for(var j in layers){
+                        if(layers[j].layer_id==layer_id){
+                            layers[j].choosen_by = data.layers[j].choosen_by
+                        }
+                    }
+                }
+                _this.refs.sketchpad.setState({layers})
+
             }else if(updated.indexOf('moodboard_add_arts')!=-1){
                 var arts = data.arts
                 var art_ids = updated.split('.')
@@ -412,6 +432,24 @@ class Board extends Component{
         }   
     }
 
+    ChooseLayers(layer_idxs, d_layer_idxs){
+        var patch={}
+        patch['updated'] = 'sketchpad_layers_choosen'
+        var layers = this.refs.sketchpad.state.layers.slice()
+        for(var i in layer_idxs){
+            var layer_idx = layer_idxs[i]
+            patch['updated'] = patch['updated']+'.'+layers[layer_idx].layer_id
+            patch['layers.'+layer_idx+'.choosen_by']=this.state.user_id
+        }
+        for(var i in d_layer_idxs){
+            var layer_idx = d_layer_idxs[i]
+            patch['updated'] = patch['updated']+'.'+layers[layer_idx].layer_id
+            patch['layers.'+layer_idx+'.choosen_by']=''
+        }
+        if(Object.keys(patch).length>1){
+            Api.app.service('boards').patch(this.state.board_id, {$set:patch})
+        }   
+    }
 
 
 
@@ -420,6 +458,9 @@ class Board extends Component{
         // pull['current_collaborators.'+user_id] = current_collaborators[user_id]
         // unset everyithing that are selected
         this.ChooseArtsTexts([],[], this.refs.moodboard.state.current_image.slice(0), this.refs.moodboard.state.current_text.slice(0))
+        if(this.refs.sketchpad.state.current_layer!=-1){
+            this.ChooseLayers([],[this.refs.sketchpad.state.current_layer])
+        }
         
         var set = {}
         set['current_collaborators.'+this.state.user_id+'.active'] = tf
