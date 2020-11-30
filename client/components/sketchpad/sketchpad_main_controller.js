@@ -9,6 +9,17 @@ class SketchpadMainController extends Component{
             if(control_state=='move-layer'){
                 this.props.mother_this.initializeMoveLayer();
             }
+            if(control_state=='content-stamp'){
+
+                this.props.mother_this.props.board_this.refs.moodboard.setState({control_state:'content-stamp'})
+                var moodboard_state = this.props.mother_this.props.board_this.refs.moodboard.state
+                if(moodboard_state.current_image.length>1 || moodboard_state.current_text.length>0){
+                    this.props.mother_this.props.board_this.refs.moodboard.deSelect();
+                }
+            }
+            if(this.props.mother_state.control_state=='content-stamp'){
+                this.props.mother_this.props.board_this.refs.moodboard.setState({control_state:'control_object'})
+            }
             this.props.mother_this.setState({control_state: control_state})
         } 
     }
@@ -36,6 +47,11 @@ class SketchpadMainController extends Component{
                 <span className="iconify" data-icon="mdi-lasso" data-inline="false"></span>
                 {/* < style={{width: '38px', height: '38px', border: (this.props.mother_state.control_state=='area')?'dashed 4px white':'dashed 4px #888888'}}></div> */}
    
+            </div>
+            <div  className='controller_button' style={{color: (this.props.mother_state.control_state=='content-stamp')?'white':'#888888'}}
+                onClick={this.changeControlState.bind(this, 'content-stamp')}>
+                <i style={{fontSize:'25px', verticalAlign:'bottom'}} className='controller_button_icon fa fa-stamp'></i>
+                <span style={{fontSize:'20px'}}>C</span>
             </div>
             {/* <div  className='controller_button' style={{color: (this.props.mother_state.control_state=='copy_content')?'white':'#888888'}}>
                 <i className='controller_button_icon fa fa-stamp'></i>

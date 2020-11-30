@@ -109,7 +109,7 @@ h1, h2, h3, h4, h5, h6{
 .sketchpad_main_controller{
     position: absolute;
     width: 50px; 
-    height: 230px;
+    height: 270px;
     
     left: 10px;
     top: 10px;
@@ -216,4 +216,11 @@ input[type=range][orient=vertical]
     position: absolute;
     /* background-color: black; */
     pointer-events: none;
+}
+
+.undo_controller{
+    position: absolute;
+    right: 70px;
+    top: 10px;
+    cursor: pointer;
 }

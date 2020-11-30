@@ -13,7 +13,7 @@ class MoodBoard extends ProtoBoard{
         boardname:'moodboard',
 
         control_state: 'control_object',
-        //control_state --> move_board, add_image, add_comment, add_text, control_object
+        //control_state --> move_board, add_image, add_comment, add_text, control_object, content-stamp, style-stamp
         // action --> move_board: idle, move_board
         //            add_image: idle, 
         //            control_object: idle, image_selected, object_resizing, object_moving, text_selected, objects_selected
@@ -142,6 +142,9 @@ class MoodBoard extends ProtoBoard{
     dropImage(e){
         e.stopPropagation();
         e.preventDefault();
+        if(this.state.control_state=='content-stamp'){
+            return  
+        }
         
         var files = e.dataTransfer.files
         var arts = this.state.arts
@@ -150,6 +153,7 @@ class MoodBoard extends ProtoBoard{
         var pageX = e.pageX
         var pageY = e.pageY
         var current_image = []
+        this.props.board_this.ChooseArtsTexts([],[], this.state.current_image.slice(0), this.state.current_text.slice(0))
         this.setState({current_image:[], current_text: [], current_selected_pos: undefined, current_selected_ratio: undefined}, function(){
             console.log(files)
             var counter=0
@@ -352,7 +356,7 @@ class MoodBoard extends ProtoBoard{
     }
 
     moodBoardMouseInit(e){
-        if(this.state.control_state=='control_object' && this.state.action=='idle'){
+        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp') && this.state.action=='idle'){
             this.moveBoardInit(e)
         }else if(this.state.control_state=='add_image' && this.state.action=='add_image'){
             this.add_image_init(e)
@@ -365,7 +369,7 @@ class MoodBoard extends ProtoBoard{
         // var pos = this.getCurrentMouseOnBoard(e)
         // this.props.board_this.setMoodboardPosition(pos[0], pos[1]);
 
-        if(this.state.control_state=='control_object' && this.state.action=='move_board'){
+        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp') && this.state.action=='move_board'){
             this.moveMouse(e)
         }else if(this.state.control_state=='control_object' && this.state.action=='object_resizing'){
             this.object_resizing(e)
@@ -377,7 +381,7 @@ class MoodBoard extends ProtoBoard{
 
 
     moodBoardMouseEnd(e){
-        if(this.state.control_state=='control_object' && this.state.action=='move_board'){
+        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp') && this.state.action=='move_board'){
             this.moveBoardEnd(e)
         }else if(this.state.control_state=='control_object' && this.state.action=='object_resizing'){
             this.end_object_resizing(e)
@@ -388,33 +392,37 @@ class MoodBoard extends ProtoBoard{
 
     moveBoardEnd(e){
         if(this.state.move_board_init[0]==this.state.boardcenter[0] && this.state.move_board_init[1]==this.state.boardcenter[1]){
-            var del_texts = []
-            var replace_texts = []
-            var replace_text_ids = []
-            for(var i in this.state.current_text){
-                var key = this.state.current_text[i]
-                if(this.state.texts[key].text==''){
-                    del_texts.push(key)
-                    delete this.state.texts[key]
-                }else{
-                    replace_text_ids.push(key)
-                    replace_texts.push(this.state.texts[key])
-                }
-            }
-            var promises = [ 
-                this.props.board_this.ChooseArtsTexts([],[],this.state.current_image.slice(0), this.state.current_text.slice(0)),
-                this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids)
-            ]
-            if(del_texts.length>0){
-                promises.push(this.props.board_this.RemoveArtsTexts([], del_texts))
-            }
-            promises.push(this.setState({action:'idle', current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined, 
-            move_board_init: undefined, move_board_mouse_init: undefined}))
-            Promise.all(promises)
+            this.deSelect()
             
         }else{
             super.moveBoardEnd(e)
         }
+    }
+
+    deSelect(){
+        var del_texts = []
+        var replace_texts = []
+        var replace_text_ids = []
+        for(var i in this.state.current_text){
+            var key = this.state.current_text[i]
+            if(this.state.texts[key].text==''){
+                del_texts.push(key)
+                delete this.state.texts[key]
+            }else{
+                replace_text_ids.push(key)
+                replace_texts.push(this.state.texts[key])
+            }
+        }
+        var promises = [ 
+            this.props.board_this.ChooseArtsTexts([],[],this.state.current_image.slice(0), this.state.current_text.slice(0)),
+            this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids)
+        ]
+        if(del_texts.length>0){
+            promises.push(this.props.board_this.RemoveArtsTexts([], del_texts))
+        }
+        promises.push(this.setState({action:'idle', current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined, 
+        move_board_init: undefined, move_board_mouse_init: undefined}))
+        Promise.all(promises)
     }
 
     add_text_init(e){

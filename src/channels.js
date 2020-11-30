@@ -70,10 +70,12 @@ module.exports = function(app) {
               data_to_return['layers'].push(data.layers[i])
             }
           }
-          
+          data_to_return['sketchundo'] = data.sketchundo[data.sketchundo.length-1]
+           
         }else if(data.updated.indexOf('sketchpad_remove_a_layer')!=-1 || data.updated.indexOf('sketchpad_add_a_layer')!=-1 || data.updated.indexOf('sketchpad_reorder_layers')!=-1){
           data_to_return['updated']=data.updated
           data_to_return['layers']=data.layers
+          data_to_return['sketchundo'] = data.sketchundo[data.sketchundo.length-1]
           
         }else if(data.updated.indexOf('sketchpad_layers_choosen')!=-1){
           data_to_return['layers'] = []
@@ -87,6 +89,20 @@ module.exports = function(app) {
               }
             }
           }
+        }else if(data.updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
+          data_to_return['updated']=data.updated
+          data_to_return['layers'] = []
+          for(var i in data.layers){
+            if(data.layers[i].layer_id==data.updated.split('.')[1]){
+              data_to_return['layers'].push(data.layers[i])
+            }
+          }
+
+        }else if(data.updated.indexOf('sketchpad_undo_add_a_layer')!=-1){
+          data_to_return['updated']=data.updated
+        }else if(data.updated.indexOf('sketchpad_undo_remove_a_layer')!=-1 || data.updated.indexOf('sketchpad_undo_reorder_a_layer')!=-1){
+          data_to_return['updated']=data.updated
+          data_to_return['layers']=data.layers
         }else if(data.updated.indexOf('moodboard_add_arts')!=-1){
           data_to_return['arts'] = {}
           data_to_return['updated']=data.updated
@@ -184,6 +200,8 @@ module.exports = function(app) {
           console.log(data.current_collaborators[data.updated.split('.')[1]].moodboard_pos)
           data_to_return['pos'] = data.current_collaborators[data.updated.split('.')[1]].moodboard_pos
         
+        }else if(data.updated=='sketchpad_undoupdate'){
+          data_to_return['updated']=data.updated
         }else{
           data_to_return = data
           

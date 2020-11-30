@@ -4,32 +4,35 @@ import React, {Component} from 'react'
 class MoodBoardMainController extends Component{
 
     changeControlState(control_state){
-        console.log(control_state)
-        if(control_state!='control_object'){
-            var promises = [this.props.mother_this.props.board_this.ChooseArtsTexts([],[],this.props.mother_state.current_image.slice(0), this.props.mother_state.current_text.slice(0))]
-            
-            var del_texts = []
-            var replace_texts = []
-            var replace_text_ids = []
-            for(var i in this.props.mother_state.current_text){
-                var key = this.props.mother_state.current_text[i]
-                if(this.props.mother_state.texts[key].text==''){
-                    del_texts.push(key)
-                    delete this.props.mother_state.texts[key]
-                }else{
-                    replace_text_ids.push(key)
-                    replace_texts.push(this.props.mother_state.texts[key])
+        if(this.props.mother_state.control_state!='content-stamp'){
+            console.log(control_state)
+            if(control_state!='control_object'){
+                var promises = [this.props.mother_this.props.board_this.ChooseArtsTexts([],[],this.props.mother_state.current_image.slice(0), this.props.mother_state.current_text.slice(0))]
+                
+                var del_texts = []
+                var replace_texts = []
+                var replace_text_ids = []
+                for(var i in this.props.mother_state.current_text){
+                    var key = this.props.mother_state.current_text[i]
+                    if(this.props.mother_state.texts[key].text==''){
+                        del_texts.push(key)
+                        delete this.props.mother_state.texts[key]
+                    }else{
+                        replace_text_ids.push(key)
+                        replace_texts.push(this.props.mother_state.texts[key])
+                    }
                 }
+                promises.push(this.props.mother_this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids))
+                if(del_texts.length>0){
+                    promises.push(this.props.mother_this.props.board_this.RemoveArtsTexts([], del_texts))
+                }
+                promises.push(this.props.mother_this.setState({current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined}))
+                Promise.all(promises)
+                
             }
-            promises.push(this.props.mother_this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids))
-            if(del_texts.length>0){
-                promises.push(this.props.mother_this.props.board_this.RemoveArtsTexts([], del_texts))
-            }
-            promises.push(this.props.mother_this.setState({current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined}))
-            Promise.all(promises)
-            
+            this.props.mother_this.setState({control_state: control_state})
         }
-        this.props.mother_this.setState({control_state: control_state})
+        
 
     }
 

@@ -3,13 +3,14 @@ import ProtoBoard from '../proto/protoboard'
 import SketchpadCanvas from './sketchpad_canvas'
 import SketchpadLayerController from './sketchpad_layer_controller'
 import SketchpadMainController from './sketchpad_main_controller'
+import SketchpadUndo from './sketchpad_undo'
 
 class SketchPad extends ProtoBoard {
     state = {
         ...this.state,
         boardname:'sketchpad',
         control_state: 'move',
-        //control_state --> area, move, brush, erase, comment, copy_content, copy_style
+        //control_state --> area, move, brush, erase, content_stamp, style_stamp
         // action --> move: idle, move_board
         //            brush: idle, brush
 
@@ -31,6 +32,8 @@ class SketchPad extends ProtoBoard {
                 choosen_by:'',
             }
         ],
+
+        sketchundo: [],
         current_layer: -1,
 
         lasso: [],
@@ -114,6 +117,8 @@ class SketchPad extends ProtoBoard {
             this.setState({action:'idle'})
         }else if(this.state.control_state=='area' && this.state.action=='idle'){
             this.lassoInit(e)
+        }else if(this.state.control_state=='content-stamp' && this.state.action=='idle' && this.props.board_this.refs.moodboard.state.current_image.length==1){
+            this.contentStampInit(e)
         }
     }
 
@@ -185,11 +190,12 @@ class SketchPad extends ProtoBoard {
         cur_colored_brush_img.src = brush_canvas.toDataURL();
 
         var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
+        var cur_image = el.toDataURL()
         var ctx = el.getContext('2d');
         ctx.lineJoin = ctx.lineCap = 'round'
         
         console.log(this.state.brush_img)
-        this.setState({action:'brush', brush_cur:this.getCurrentMouseOnBoard(e), cur_colored_brush_img: cur_colored_brush_img, brush_pre_canvas:brush_pre_canvas})
+        this.setState({action:'brush', brush_cur:this.getCurrentMouseOnBoard(e), cur_colored_brush_img: cur_colored_brush_img, brush_pre_canvas:brush_pre_canvas, origin_image: cur_image})
        
     }
 
@@ -243,7 +249,7 @@ class SketchPad extends ProtoBoard {
         var cur_image = el.toDataURL()
         var layers = this.state.layers
         // layers[this.state.current_layer]['image'] = cur_image
-        this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image)
+        this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image, this.state.origin_image)
         this.setState({action:'idle', brush_cur:undefined, cur_colored_brush_img: undefined, brush_pre_canvas: undefined})
         // Promise.all([this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image), 
         //     this.setState({action:'idle', brush_cur:undefined, cur_colored_brush_img: undefined, brush_pre_canvas: undefined})
@@ -257,6 +263,7 @@ class SketchPad extends ProtoBoard {
         }
         var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
         var ctx = el.getContext('2d');
+        var cur_image = el.toDataURL()
         ctx.globalCompositeOperation ='destination-out'
         ctx.lineWidth = this.state.erase_size
         ctx.beginPath();
@@ -270,7 +277,7 @@ class SketchPad extends ProtoBoard {
         brush_pre_canvas_ctx.lineWidth = this.state.erase_size
 
 
-        this.setState({action:'erase', brush_cur: brush_cur, brush_pre_canvas: brush_pre_canvas})
+        this.setState({action:'erase', brush_cur: brush_cur, brush_pre_canvas: brush_pre_canvas, origin_image: cur_image})
         
     }
 
@@ -311,7 +318,7 @@ class SketchPad extends ProtoBoard {
         var cur_image = el.toDataURL()
         var layers = this.state.layers
         // layers[this.state.current_layer]['image'] = cur_image
-        this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image)
+        this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image, this.state.origin_image)
         this.setState({action:'idle', brush_cur: undefined, brush_pre_canvas:undefined})
     }
 
@@ -370,12 +377,15 @@ class SketchPad extends ProtoBoard {
         adjust_pre_canvas.width = 1000
         adjust_pre_canvas.height = 1000
 
+        var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
+        var cur_image = el.toDataURL()
+
         // adjust_pre_canvas.getContext('2d') = 
         if(this.state.lasso.length>0){
-            this.setState({action:'move-layer', move_layer_init_pos: pos, adjust_pre_canvas: adjust_pre_canvas, init_lasso:this.state.lasso.slice(0)})
+            this.setState({action:'move-layer', move_layer_init_pos: pos, adjust_pre_canvas: adjust_pre_canvas, init_lasso:this.state.lasso.slice(0), origin_image: cur_image})
         }else{
             console.log(JSON.parse(JSON.stringify(this.state.nonlasso_ret)))
-            this.setState({action:'move-layer', move_layer_init_pos: pos, adjust_pre_canvas: adjust_pre_canvas, init_nonlasso_ret:JSON.parse(JSON.stringify(this.state.nonlasso_ret))})
+            this.setState({action:'move-layer', move_layer_init_pos: pos, adjust_pre_canvas: adjust_pre_canvas, init_nonlasso_ret:JSON.parse(JSON.stringify(this.state.nonlasso_ret)), origin_image: cur_image})
         }
         
         
@@ -444,10 +454,10 @@ class SketchPad extends ProtoBoard {
             new_lasso.height = 1000
             new_lasso.getContext('2d').translate(pos[0]-this.state.move_layer_init_pos[0], pos[1]-this.state.move_layer_init_pos[1])
             new_lasso.getContext('2d').drawImage(this.state.lasso_img, 0, 0)
-            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image)
+            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image, this.state.origin_image)
             this.setState({action:'idle', move_layer_init_pos: undefined, adjust_pre_canvas: undefined, layers: layers, lassoed_canvas:new_l_canvas, lasso_img: new_lasso})
         }else{
-            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image)
+            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image, this.state.origin_image)
             this.setState({action:'idle', move_layer_init_pos: undefined, adjust_pre_canvas: undefined, layers: layers, lassoed_canvas:new_l_canvas})
         }
         
@@ -492,7 +502,10 @@ class SketchPad extends ProtoBoard {
             rotateCenter.push(this.state.nonlasso_ret.top+this.state.nonlasso_ret.height/2)
         }
 
-        this.setState({action: 'rotate-layer', rotateCenter: rotateCenter, adjust_pre_canvas: adjust_pre_canvas})
+        var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
+        var cur_image = el.toDataURL()
+
+        this.setState({action: 'rotate-layer', rotateCenter: rotateCenter, adjust_pre_canvas: adjust_pre_canvas, origin_image: cur_image})
     }
 
     rotateLayerMove(e){
@@ -582,13 +595,13 @@ class SketchPad extends ProtoBoard {
                 var ny = -dx*Math.sin(deg)+dy*Math.cos(deg)+this.state.rotateCenter[1]
                 new_lasso.push([nx, ny])
             }
-            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image)
+            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image, this.state.origin_image)
             this.setState({action:'idle', rotateCenter:undefined, lasso_rot_deg: 0, lasso: new_lasso, lassoed_canvas, lasso_img: lasso_img})
         }else{
             // var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
             var ctx = el.getContext('2d');
             var ret = this.getCanvasBoundingBox(ctx)
-            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image)
+            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image, this.state.origin_image)
             this.setState({action:'idle', rotateCenter:undefined, lasso_rot_deg: 0, nonlasso_ret:ret, lassoed_canvas: lassoed_canvas})
         }
     }
@@ -601,6 +614,9 @@ class SketchPad extends ProtoBoard {
         var adjust_pre_canvas = document.createElement('canvas')
         adjust_pre_canvas.width = 1000
         adjust_pre_canvas.height = 1000
+        var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
+        var cur_image = el.toDataURL()
+
         if(this.state.lasso.length>0){
             var xmax=Number.MIN_VALUE
             var ymax = Number.MIN_VALUE
@@ -625,11 +641,11 @@ class SketchPad extends ProtoBoard {
         
 
             this.setState({lasso_resize_direction: direction, action: 'resize-layer', resize_layer_init_pos: this.getCurrentMouseOnBoard(e), 
-                resize_ret: ret, init_lasso: this.state.lasso.slice(0), adjust_pre_canvas: adjust_pre_canvas})
+                resize_ret: ret, init_lasso: this.state.lasso.slice(0), adjust_pre_canvas: adjust_pre_canvas, origin_image: cur_image})
         }else{
             ret = JSON.parse(JSON.stringify(this.state.nonlasso_ret))
             this.setState({lasso_resize_direction: direction, action: 'resize-layer', resize_layer_init_pos: this.getCurrentMouseOnBoard(e), 
-                resize_ret: ret, adjust_pre_canvas: adjust_pre_canvas})
+                resize_ret: ret, adjust_pre_canvas: adjust_pre_canvas, origin_image: cur_image})
         }
         
     }
@@ -870,14 +886,35 @@ class SketchPad extends ProtoBoard {
                 lasso_ctx.scale(1/scale,1);
             }
 
-            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image)
+            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image, this.state.origin_image)
             this.setState({action: 'idle', lassoed_canvas: lassoed_canvas, lasso_img:lasso_img,
             lasso_resize_direction:undefined,resize_layer_init_pos:undefined, resize_ret:undefined, init_lasso:undefined, adjust_pre_canvas:undefined})
         }else{
-            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image)
+            this.props.board_this.updateALayerImage(this.state.current_layer, layers[this.state.current_layer].layer_id, cur_image, this.state.origin_image)
             this.setState({action: 'idle', lassoed_canvas: lassoed_canvas,
             lasso_resize_direction:undefined,resize_layer_init_pos:undefined, resize_ret:undefined, init_lasso:undefined, adjust_pre_canvas:undefined})
         }
+
+    }
+
+    contentStampInit(e){
+        var current_image_id = this.props.board_this.refs.moodboard.state.current_image[0]
+        var cur_art = this.props.board_this.refs.moodboard.state.arts[current_image_id].file
+        var im= new Image;
+        var _this = this
+        var p = _this.getCurrentMouseOnBoard(e)
+        im.onload = function(){
+            var el = document.getElementById('sketchpad_canvas_'+_this.state.layers[_this.state.current_layer]['layer_id'])
+            var cur_image = el.toDataURL()
+
+            var w = 200
+            var h = im.height * w /im.width
+            el.getContext('2d').drawImage(im, p[0]-w/2, p[1]-h/2, w, h)
+            _this.props.board_this.updateALayerImage(_this.state.current_layer, _this.state.layers[_this.state.current_layer].layer_id, el.toDataURL(), cur_image)
+
+        }
+        im.src = cur_art
+        
 
     }
 
@@ -1031,8 +1068,6 @@ class SketchPad extends ProtoBoard {
         var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer]['layer_id'])
         var ctx = el.getContext('2d');
         if(this.state.lasso_img!=undefined){
-            
-
             var lassoed_canvas = document.createElement('canvas')
             lassoed_canvas.width =1000
             lassoed_canvas.height=1000 
@@ -1075,6 +1110,10 @@ class SketchPad extends ProtoBoard {
 
 
     }
+
+    // initializeContentStamp(){
+
+    // }
 
     getCanvasBoundingBox(ctx, left=0, top=0, width=1000, height=1000){
         var ret = {};
@@ -1176,11 +1215,12 @@ class SketchPad extends ProtoBoard {
                 top: this.state.boardheight/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[1],
                 left: this.state.boardwidth/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[0],
             }}>
+                
+                {this.renderCanvas()}
                 <svg id='sketch_pad_svg' width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength} style={{position: 'absolute', top: '0', left: '0'}}>
                     {/* {this.renderAdjuster()} */}
                     {this.renderLasso()}
                 </svg>
-                {this.renderCanvas()}
                 <canvas id='temp_canvas' width={1000} height={1000} style={{width: '100%', position:'absolute', top:'0', left: '0'}}></canvas>
                 <svg id='sketch_pad_svg2' width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength} style={{position: 'absolute', top: '0', left: '0'}}>
                     {this.renderAdjuster()}
@@ -1190,6 +1230,7 @@ class SketchPad extends ProtoBoard {
             </div>
             <SketchpadMainController mother_state={this.state} mother_this={this}></SketchpadMainController>
             <SketchpadLayerController mother_state={this.state} mother_this={this}></SketchpadLayerController>
+            <SketchpadUndo mother_state={this.state} mother_this={this}></SketchpadUndo>
         </div>
     </div>)
     }

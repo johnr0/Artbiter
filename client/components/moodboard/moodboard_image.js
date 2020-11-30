@@ -82,6 +82,7 @@ class MoodboardImage extends Component{
 
     choose_image(e){
         e.stopPropagation()
+        console.log('look',this.props.mother_state.control_state)
         var ecopied = {pageX: e.pageX, pageY: e.pageY}
         if(this.props.mother_state.control_state=='control_object'){
             if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
@@ -92,6 +93,9 @@ class MoodboardImage extends Component{
                 this.add_an_image(ecopied)
             }
             
+        }else if(this.props.mother_state.control_state=='content-stamp'){
+            console.log('yeah')
+            this.select_new_image(ecopied)
         }
 
     }
@@ -111,7 +115,10 @@ class MoodboardImage extends Component{
         if(this.props.art.choosen_by==this.props.mother_this.props.board_this.state.user_id){
             color = '#aaaaff'
         }else if(this.props.art.choosen_by!=''){
-            color = this.props.mother_this.props.board_this.state.collaborator_dict[this.props.art.choosen_by].color
+            if(this.props.mother_this.props.board_this.state.collaborator_dict[this.props.art.choosen_by]!=undefined){
+                color = this.props.mother_this.props.board_this.state.collaborator_dict[this.props.art.choosen_by].color
+            }
+            
         }
         // console.log(this.props.art_key)
         return (<g onPointerDown={this.test.bind(this)}>

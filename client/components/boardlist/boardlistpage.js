@@ -115,6 +115,10 @@ class BoardListPage extends Component{
         ]
         var _id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
 
+        var sketchundo = []
+        var moodboardundo = []
+        sketchundo.length = 20
+        moodboardundo.length = 20
         var board= {
             _id: _id,
             name:'new board',
@@ -122,6 +126,8 @@ class BoardListPage extends Component{
             arts:arts, texts:texts, layers:layers,
             collaborators: [],
             current_collaborators: {},
+            sketchundo: sketchundo,
+            moodboardundo: moodboardundo,
         }
         Api.app.service('boards').create(board)
         var boards = this.state.boards
@@ -182,7 +188,7 @@ class BoardListPage extends Component{
                 if(boards[invite].collaborators.indexOf(res[0]._id)==-1){
                     boards[invite].collaborators.push(res[0]._id)
                     _this.state.collaborator_dict[res[0]._id] = email
-                    Api.app.service('boards').update(invite, {$push: {collaborators: res[0]._id}}).then(()=>{
+                    Api.app.service('boards').update(invite, {$set:{updated:'collaborator_invited'}, $push: {collaborators: res[0]._id}}).then(()=>{
                         _this.setState({boards:boards}, function(){
                             document.getElementById('collaborator_input').value=''
                         })
@@ -208,8 +214,8 @@ class BoardListPage extends Component{
         col.splice(col.indexOf(_id), 1)
         boards[invite].collaborators = col
         
-
-        Api.app.service('boards').update(invite, {$pull: {collaborators: _id}}).then(()=>{
+        console.log('remove...', _id, invite)
+        Api.app.service('boards').update(invite, {$set:{updated:'collaborator_invited'}, $pull: {collaborators: _id}}).then(()=>{
             _this.setState({boards:boards})
         }).catch((err)=>{
             console.log('err here')
