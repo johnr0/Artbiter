@@ -40,8 +40,8 @@ class ProtoBoard extends Component {
         // console.log(e.deltaY)
         if(this.state.action=='idle'){
             var boardzoom_new = this.state.boardzoom+e.deltaY/100
-            if(boardzoom_new<1){
-                this.setState({boardzoom: 1})
+            if(boardzoom_new<0.5){
+                this.setState({boardzoom: 0.5})
             }else if(boardzoom_new>10){
                 this.setState({boardzoom: 10})
             }else{

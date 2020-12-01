@@ -125,7 +125,7 @@ class BoardListPage extends Component{
             _id: _id,
             name:'new board',
             owner: this.state.user_id, 
-            arts:arts, texts:texts, layers:layers,
+            texts:texts, layers:layers,
             collaborators: [],
             current_collaborators: {},
             sketchundo: sketchundo,

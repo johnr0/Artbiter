@@ -242,6 +242,34 @@ module.exports = function(app) {
       
       
     })
+
+    app.service('arts').publish((data)=>{
+      
+      var data_to_return = {}
+      data_to_return.updated = data.updated
+      if(data.updated.indexOf('moodboard_remove_arts_texts')!=-1){
+        data_to_return._id = data._id
+      }else if(data.updated.indexOf('moodboard_update_arts_texts')!=-1){
+        data_to_return._id = data._id
+        data_to_return.position = data.position
+        data_to_return.choosen_by = data.choosen_by
+      }else if(data.updated.indexOf('moodboard_arts_texts_choosen')!=-1){
+        data_to_return._id = data._id
+        data_to_return.choosen_by = data.choosen_by
+      }else{
+        data_to_return = data
+      }
+        
+      
+      console.log(data.board_id)
+
+
+      return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
+
+    
+      
+      
+    })
   };
 
 

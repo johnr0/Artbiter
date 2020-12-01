@@ -84,10 +84,19 @@ class Board extends Component{
                         }
                     })
                     // find and retrieve layers
+                    var arts = _this.refs.moodboard.state.arts
+                    Api.app.service('arts').find({query: {board_id: board_id}})
+                    .then((res)=>{
+                        for(var i in res){
+                            var art = res[i]
+                            arts[art._id] = art
+                            _this.refs.moodboard.setState({arts: arts})
+                        }
+                    })
                     
 
 
-                    var arts = res[0]['arts']
+                    // var arts = res[0]['arts']
                     var texts = res[0]['texts']
                     var sketchundo = res[0]['sketchundo']
                     var moodboardundo = res[0]['moodboardundo']
@@ -113,7 +122,7 @@ class Board extends Component{
                             //     }
                             //     Promise.all(promises)
                             // })
-                            _this.refs.moodboard.setState({arts: arts, texts:texts})
+                            _this.refs.moodboard.setState({texts:texts})
                         })
                     })
 
@@ -125,6 +134,34 @@ class Board extends Component{
             })
         }).catch((err)=>{
             window.location.href='/'
+        })
+
+        Api.app.service('arts').on('created', (data)=>{
+            if(data.board_id==this.state.board_id){
+                var arts = this.refs.moodboard.state.arts
+                arts[data._id] = data
+                this.refs.moodboard.setState({arts})
+            }
+        })
+
+        Api.app.service('arts').on('removed', (data)=>{
+            if(data.board_id==this.state.board_id){
+                var arts = this.refs.moodboard.state.arts
+                delete arts[data._id]
+                this.refs.moodboard.setState({arts})
+            }
+        })
+
+        Api.app.service('arts').on('patched', (data)=>{
+            console.log('patched!')
+            var arts = this.refs.moodboard.state.arts
+            if(data.position!=undefined){
+                arts[data._id].position = data.position
+            }
+            if(data.choosen_by!=undefined){
+                arts[data._id].choosen_by = data.choosen_by
+            }
+            this.refs.moodboard.setState({arts})
         })
 
         Api.app.service('layers').on('created', (data)=>{
@@ -362,43 +399,37 @@ class Board extends Component{
                 }
                 sketchundo.unshift(null)
                 _this.refs.sketchpad.setState({layers, sketchundo, current_layer, control_state})
-            }else if(updated.indexOf('moodboard_add_arts')!=-1){
-                var arts = data.arts
-                var art_ids = updated.split('.')
-                var md_arts = _this.refs.moodboard.state.arts
-                // var art = arts[art_id]
-                for(var i in art_ids){
-                    if(i==0){
-                        continue
-                    }
-                    var art = arts[art_ids[i]]
-                    md_arts[art_ids[i]]=art
-                }
-                _this.refs.moodboard.setState({arts:md_arts})
-            }else if(updated.indexOf('moodboard_add_texts')!=-1){
+            }
+            // else if(updated.indexOf('moodboard_add_arts')!=-1){
+            //     var arts = data.arts
+            //     var art_ids = updated.split('.')
+            //     var md_arts = _this.refs.moodboard.state.arts
+            //     // var art = arts[art_id]
+            //     for(var i in art_ids){
+            //         if(i==0){
+            //             continue
+            //         }
+            //         var art = arts[art_ids[i]]
+            //         md_arts[art_ids[i]]=art
+            //     }
+            //     _this.refs.moodboard.setState({arts:md_arts})
+            // }
+            else if(updated.indexOf('moodboard_add_texts')!=-1){
                 var texts = data.texts
                 var text_id = updated.split('.')[1]
                 var md_texts = _this.refs.moodboard.state.texts
                 md_texts[text_id] = texts[text_id]
                 _this.refs.moodboard.setState({texts:md_texts})
             }else if(updated.indexOf('moodboard_update_arts_texts')!=-1){
-                var arts = data.arts
                 var texts = data.texts
                 var ids = updated.split('.')
-
-                var md_arts = _this.refs.moodboard.state.arts
                 var md_texts = _this.refs.moodboard.state.texts
                 // var art = arts[art_id]
                 for(var i in ids){
                     if(i==0){
                         continue
                     }
-                    if(ids[i].indexOf('art')!=-1){
-                        var art_id = ids[i].split('_')[1]
-                        var art = arts[art_id]
-                        md_arts[art_id].position=art['position']
-                        md_arts[art_id].choosen_by=art['choosen_by']
-                    }if(ids[i].indexOf('text')!=-1){
+                    if(ids[i].indexOf('text')!=-1){
                         var text_id = ids[i].split('_')[1]
                         var text = texts[text_id]
                         md_texts[text_id].position=text['position']
@@ -408,23 +439,16 @@ class Board extends Component{
                     }
                     
                 }
-                _this.refs.moodboard.setState({arts:md_arts, texts:md_texts})
+                _this.refs.moodboard.setState({texts:md_texts})
             }else if(updated.indexOf('moodboard_remove_arts_texts')!=-1){
-                var arts = data.arts
                 var texts = data.texts
-                var md_arts = _this.refs.moodboard.state.arts
                 var md_texts = _this.refs.moodboard.state.texts
-                for(var key in md_arts){
-                    if(arts[key]==undefined){
-                        delete md_arts[key]
-                    }
-                }
                 for(var key in md_texts){
                     if(texts[key]==undefined){
                         delete md_texts[key]
                     }
                 }
-                _this.refs.moodboard.setState({arts:md_arts, texts:md_texts})
+                _this.refs.moodboard.setState({texts:md_texts})
 
             }else if(updated.indexOf('moodboard_edit_text')!=-1){
                 var texts = data.texts
@@ -433,23 +457,24 @@ class Board extends Component{
                 md_texts[text_id] = texts[text_id]
                 _this.refs.moodboard.setState({texts:md_texts})
             }else if(updated.indexOf('moodboard_arts_texts_choosen')!=-1){
-                var arts = data.arts
+                // var arts = data.arts
                 var texts = data.texts
-                var md_arts = _this.refs.moodboard.state.arts
+                // var md_arts = _this.refs.moodboard.state.arts
                 var md_texts = _this.refs.moodboard.state.texts
                 var list =updated.split('.')
                 for(var i in list){
                     if(i==0){continue}
                     var item = list[i]
-                    if(item.indexOf('art_')!=-1){
-                        item = item.split('_')[1]
-                        md_arts[item].choosen_by = arts[item].choosen_by
-                    }else if(item.indexOf('text_')!=-1){
+                    // if(item.indexOf('art_')!=-1){
+                    //     item = item.split('_')[1]
+                    //     md_arts[item].choosen_by = arts[item].choosen_by
+                    // }else 
+                    if(item.indexOf('text_')!=-1){
                         item = item.split('_')[1]
                         md_texts[item].choosen_by = texts[item].choosen_by
                     }
                 }
-                _this.refs.moodboard.setState({texts:md_texts, arts:md_arts})
+                _this.refs.moodboard.setState({texts:md_texts})
             }
         })
 
@@ -669,15 +694,18 @@ class Board extends Component{
     }
 
     AddArts(arts, art_ids){
-        var patch = {}
-        patch['updated'] = 'moodboard_add_arts'
+        
         for(var i in art_ids){
-            patch['arts.'+art_ids[i]] = arts[i]
-            patch['updated'] = patch['updated']+'.'+art_ids[i]
-            
+            var create = arts[i]
+            console.log(arts)
+            create['_id']=art_ids[i]
+            create['updated'] = 'moodboard_add_arts'
+            create['board_id'] = this.state.board_id
+            // patch['updated'] = patch['updated']+'.'+art_ids[i]
+            Api.app.service('arts').create(create)
         }
         
-        Api.app.service('boards').patch(this.state.board_id, {$set:patch})
+        // Api.app.service('boards').patch(this.state.board_id, {$set:patch})
 
     }
 
@@ -686,8 +714,11 @@ class Board extends Component{
         patch['updated'] = 'moodboard_update_arts_texts'
         
         for(var i in art_ids){
-            patch['arts.'+art_ids[i]+'.position'] = arts[i].position
-            patch['updated'] = patch['updated']+'.art_'+art_ids[i]
+            var art = {}
+            art['updated'] = 'moodboard_update_arts_texts'
+            art['position'] = arts[i].position
+            // patch['updated'] = patch['updated']+'.art_'+art_ids[i]
+            Api.app.service('arts').patch(art_ids[i], {$set:art})
         }
         for(var i in text_ids){
             patch['texts.'+text_ids[i]+'.position'] = texts[i].position
@@ -709,16 +740,16 @@ class Board extends Component{
         console.log(arts, texts)
         var unset = {}
         for(var i in arts){
-            unset['arts.'+arts[i]]=1
+            Api.app.service('arts').remove(arts[i])
         }
         for(var i in texts){
             unset['texts.'+texts[i]]=1
         }
         var set={}
         set['updated'] = 'moodboard_remove_arts_texts'
-        Api.app.service('boards').patch(this.state.board_id, {$unset: unset, $set: set})
-        
-
+        if(Object.keys(unset).length>0){
+            Api.app.service('boards').patch(this.state.board_id, {$unset: unset, $set: set})
+        }
     }
 
     AddAText(text_id, text){
@@ -744,8 +775,7 @@ class Board extends Component{
         var unset={}
         for(var i in art_ids){
             var art_id = art_ids[i]
-            patch['updated'] = patch['updated']+'.art_'+art_id
-            patch['arts.'+art_id+'.choosen_by'] = this.state.user_id   
+            Api.app.service('arts').patch(art_id, {$set:{choosen_by: this.state.user_id, updated:'moodboard_arts_texts_choosen'}})
         }
         for (var i in text_ids){
             var text_id = text_ids[i]
@@ -754,8 +784,7 @@ class Board extends Component{
         }
         for(var i in d_art_ids){
             var art_id = d_art_ids[i]
-            patch['updated'] = patch['updated']+'.art_'+art_id
-            patch['arts.'+art_id+'.choosen_by'] = ''  
+            Api.app.service('arts').patch(art_id, {$set:{choosen_by: '', updated: 'moodboard_arts_texts_choosen'}})
         }
         for (var i in d_text_ids){
             var text_id = d_text_ids[i]

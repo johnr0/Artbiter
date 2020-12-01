@@ -85,8 +85,8 @@ class MoodBoard extends ProtoBoard{
         // console.log(e.deltaY)
         if(this.state.action=='idle' || this.state.action=='image_selected' || this.state.action=='text_selected' || this.state.action=='objects_selected'){
             var boardzoom_new = this.state.boardzoom+e.deltaY/100
-            if(boardzoom_new<1){
-                this.setState({boardzoom: 1})
+            if(boardzoom_new<0.5){
+                this.setState({boardzoom: 0.5})
             }else if(boardzoom_new>10){
                 this.setState({boardzoom: 10})
             }else{
@@ -101,6 +101,7 @@ class MoodBoard extends ProtoBoard{
             var art_ids = []
             var text_ids = []
             var arts = this.state.arts
+            console.log(this.state.current_image, arts)
             for(var i in this.state.current_image){
                 var key = this.state.current_image[i]
                 art_ids.push(key)
@@ -118,6 +119,7 @@ class MoodBoard extends ProtoBoard{
                 }
                 
             }
+            
             this.props.board_this.RemoveArtsTexts(art_ids, text_ids)
             this.setState({current_selected_pos: undefined, current_selected_ratio:undefined, current_image:[], current_text:[], arts:arts, texts: texts})
         }
@@ -224,7 +226,7 @@ class MoodBoard extends ProtoBoard{
                 }
             }
         }
-        console.log(_this.state.current_image, current_image_pos, current_selected_ratio)
+        console.log(_this.state.current_image, current_image_pos, current_selected_ratio, add_arts, add_art_ids)
         Promise.all([
             _this.props.board_this.AddArts(add_arts, add_art_ids),
             _this.setState({control_state: 'control_object', current_selected_pos: current_image_pos, current_selected_ratio})
