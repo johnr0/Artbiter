@@ -105,15 +105,17 @@ class BoardListPage extends Component{
     createBoard(){
         var arts = {}
         var texts = {}
-        var layers = [
-            {
-                layer_id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-                image: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-                opacity: 1,
-                choosen_by: '',
-            }
-        ]
+        var a_layer_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
         var _id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+        var layers = [a_layer_id]
+        var a_layer = {
+            _id:a_layer_id,
+            board_id: _id,
+            image: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+            opacity: 1,
+            choosen_by: '',
+        }
+        
 
         var sketchundo = []
         var moodboardundo = []
@@ -130,6 +132,7 @@ class BoardListPage extends Component{
             moodboardundo: moodboardundo,
         }
         Api.app.service('boards').create(board)
+        Api.app.service('layers').create(a_layer)
         var boards = this.state.boards
         boards[_id] = board
 

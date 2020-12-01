@@ -19,6 +19,10 @@ const checkExistingUsers= async context =>{
     })
   }
 
+const doingauth = async context => {
+  console.log(context)
+}
+
 module.exports = {
     before: {
       all: [],

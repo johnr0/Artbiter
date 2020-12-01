@@ -35,7 +35,11 @@ module.exports = function(app) {
         // app.channel(`emails/${user.email}`).join(channel);
         // app.channel(`a`).join(connection);
         app.channel(`userIds/${user._id}`).join(connection);
-
+        if(user.board_id!=undefined){
+          console.log('to boards...', user.board_id)
+          app.channel(`boards/${user.board_id}`).join(connection);
+        } 
+        
 
       }
     });
@@ -216,4 +220,29 @@ module.exports = function(app) {
         // console.log(return_list)
       return return_list;
     });
+
+    app.service('layers').publish((data)=>{
+      
+      var data_to_return = {}
+      data_to_return.updated = data.updated
+      if(data.updated.indexOf('sketchpad_layers_choosen')!=-1){
+        data_to_return._id = data._id
+        data_to_return.choosen_by = data.choosen_by
+      }else if(data.updated=='sketchpad_add_a_layer'){
+        data_to_return = data
+      }else{
+        data_to_return = data
+      }
+      console.log(data.board_id)
+
+
+      return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
+
+    
+      
+      
+    })
   };
+
+
+  

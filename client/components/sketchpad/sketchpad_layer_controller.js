@@ -14,33 +14,37 @@ class SketchpadLayerController extends Component{
     selectLayer(idx,e){
         var ypos = e.pageY
         var _this = this
-        var prev_current_layer = this.props.mother_state.current_layer
+        var prev_current_layer_idx = this.props.mother_state.current_layer
         var layers = this.props.mother_state.layers
+        var prev_current_layer = layers[prev_current_layer_idx]
+        var layer_dict = this.props.mother_state.layer_dict
+        var layer = layer_dict[layers[idx]]
         var layerChanged = false
-        if(layers[idx].choosen_by!='' && layers[idx].choosen_by != this.props.mother_this.props.board_this.state.user_id){
+        if(layer.choosen_by!='' && layer.choosen_by != this.props.mother_this.props.board_this.state.user_id){
             console.log('reeturn')
             return
         }
-        if(layers[idx].choosen_by != this.props.mother_this.props.board_this.state.user_id){
-            layers[idx].choosen_by = this.props.mother_this.props.board_this.state.user_id
+        if(layer.choosen_by != this.props.mother_this.props.board_this.state.user_id){
+            layer.choosen_by = this.props.mother_this.props.board_this.state.user_id
             layerChanged = true
         }
+        console.log("??", layerChanged)
         
 
 
-        this.props.mother_this.setState({current_layer: idx, layers: layers}, function(){
+        this.props.mother_this.setState({current_layer: idx, layers: layers, layer_dict:layer_dict}, function(){
             var y_init_pos = ypos
             //10-document.getElementById('sketchpad_layer_controller').getBoundingClientRect().top+document.getElementById('sketchpad_layer_'+_this.props.mother_state.current_layer).getBoundingClientRect().top
             console.log(ypos)
             var promises = []
             if(layerChanged){
-                if(prev_current_layer!=-1){
-                    promises.push(_this.props.mother_this.props.board_this.ChooseLayers([idx],[prev_current_layer]))
+                if(prev_current_layer!=undefined){
+                    promises.push(_this.props.mother_this.props.board_this.ChooseLayers([layers[idx]],[prev_current_layer]))
                 }else{
-                    promises.push(_this.props.mother_this.props.board_this.ChooseLayers([idx],[]))
+                    promises.push(_this.props.mother_this.props.board_this.ChooseLayers([layers[idx]],[]))
                 }
             }
-            promises.push(_this.setState({layer_mouse_down: true, mouse_y_pos: ypos, y_init_pos: y_init_pos, prev_current_layer: prev_current_layer}))
+            promises.push(_this.setState({layer_mouse_down: true, mouse_y_pos: ypos, y_init_pos: y_init_pos, prev_current_layer: prev_current_layer_idx}))
             Promise.all(promises)
 
             
@@ -56,17 +60,21 @@ class SketchpadLayerController extends Component{
     deletelayer(){
 
         var layers = this.props.mother_state.layers
-        if(layers.length>1){
+        var origin_layers = this.props.mother_state.layers.slice()
+        console.log(origin_layers)
+        if(layers.length>1 && this.props.mother_state.current_layer!=-1){
             var remove_idx = this.props.mother_state.current_layer
-            var layer_id = layers[remove_idx].layer_id
-            var removed_layer = layers[remove_idx]
+            var removed_layer_id = layers[remove_idx]
+            console.log(this.props.mother_state.layer_dict[removed_layer_id])
+            var removed_layer = JSON.parse(JSON.stringify(this.props.mother_state.layer_dict[removed_layer_id]))
+            delete this.props.mother_state.layer_dict[removed_layer_id]
             layers.splice(remove_idx,1)
             var current_layer = -1//this.props.mother_state.current_layer-1
             // if(current_layer<0){
             //     current_layer =0
             // }
             Promise.all([
-                this.props.mother_this.props.board_this.RemoveALayer(remove_idx, removed_layer),
+                this.props.mother_this.props.board_this.RemoveALayer(remove_idx, removed_layer, origin_layers),
                 this.props.mother_this.setState({layers:layers, current_layer: current_layer})
             ])
             
@@ -79,13 +87,17 @@ class SketchpadLayerController extends Component{
             var border = 'solid 4px transparent'
             var opacity = '50%'
             // console.log(idx)
+            if(this.props.mother_state.layer_dict[item]==undefined){
+                return
+            }
+            var layer_obj = this.props.mother_state.layer_dict[item]
             if(idx==this.props.mother_state.current_layer){
                 border = 'solid 4px transparent'
                 opacity='100%'
-            }else if(item.choosen_by!=''){
+            }else if(layer_obj.choosen_by!=''){
                 // if(this.props.mother_this.props.borad_this!=undefined){
-                    if(this.props.mother_this.props.board_this.state.collaborator_dict[item.choosen_by]!=undefined){
-                        border = 'solid 4px '+this.props.mother_this.props.board_this.state.collaborator_dict[item.choosen_by].color
+                    if(this.props.mother_this.props.board_this.state.collaborator_dict[layer_obj.choosen_by]!=undefined){
+                        border = 'solid 4px '+this.props.mother_this.props.board_this.state.collaborator_dict[layer_obj.choosen_by].color
                         opacity='80%'
                     } 
                 // }    
@@ -102,11 +114,12 @@ class SketchpadLayerController extends Component{
                     top = (idx+1)*43
                 }
             }
+            // console.log(item)
             return (<div id={'sketchpad_layer_'+idx} style={{opacity: opacity, border: border, position: 'absolute', left: 1, top: top, width: '38px', height: '38px', marginBottom:'5px', backgroundColor: 'white'}} 
                     onPointerDown={this.selectLayer.bind(this, idx)} onPointerUp={this.layerDone.bind(this)} 
                     onDragOver={this.layerMove.bind(this)}
                     onDragEnd={this.layerDone.bind(this)}>
-                <img src={item.image} style={{width: '100%', height: '100%'}}></img>
+                <img src={this.props.mother_state.layer_dict[item].image} style={{width: '100%', height: '100%'}}></img>
             </div>)
         })
     }
@@ -119,16 +132,19 @@ class SketchpadLayerController extends Component{
         e.stopPropagation()
        
         var layers = this.props.mother_state.layers
-        
-        layers.push({
-            layer_id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15), 
+        var layer_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+        var layer = ({
+            _id: layer_id, 
+            board_id: this.props.mother_this.props.board_this.state.board_id,
             image: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
             opacity: 1,
             choosen_by: '',
         })
+        var layer_dict = this.props.mother_this.state.layer_dict
+        layer_dict[layer_id] = layer
         Promise.all([
-            this.props.mother_this.props.board_this.AddALayer(layers.length-1, layers[layers.length-1]),
-            this.props.mother_this.setState({layers:layers})
+            this.props.mother_this.props.board_this.AddALayer(layers.length, layer_id, layer),
+            this.props.mother_this.setState({layers:layers, layer_dict: layer_dict})
         ])
     }
 
@@ -198,6 +214,7 @@ class SketchpadLayerController extends Component{
             }
             Promise.all(promises)
             var _this = this
+            console.log(new_index)
             Promise.all([
                 this.props.mother_this.props.board_this.ReorderLayers(new_layer, prev_layer),
                 this.props.mother_this.setState({layers:new_layer, current_layer: new_index}, function(){
@@ -208,9 +225,10 @@ class SketchpadLayerController extends Component{
         }
         else if(this.state.mouse_y_pos==this.state.y_init_pos && this.state.prev_current_layer!=-1 && this.state.prev_current_layer==this.props.mother_state.current_layer){
             var cl = this.props.mother_state.current_layer
+            var layers = this.props.mother_state.layers.slice()
             var _this = this
             console.log('uppy')
-            Promise.all([this.props.mother_this.props.board_this.ChooseLayers([],[cl]),
+            Promise.all([this.props.mother_this.props.board_this.ChooseLayers([],[layers[cl]]),
                 this.setState({layer_mouse_down: false, mouse_y_pos:undefined, y_init_pos:undefined}, function(){
                     _this.props.mother_this.setState({current_layer:-1, control_state: 'move'})
                 })
@@ -237,7 +255,7 @@ class SketchpadLayerController extends Component{
             <div onPointerDown={this.addNewLayer.bind(this)} style={{textAlign: 'center', fontSize: 30}}>
                 +
             </div>
-            <div onPointerDown={this.deletelayer.bind(this)} style={{textAlign: 'center', fontSize: 30, color:(this.props.mother_state.layers.length>1)?'white':'#888888'}}>
+            <div onPointerDown={this.deletelayer.bind(this)} style={{textAlign: 'center', fontSize: 30, color:(this.props.mother_state.layers.length>1 && this.props.mother_state.current_layer!=-1)?'white':'#888888'}}>
                 <i className="fa fa-trash"></i>
             </div>
         </div>)

@@ -4,6 +4,9 @@ class SketchpadUndo extends Component{
 
     undoSkip(){
         var sketchundo = this.props.mother_state.sketchundo
+        if(sketchundo==undefined){
+            return [false, false]
+        }
         var user_id = this.props.mother_this.props.board_this.state.user_id
         var idx = undefined
         var type=undefined
