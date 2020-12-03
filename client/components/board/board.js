@@ -10,7 +10,7 @@ class Board extends Component{
         user_id: undefined,
         current_collaborators: {},
         board_id: undefined, 
-
+        board_owner: undefined, 
         collaborator_dict: {},
         // lastmouseupdate: new Date(),
     }
@@ -39,6 +39,13 @@ class Board extends Component{
 
     
     componentDidMount(){
+        this.runAuth()
+        this.prepareUpdates()
+  
+
+    }
+
+    runAuth(){
         var board_id = this.gup('_id')
         var _this = this
         Api.app.reAuthenticate().then((res)=>{
@@ -56,6 +63,7 @@ class Board extends Component{
                     window.location.href='/boardlist'
                 }else{
                     console.log(res[0])
+                    var owner = res[0].owner
                     for(var j in res[0].collaborators){
                         if(res[0].collaborators[j]!=user_id){
                             this.addCollaboratorEmail(res[0].collaborators[j])
@@ -113,7 +121,7 @@ class Board extends Component{
                     console.log(layers, arts, texts, sketchundo)
                     Api.app.service('boards').update(board_id, {$set: set})
                     .then((res)=>{
-                        _this.setState({current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email}, function(){
+                        _this.setState({current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email, board_owner: owner}, function(){
                             _this.refs.sketchpad.setState({sketchundo: sketchundo})
                                 // , function(){
                             //     var promises = []
@@ -135,7 +143,11 @@ class Board extends Component{
         }).catch((err)=>{
             window.location.href='/'
         })
+    }
 
+    prepareUpdates(){
+        var _this = this
+        
         Api.app.service('arts').on('created', (data)=>{
             if(data.board_id==this.state.board_id){
                 var arts = this.refs.moodboard.state.arts
@@ -145,11 +157,10 @@ class Board extends Component{
         })
 
         Api.app.service('arts').on('removed', (data)=>{
-            if(data.board_id==this.state.board_id){
                 var arts = this.refs.moodboard.state.arts
                 delete arts[data._id]
                 this.refs.moodboard.setState({arts})
-            }
+            
         })
 
         Api.app.service('arts').on('patched', (data)=>{
@@ -484,7 +495,6 @@ class Board extends Component{
             (e || window.event).returnValue = null;
             return null;
           });
-
     }
 
     loadALayer(layer){

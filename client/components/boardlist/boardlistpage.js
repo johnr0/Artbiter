@@ -231,10 +231,13 @@ class BoardListPage extends Component{
             var board = this.state.boards[key]
             return (<li key={board._id} className='collection-item' style={{position: 'relative'}}>
                 <div style={{display:'inline-block', color: (board.owner==this.state.user_id)?'black':'#333333'}}>
-                    <a href={'/boards?_id='+board._id}>
+                    <a href={'/boards_AI?_id='+board._id}>
                         {board.name}
                         {(board.owner==this.state.user_id) && ' (belongs to you)'}
                         {(board.owner!=this.state.user_id) && ' (belongs to '+this.state.collaborator_dict[board.owner]+')'}
+                    </a>/
+                    <a href={'/boards_baseline?_id='+board._id}>
+                        baseline
                     </a>
                 </div>
                 {this.state.user_id==board.owner && 

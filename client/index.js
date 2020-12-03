@@ -13,6 +13,7 @@ import 'materialize-css/dist/css/materialize.css'
 import './style.css';
 import Login from './containers/Login'
 import BoardList from './containers/BoardList'
+import InterfaceAI from './containers/InterfaceAI'
 
 // injectTapEventPlugin()
 
@@ -23,8 +24,11 @@ render(
       <Route exact path='/'>
         <Login></Login>
       </Route>
-      <Route path='/boards'>
+      <Route path='/boards_baseline'>
         <Interface></Interface>
+      </Route>
+      <Route path='/boards_AI'>
+        <InterfaceAI></InterfaceAI>
       </Route>
       <Route path='/boardlist'>
         <BoardList></BoardList>

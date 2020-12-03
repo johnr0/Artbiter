@@ -270,6 +270,46 @@ module.exports = function(app) {
       
       
     })
+
+    app.service('groups').publish((data)=>{
+      
+      var data_to_return = {}
+      data_to_return.updated = data.updated
+      if(data.updated!=undefined){
+        if(data.updated.indexOf('groups_position')!=-1){
+          data_to_return._id = data._id
+          data_to_return.board_id = data.board_id
+          data_to_return.pos = data.pos
+        }else if(data.updated.indexOf('groups_add')!=-1){
+          data_to_return._id = data._id
+          data_to_return.board_id = data.board_id
+          data_to_return.pos = data.pos
+          data_to_return.art_ids = data.art_ids
+          data_to_return.user_info = data.user_info
+        }else if(data.updated.indexOf('groups_relate')!=-1){
+          data_to_return._id = data._id
+          data_to_return.board_id = data.board_id
+          data_to_return.higher_group = data.higher_group
+        }else if(data.updated.indexOf('groups_toggle_inclusion')!=-1){
+          data_to_return._id = data._id
+          data_to_return.board_id = data.board_id
+          data_to_return.user_info= data.user_info
+        }else{
+          data_to_return = data
+        }
+      }else{
+        data_to_return = data
+      }  
+      
+      console.log(data.board_id, data)
+
+
+      return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
+
+    
+      
+      
+    })
   };
 
 

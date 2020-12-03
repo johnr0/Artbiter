@@ -48,7 +48,8 @@ console.log(app.get('public'))
 app.use('/static/', express.static(app.get('public')+'/static'));
 app.use('/', express.static(app.get('public')));
 app.use('/boardlist', express.static(app.get('public')));
-app.use('/boards', express.static(app.get('public')));
+app.use('/boards_baseline', express.static(app.get('public')));
+app.use('/boards_AI', express.static(app.get('public')));
 
 
 // Set up Plugins and providers
