@@ -23,7 +23,7 @@ class BoardAI extends Board{
             delete groups[data._id]
             this.refs.moodboard.setState({groups})
         
-    })
+        })
 
         Api.app.service('groups').on('patched', (data)=>{
             if(data.board_id==this.state.board_id){
@@ -31,13 +31,13 @@ class BoardAI extends Board{
                     var groups = this.refs.moodboard.state.groups
                     groups[data._id].pos = data.pos
                     this.refs.moodboard.setState({groups})
-                }else if(data.updated == 'groups_add'){
+                }else if(data.updated == 'groups_add' || data.updated=='groups_remove'){
                     var groups = this.refs.moodboard.state.groups
                     groups[data._id].pos = data.pos
                     groups[data._id].art_ids = data.art_ids
                     groups[data._id].user_info = data.user_info
                     this.refs.moodboard.setState({groups})
-                }else if(data.updated == 'groups_relate'){
+                }else if(data.updated.indexOf('groups_relate')!=-1){
                     var groups = this.refs.moodboard.state.groups
                     groups[data._id].higher_group = data.higher_group
                     this.refs.moodboard.setState({groups})
@@ -48,6 +48,21 @@ class BoardAI extends Board{
                 }
                 
             }
+        })
+
+        Api.app.service('searched_arts').on('created', (data)=>{
+            if(data.board_id==this.state.board_id){
+                var searched_arts = this.refs.moodboard.state.searched_arts
+                searched_arts[data._id] = data
+                this.refs.moodboard.setState({searched_arts})
+            }
+        })
+
+        Api.app.service('searched_arts').on('removed', (data)=>{
+            var searched_arts = this.refs.moodboard.state.searched_arts
+            delete searched_arts[data._id]
+            this.refs.moodboard.setState({searched_arts})
+        
         })
         
 
@@ -101,6 +116,26 @@ class BoardAI extends Board{
                     })
                     // find and retrieve layers
                     var arts = _this.refs.moodboard.state.arts
+                    var searchPane=false
+                    var search_image_selected = undefined
+                    var search_slider_values = {}
+
+                    var agreementPane=false
+                    
+                    if(res[0].searchPane!=undefined){
+                        searchPane = res[0].searchPane
+                    }
+                    if(res[0].search_image_selected!=undefined){
+                        search_image_selected = res[0].search_image_selected
+                    }
+                    if(res[0].search_slider_values!=undefined){
+                        search_slider_values = res[0].search_slider_values
+                    }
+
+                    if(res[0].agreementPane!=undefined){
+                        agreementPane = res[0].agreementPane
+                    }
+                    
                     Api.app.service('arts').find({query: {board_id: board_id}})
                     .then((res)=>{
                         for(var i in res){
@@ -108,7 +143,9 @@ class BoardAI extends Board{
                             arts[art._id] = art
                             
                         }
-                        _this.refs.moodboard.setState({arts: arts})
+                        
+                        _this.refs.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, search_slider_values:search_slider_values,
+                            agreementPane: agreementPane})
                     })
 
                     var groups = _this.refs.moodboard.state.groups
@@ -122,6 +159,15 @@ class BoardAI extends Board{
                         _this.refs.moodboard.setState({groups:groups})
                     })
                     
+                    var searched_arts = _this.refs.moodboard.state.searched_arts
+                    Api.app.service('searched_arts').find({query: {board_id: board_id}})
+                    .then((res)=>{
+                        for(var i in res){
+                            searched_arts[res[i]._id] = res[i]
+                        }
+                        console.log('searched arts', searched_arts)
+                        _this.refs.moodboard.setState({searched_arts:searched_arts})
+                    })
 
 
                     // var arts = res[0]['arts']
@@ -167,12 +213,17 @@ class BoardAI extends Board{
 
     render(){
         return (
-            <div id='board_whole' style={{flex: 'auto', width: '100%'}} className='row'>
+            <div id='board_whole' style={{flex: 'auto', width: '100%', position:'relative'}} className='row'>
     
                 <SketchPadAI board_this={this} board_state={this.state} ref='sketchpad'></SketchPadAI>
                 <MoodBoardAI board_this={this} board_state={this.state} ref='moodboard'></MoodBoardAI>
                 <div style={{position:'absolute', right: '10px', top: '10px'}}>
                     {this.renderCollaboartorStatus()}
+                </div>
+                <div style={{position:'absolute', left: 'calc(50% - 30px)', top: 'calc(50% + 38px)', 
+                width:'60px', height:'60px', borderRadius: '50%', backgroundColor: '#333333',
+                color: 'white', textAlign:'center', fontSize: '40px', cursor:'default'}} onMouseDown={this.addSketchIntoMoodboard.bind(this)}>
+                    →
                 </div>
             </div>)
     }

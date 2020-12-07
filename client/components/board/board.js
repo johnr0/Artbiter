@@ -486,6 +486,12 @@ class Board extends Component{
                     }
                 }
                 _this.refs.moodboard.setState({texts:md_texts})
+            }else if(updated.indexOf('moodboard_search_pane_toggle')!=-1){
+                _this.refs.moodboard.setState({searchPane: data.searchPane})
+            }else if(updated.indexOf('moodboard_search_image_select')!=-1){
+                _this.refs.moodboard.setState({search_image_selected: data.search_image_selected})
+            }else if(updated.indexOf('moodboard_search_slider_change')!=-1){
+                _this.refs.moodboard.setState({search_slider_values: data.search_slider_values})
             }
         })
 
@@ -853,6 +859,47 @@ class Board extends Component{
         
     }
 
+    addSketchIntoMoodboard(e){
+        e.stopPropagation();
+        var _this = this
+        var output_el= document.createElement('canvas')
+        output_el.width = 1000
+        output_el.height = 1000
+        var output_canvas = output_el.getContext('2d')
+        output_canvas.globalCompositeOperation = 'destination-over'
+
+        console.log(this.refs.sketchpad.state.layers)
+        for(var i in this.refs.sketchpad.state.layers){
+            var key = this.refs.sketchpad.state.layers[i]
+            var el = document.getElementById('sketchpad_canvas_'+key)
+            var cur_canvas = el.getContext('2d')
+            output_canvas.drawImage(el, 0, 0);
+        }
+        console.log('sketch image generated')
+
+        var image = output_el.toDataURL()
+        var arts =this.refs.moodboard.state.arts
+        var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+        var pos = this.refs.moodboard.getPositionOnBoard(0, document.getElementById('moodboard').offsetHeight/2)
+        var pos0 = Math.max(pos[0], 0)
+        
+        console.log(pos0, pos)
+        arts[id] = {
+            file: image,
+            position: [pos0, pos[1]-0.05, pos0+0.1,pos[1]+0.05],
+            ratio: 1,
+            choosen_by: this.state.user_id
+        }
+
+        Promise.all([
+            _this.AddArts([arts[id]],[id]),
+            _this.refs.moodboard.setState({arts:arts, control_state:'control_object', action:'idle', current_image: [id], current_text:[], 
+            current_selected_pos: [pos0, pos[1]-0.05, pos0+0.1,pos[1]+0.05], current_selected_ratio: 1})
+        ])
+
+    }
+
 
     gup( name, url ) {
         if (!url) url = location.href;
@@ -981,12 +1028,17 @@ class Board extends Component{
 
     render(){
         return (
-        <div id='board_whole' style={{flex: 'auto', width: '100%'}} className='row'>
+        <div id='board_whole' style={{flex: 'auto', width: '100%', position:'relative'}} className='row'>
 
             <SketchPad board_this={this} board_state={this.state} ref='sketchpad'></SketchPad>
             <MoodBoard board_this={this} board_state={this.state} ref='moodboard'></MoodBoard>
             <div style={{position:'absolute', right: '10px', top: '10px'}}>
                 {this.renderCollaboartorStatus()}
+            </div>
+            <div style={{position:'absolute', left: 'calc(50% - 30px)', top: 'calc(50% + 38px)', 
+            width:'60px', height:'60px', borderRadius: '50%', backgroundColor: '#333333',
+            color: 'white', textAlign:'center', fontSize: '40px', cursor:'default'}} onMouseDown={this.addSketchIntoMoodboard.bind(this)}>
+                →
             </div>
         </div>)
     }

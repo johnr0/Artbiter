@@ -42,6 +42,46 @@ h1, h2, h3, h4, h5, h6{
     
 }
 
+.moodboard_search_pane{
+    position: absolute;
+    width: calc(100% - 20px);
+    bottom: 0px;
+    left: 10px;
+    height: 50%;
+    min-height: 200px;
+}
+
+.moodboard_search_pane_open{
+    position: absolute;
+    cursor: default;
+    width: 180px;
+    height: 30px;
+    bottom: 0px;
+    left: 10px;
+    line-height: 18px;
+    text-align: center;
+}
+
+.moodboard_search_pane_subpane{
+    height: calc(100% - 30px);
+}
+
+.moodboard_search_pane_subpane_div{
+    height: 100%;
+    padding: 3px;
+    border: solid 1px white;
+    border-radius: 5px;
+}
+
+.moodboard_search_pane_close{
+    height: 27px;
+    border: solid 1px white;
+    border-radius: 10px;
+    padding: 3px;
+    width: fit-content;
+
+}
+
 .moodboard_image_add_controller{
     position: absolute;
     width: 360px;
@@ -100,6 +140,17 @@ h1, h2, h3, h4, h5, h6{
     -ms-user-select: none;
     user-select: none;
     pointer-events: none;
+}
+
+.textSelectdisabled{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    cursor: default;
 }
 
 .select_disabled::selection{
@@ -223,4 +274,11 @@ input[type=range][orient=vertical]
     right: 70px;
     top: 10px;
     cursor: pointer;
+}
+
+.tiny-btn{
+    font-size: 12px;
+    padding: 3px;
+    height: fit-content;
+    line-height: inherit;
 }

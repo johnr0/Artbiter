@@ -257,7 +257,12 @@ class MoodBoard extends ProtoBoard{
                 ratio:  this.width/this.height,
                 choosen_by: _this.props.board_this.state.user_id, 
             }
-            resolve([id, arts[id]])
+            if(typeof resolve === 'function'){
+                resolve([id, arts[id]])
+            }else{
+                resolve.push([id, arts[id]])
+            }
+            
                         
             var current_image = _this.state.current_image
             var current_image_pos = _this.state.current_selected_pos

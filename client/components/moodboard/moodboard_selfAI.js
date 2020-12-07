@@ -99,7 +99,9 @@ class MoodboardSelfAI extends Component{
                 var choosen_bys=[]
                 for(var jdx in group.art_ids){
                     var art_id = group.art_ids[jdx]
-                    choosen_bys.push(this.props.mother_state.arts[art_id].choosen_by)
+                    if(this.props.mother_state.arts[art_id]!=undefined){
+                        choosen_bys.push(this.props.mother_state.arts[art_id].choosen_by)
+                    }
                 }
                 choosen_bys.sort()
                 if(choosen_bys[0]==choosen_bys[choosen_bys.length-1]){
@@ -124,7 +126,7 @@ class MoodboardSelfAI extends Component{
 
 
         // console.log(this.props.art_key)
-        console.log(renderUser)
+        // console.log(renderUser)
         return (<g>
             {color!='' && renderUser && this.renderSelf(userGroup,x,y, width)}
             

@@ -30,6 +30,14 @@ class MoodboardImageAI extends MoodboardImage{
 
     // }
 
+    choose_image(e){
+        super.choose_image(e)
+        if(this.props.mother_state.control_state=='search_image_select'){
+            Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {search_image_selected: this.props.art_key, updated:'moodboard_search_image_select'}})
+            this.props.mother_this.setState({control_state: 'control_object'})
+        }
+    }
+
     renderUsers(group_key, x, y, width){
         var group= this.props.mother_state.groups[group_key]
         var user_keys = []
@@ -114,7 +122,9 @@ class MoodboardImageAI extends MoodboardImage{
                 var choosen_bys=[]
                 for(var jdx in group.art_ids){
                     var art_id = group.art_ids[jdx]
-                    choosen_bys.push(this.props.mother_state.arts[art_id].choosen_by)
+                    if(this.props.mother_state.arts[art_id]!=undefined){
+                        choosen_bys.push(this.props.mother_state.arts[art_id].choosen_by)
+                    }
                 }
                 choosen_bys.sort()
                 if(choosen_bys[0]==choosen_bys[choosen_bys.length-1]){
@@ -138,7 +148,7 @@ class MoodboardImageAI extends MoodboardImage{
 
 
         // console.log(this.props.art_key)
-        console.log(renderUser)
+        // console.log(renderUser)
         return (<g onPointerDown={this.test.bind(this)}>
             <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)}></image>
             {color!='' && <g>

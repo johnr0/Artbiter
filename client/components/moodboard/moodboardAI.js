@@ -4,6 +4,7 @@ import MoodBoard from './moodboard'
 import MoodboardImageAI from './moodboard_imageAI'
 import MoodBoardImageAddController from './moodboard_image_add_controller'
 import MoodBoardMainController from './moodboard_main_controller'
+import MoodBoardSearchPaneAI from './moodboard_searchPaneAI'
 import MoodboardSelfAI from './moodboard_selfAI'
 import MoodBoardText from './moodboard_text'
 
@@ -13,6 +14,14 @@ class MoodBoardAI extends MoodBoard{
     state = {
         ...this.state,
         groups: {},
+        searchPane: false,
+        search_image_selected: undefined,
+        search_slider_values: {},
+        searched_arts: {},
+        
+        agreementPane: false,
+
+
     }
             
 
@@ -203,7 +212,7 @@ class MoodBoardAI extends MoodBoard{
             } 
         }
 
-        Api.app.service('groups').patch(group_id, {$set:{updated:'groups_add', pos: pos}, $pull:pull})
+        Api.app.service('groups').patch(group_id, {$set:{updated:'groups_remove', pos: pos}, $pull:pull})
 
     }
 
@@ -256,11 +265,11 @@ class MoodBoardAI extends MoodBoard{
 
     relateGroup(key, key2){
         var standard_group = this.state.groups[key2]
-        Api.app.service('groups').patch(key, {$set: {updated:'groups_relate', higher_group: standard_group.higher_group}})
+        Api.app.service('groups').patch(key, {$set: {updated:'groups_relate_r', higher_group: standard_group.higher_group}})
     }
 
     unrelateGroup(key){
-        Api.app.service('groups').patch(key, {$set: {updated: 'groups_relate', higher_group: this.getRandomColor()}})
+        Api.app.service('groups').patch(key, {$set: {updated: 'groups_relate_u', higher_group: this.getRandomColor()}})
     }
 
 
@@ -414,16 +423,16 @@ class MoodBoardAI extends MoodBoard{
                 {relatable && 
                 <g>
                     <rect x={backx+width/2+zwidth/2-10} y={backy+height/2+0} width="20" height="20" fill='#fcba03' rx='4'
-                        onMouseDown={this.relateGroup.bind(this, key, key2)}></rect>
+                        onMouseDown={this.relateGroup.bind(this, key2, key)}></rect>
                     <text x={backx+width/2+zwidth/2} y={backy+height/2+15.5} textAnchor='middle' fontSize='17'
-                        onMouseDown={this.relateGroup.bind(this, key, key2)}>R</text>
+                        onMouseDown={this.relateGroup.bind(this, key2, key)}>R</text>
                 </g>}
                 {unrelatable && 
                 <g>
                     <rect x={backx+width/2+zwidth/2-10} y={backy+height/2+0} width="20" height="20" fill='#9803fc' rx='4'
-                        onMouseDown={this.unrelateGroup.bind(this, key, key2)}></rect>
+                        onMouseDown={this.unrelateGroup.bind(this, key2)}></rect>
                     <text x={backx+width/2+zwidth/2} y={backy+height/2+15.5} textAnchor='middle' fontSize='17'
-                        onMouseDown={this.unrelateGroup.bind(this, key, key2)}>U</text>
+                        onMouseDown={this.unrelateGroup.bind(this, key2)}>U</text>
                 </g>}
             </g>)
         })
@@ -512,7 +521,8 @@ class MoodBoardAI extends MoodBoard{
                 <MoodBoardMainController mother_this={this} mother_state={this.state}></MoodBoardMainController>
                 {this.state.control_state=='add_image' && this.state.action=='idle' && 
                     <MoodBoardImageAddController mother_this={this} mother_state={this.state}></MoodBoardImageAddController>}
-                
+                <MoodBoardSearchPaneAI mother_this={this} mother_state={this.state}></MoodBoardSearchPaneAI>
+
             </div>
         </div>)
     }

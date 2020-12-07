@@ -193,7 +193,7 @@ module.exports = function(app) {
               }
             }
           }
-          console.log(data_to_return)
+          // console.log(data_to_return)
         }else if(data.updated.indexOf('current_collaborators_sketch_pos')!=-1){
           data_to_return['updated'] = data.updated
 
@@ -206,6 +206,17 @@ module.exports = function(app) {
         
         }else if(data.updated=='sketchpad_undoupdate'){
           data_to_return['updated']=data.updated
+        }else if(data.updated=='moodboard_search_pane_toggle'){
+          data_to_return['updated']=data.updated
+          data_to_return['searchPane']=data.searchPane
+        }else if(data.updated=='moodboard_search_image_select'){
+          data_to_return['updated']=data.updated
+          data_to_return['search_image_selected'] = data.search_image_selected
+        }else if(data.updated=='moodboard_search_slider_change'){
+          data_to_return['updated'] = data.updated
+          data_to_return['search_slider_values'] = data.search_slider_values
+        }else if(data.updated=='moodboard_search_images'){
+          data_to_return['updated'] = data.updated
         }else{
           data_to_return = data
           
@@ -280,7 +291,7 @@ module.exports = function(app) {
           data_to_return._id = data._id
           data_to_return.board_id = data.board_id
           data_to_return.pos = data.pos
-        }else if(data.updated.indexOf('groups_add')!=-1){
+        }else if(data.updated.indexOf('groups_add')!=-1 || data.updated.indexOf('groups_remove')!=-1){
           data_to_return._id = data._id
           data_to_return.board_id = data.board_id
           data_to_return.pos = data.pos
@@ -305,9 +316,11 @@ module.exports = function(app) {
 
 
       return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
+    })
 
-    
-      
+    app.service('searched_arts').publish((data)=>{
+
+      return [app.channel(`boards/${data.board_id}`).send(data)]
       
     })
   };
