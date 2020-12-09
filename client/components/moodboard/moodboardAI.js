@@ -17,8 +17,9 @@ class MoodBoardAI extends MoodBoard{
         searchPane: false,
         search_image_selected: undefined,
         search_slider_values: {},
+        search_slider_distances: {},
         searched_arts: {},
-        
+
         agreementPane: false,
 
 
@@ -121,8 +122,9 @@ class MoodBoardAI extends MoodBoard{
             arts: this.state.current_image.slice(),
             // user model?
         }
-
+        var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         var a_group = {
+            _id: id,
             art_ids: this.state.current_image.slice(),
             group_name: name,
             // art_embeddings --> to be included in the backend
@@ -132,7 +134,11 @@ class MoodBoardAI extends MoodBoard{
             user_info: user_info,
         }
 
+        // var search_slider_values = this.state.search_slider_values
+        // search_slider_values[id]=0
+
         Api.app.service('groups').create(a_group)
+        // Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
         this.setState({action:'idle'})
 
     }
@@ -219,7 +225,30 @@ class MoodBoardAI extends MoodBoard{
     deleteGroup(group_id, e){
         e.stopPropagation()
         e.preventDefault()
+        // var num=0
+        // var groups_h = []
+        // var standard_group = this.state.groups[group_id]
+        // var search_slider_values = this.state.search_slider_values
+        // for(var k in this.state.groups){
+        //     if(this.state.groups[k].higher_group == standard_group.higher_group){
+        //         num=num+1
+        //         if(k!=group_id){
+        //             groups_h.push(k)
+        //         }
+                
+        //     }
+        // }
+        // if(num==2 && search_slider_values[group_id]!=undefined){
+        //     delete search_slider_values[group_id]
+        //     search_slider_values[groups_h]=0
+        // }else if(num==1&&search_slider_values[group_id]!=undefined){
+        //     delete search_slider_values[group_id]
+        // }
+        // search_slider_values={}
+
+        // Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
         Api.app.service('groups').remove(group_id)
+        // Api.app.service('groups').remove({query: {group_id:group_id}})
     }
 
     selectGroup(group_id, e){
@@ -265,11 +294,53 @@ class MoodBoardAI extends MoodBoard{
 
     relateGroup(key, key2){
         var standard_group = this.state.groups[key2]
+        // var cur_group = this.state.groups[key]
+        // var search_slider_values = this.state.search_slider_values
+        // var num = 0
+        // var num2 = 0
+        // var groups_h = []
+        // for(var k in this.state.groups){
+        //     if(this.state.groups[k].higher_group == standard_group.higher_group){
+        //         num=num+1
+        //         groups_h.push(k)
+        //     }
+        //     if(this.state.groups[k].higher_group==cur_group.higher_group){
+        //         num2=num2+1
+        //     }
+        // }
+        // if(num==1 && num2!=2){
+        //     delete search_slider_values[key]
+        // }else{
+        //     for(var i in groups_h){
+        //         if(search_slider_values[groups_h[i]]==undefined){
+        //             search_slider_values[groups_h[i]] = 0
+        //         }
+        //     }
+        //     search_slider_values[key] = 0
+        // }
+        // Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
         Api.app.service('groups').patch(key, {$set: {updated:'groups_relate_r', higher_group: standard_group.higher_group}})
     }
 
     unrelateGroup(key){
+        var standard_group = this.state.groups[key]
+        // var search_slider_values = this.state.search_slider_values
+        // var num = 0
+        // var groups_h = []
+        // for(var k in this.state.groups){
+        //     if(this.state.groups[k].higher_group == standard_group.higher_group){
+        //         num=num+1
+        //         groups_h.push(k)
+        //     }
+        // }
+        // if(num==2){
+        //     search_slider_values[key] = 0
+        //     Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
+        // }else if(num==3){
+
+        // }
         Api.app.service('groups').patch(key, {$set: {updated: 'groups_relate_u', higher_group: this.getRandomColor()}})
+
     }
 
 

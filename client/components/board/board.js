@@ -93,8 +93,11 @@ class Board extends Component{
                     })
                     // find and retrieve layers
                     var arts = _this.refs.moodboard.state.arts
-                    Api.app.service('arts').find({query: {board_id: board_id}})
+                    Api.app.service('arts').find({query: {board_id: board_id, 
+                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file']
+                    }})
                     .then((res)=>{
+                        console.log('art', res)
                         for(var i in res){
                             var art = res[i]
                             arts[art._id] = art
@@ -492,6 +495,8 @@ class Board extends Component{
                 _this.refs.moodboard.setState({search_image_selected: data.search_image_selected})
             }else if(updated.indexOf('moodboard_search_slider_change')!=-1){
                 _this.refs.moodboard.setState({search_slider_values: data.search_slider_values})
+            }else if(updated.indexOf('moodboard_search_slider_distances')!=-1){
+                _this.refs.moodboard.setState({search_slider_distances: data.search_slider_distances})
             }
         })
 

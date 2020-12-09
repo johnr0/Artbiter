@@ -119,6 +119,7 @@ class BoardAI extends Board{
                     var searchPane=false
                     var search_image_selected = undefined
                     var search_slider_values = {}
+                    var search_slider_distances = {}
 
                     var agreementPane=false
                     
@@ -131,12 +132,17 @@ class BoardAI extends Board{
                     if(res[0].search_slider_values!=undefined){
                         search_slider_values = res[0].search_slider_values
                     }
+                    if(res[0].search_slider_distances!=undefined){
+                        search_slider_distances = res[0].search_slider_distances
+                    }
 
                     if(res[0].agreementPane!=undefined){
                         agreementPane = res[0].agreementPane
                     }
                     
-                    Api.app.service('arts').find({query: {board_id: board_id}})
+                    Api.app.service('arts').find({query: {board_id: board_id, 
+                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file']
+                    }})
                     .then((res)=>{
                         for(var i in res){
                             var art = res[i]
@@ -144,13 +150,16 @@ class BoardAI extends Board{
                             
                         }
                         
-                        _this.refs.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, search_slider_values:search_slider_values,
+                        _this.refs.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, 
+                            search_slider_values:search_slider_values, search_slider_distances: search_slider_distances,
                             agreementPane: agreementPane})
                     })
 
                     var groups = _this.refs.moodboard.state.groups
 
-                    Api.app.service('groups').find({query: {board_id: board_id}})
+                    Api.app.service('groups').find({query: {board_id: board_id,
+                        $select: ['_id', 'art_ids', 'group_name', 'higher_group', 'board_id', 'pos', 'user_info', 'updated'],
+                    }})
                     .then((res)=>{
                         for(var i in res){
                             var group = res[i]

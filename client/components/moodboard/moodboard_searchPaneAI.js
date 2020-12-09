@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import Api from '../../middleware/api'
+import interpolate from 'color-interpolate'
 
 class MoodBoardSearchPaneAI extends Component{
 
@@ -64,6 +65,19 @@ class MoodBoardSearchPaneAI extends Component{
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_images'}})
     }
 
+    generate(){
+        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_generate_image'}})
+    }
+
+    renderGradientFromDistance(distance){
+        var colormap = interpolate(['#ffbb00', '#0069c4'])
+
+        return distance.map((val, idx)=>{
+            var color = colormap(val)
+            return (<stop offset={(10*idx)+'%'} style={{stopColor: color, stopOpacity: 1}}></stop>)
+        })
+    }
+
     renderSliders(){
         var higher_groups = {}
         for(var i in this.props.mother_state.groups){
@@ -88,6 +102,10 @@ class MoodBoardSearchPaneAI extends Component{
             }else if(higher_groups[group.higher_group].length==2 && higher_groups[group.higher_group][0]==group._id){
                 group_name2 = this.props.mother_state.groups[higher_groups[group.higher_group][1]].group_name
             }
+            var distance = this.props.mother_state.search_slider_distances[key]
+            if(distance == undefined){
+                distance = [0,0,0,0,0,0,0,0,0,0,0]
+            }
             return (<div key={'slider_'+group._id}>
                 {higher_groups[group.higher_group].length==2 && 
                 <div>
@@ -96,8 +114,18 @@ class MoodBoardSearchPaneAI extends Component{
                 </div>
                 }
                 {higher_groups[group.higher_group].length!=2 && <div>{group.group_name}</div>}
-
-                <input type='range' style={{margin: '5px 0'}} min={-100} max={100} value={val} onChange={this.changeSliders.bind(this, group._id)} onMouseUp={this.doneChangeSliders.bind(this, group._id)}></input>
+                <div style={{width: '100%', position:'relative'}}>
+                    <svg width='100%' height='15.2px' preserveAspectRatio="none" viewBox="0 0 300 15.2" style={{display:'inline-block',position:'absolute'}}>
+                        <defs>
+                            <linearGradient id={'grad'+idx} x1="0%" y1="0%" x2="100%" y2="0%">
+                            {this.renderGradientFromDistance(distance)}
+                            </linearGradient>
+                        </defs>
+                    <rect fill={'url(#grad'+idx+')'} style={{width:'100%', height:'100%'}}></rect>
+                    </svg>
+                    <input type='range' style={{margin: '5px 0'}} min={-100} max={100} value={val} onChange={this.changeSliders.bind(this, group._id)} onMouseUp={this.doneChangeSliders.bind(this, group._id)}></input>
+                </div>
+                
                 
             </div>)
         })
@@ -186,7 +214,7 @@ class MoodBoardSearchPaneAI extends Component{
                     <div className='col s6 moodboard_search_pane_subpane'>
                         <div style={{position: 'absolute', top: '-30px'}}>
                             <div className='btn tiny-btn' style={{marginRight:'3px'}} disabled={(!art_exist||!group_exist)} onMouseUp={this.search.bind(this)}>Search</div>
-                            <div className='btn tiny-btn' disabled={(!art_exist||!group_exist)}>Generate</div>
+                            <div className='btn tiny-btn' disabled={(!art_exist||!group_exist)} onMouseUp={this.generate.bind(this)}>Generate</div>
                         </div>
                         <div className='moodboard_search_pane_subpane_div' style={{overflowY: 'auto'}} onWheel={this.searchWheel.bind(this)}>
                             {this.renderSearchedArts()}
