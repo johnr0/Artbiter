@@ -30,7 +30,7 @@ class MoodBoardColorAddController extends Component{
             }
             Promise.all([
                 _this.props.mother_this.props.board_this.AddArts([arts[id]],[id]),
-                _this.props.mother_this.setState({arts:arts, action:'add_image', current_image: [id], current_text:[]})
+                _this.props.mother_this.setState({arts:arts, color: _this.refs.color_picker.value, action:'add_color', current_image: [id], current_text:[]})
             ])
             
             console.log('uyay', this.width, this.height)

@@ -94,7 +94,7 @@ class Board extends Component{
                     // find and retrieve layers
                     var arts = _this.refs.moodboard.state.arts
                     Api.app.service('arts').find({query: {board_id: board_id, 
-                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file']
+                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color']
                     }})
                     .then((res)=>{
                         console.log('art', res)
@@ -169,12 +169,20 @@ class Board extends Component{
         Api.app.service('arts').on('patched', (data)=>{
             console.log('patched!')
             var arts = this.refs.moodboard.state.arts
-            if(data.position!=undefined){
-                arts[data._id].position = data.position
+            if(data.updated!='moodboard_color_swatch_change'){
+                if(data.position!=undefined){
+                    arts[data._id].position = data.position
+                }
+                if(data.choosen_by!=undefined){
+                    arts[data._id].choosen_by = data.choosen_by
+                }
+            }else{
+                arts[data._id].file=data.file
+                arts[data._id].color = data.color
             }
-            if(data.choosen_by!=undefined){
-                arts[data._id].choosen_by = data.choosen_by
-            }
+            
+            
+
             this.refs.moodboard.setState({arts})
         })
 

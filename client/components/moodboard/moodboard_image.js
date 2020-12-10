@@ -14,6 +14,10 @@ class MoodboardImage extends Component{
             console.log(ratio)
             var _this = this
 
+            if(arts[this.props.art_key].color!=undefined){
+                this.props.mother_this.setState({color: arts[this.props.art_key].color})
+            }
+
             Promise.all([
                 this.props.mother_this.props.board_this.ChooseArtsTexts([this.props.art_key],[],this.props.mother_state.current_image.slice(0),this.props.mother_state.current_text.slice(0)),
                 this.props.mother_this.setState({current_image:[this.props.art_key], current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
@@ -120,16 +124,11 @@ class MoodboardImage extends Component{
             }
             
         }
-        // console.log(this.props.art_key)
+        // console.log(this.props.art)
         return (<g onPointerDown={this.test.bind(this)}>
             <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)}></image>
             {color!='' && <g>
             <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>
-            {/* <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#333333' fill='transparent' strokeWidth='2'></rect>
-            <circle cx={x} cy={y} r='6' stroke='#333333' fill='white'></circle>
-            <circle cx={x+width} cy={y} r='6' stroke='#333333' fill='white'></circle>
-            <circle cx={x} cy={y+height} r='6' stroke='#333333' fill='white'></circle>
-            <circle cx={x+width} cy={y+height} r='6' stroke='#333333' fill='white'></circle> */}
             </g>}
             
         </g>)

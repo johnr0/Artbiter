@@ -7,6 +7,7 @@ import MoodBoardMainController from './moodboard_main_controller'
 import MoodBoardSearchPaneAI from './moodboard_searchPaneAI'
 import MoodboardSelfAI from './moodboard_selfAI'
 import MoodBoardText from './moodboard_text'
+import MoodBoardColorAddController from './moodboard_color_add_controller'
 
 class MoodBoardAI extends MoodBoard{
     // for state
@@ -537,7 +538,7 @@ class MoodBoardAI extends MoodBoard{
 
     render(){
         var boardrender_cursor
-        if(this.state.control_state=='add_image' && this.state.action!='idle'){
+        if((this.state.control_state=='add_image'||this.state.control_state=='add_color') && this.state.action!='idle'){
             boardrender_cursor='crosshair'
         }else if(this.state.control_state=='add_comment'){
             boardrender_cursor='cell'
@@ -594,6 +595,8 @@ class MoodBoardAI extends MoodBoard{
                 <MoodBoardMainController mother_this={this} mother_state={this.state}></MoodBoardMainController>
                 {this.state.control_state=='add_image' && this.state.action=='idle' && 
                     <MoodBoardImageAddController mother_this={this} mother_state={this.state}></MoodBoardImageAddController>}
+                {this.state.control_state=='add_color' && this.state.action=='idle' && 
+                    <MoodBoardColorAddController mother_this={this} mother_state={this.state}></MoodBoardColorAddController>}
                 <MoodBoardSearchPaneAI mother_this={this} mother_state={this.state}></MoodBoardSearchPaneAI>
 
             </div>

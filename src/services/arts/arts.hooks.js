@@ -30,6 +30,37 @@ const turnImageToEmbedding = async context => {
   return context
 }
 
+const turnColorChangeToEmbedding = async context =>{
+  if(context.result.updated=='moodboard_color_swatch_change'){
+    console.log(context.arguments)
+    var image = context.result.file
+    console.log('ml_server', ml_server)
+
+    axios.post(ml_server.ml_server+'image_to_embedding', {
+      image: image,
+    }).then((response)=>{
+      // console.log(response.data)
+      // console.log('e1?')
+      var embedding = JSON.parse(response.data.embedding)
+      var style = JSON.parse(response.data.style)
+      console.log(Object.keys(style))
+      // console.log(context.arguments[0]._id)
+      console.log('color embedding patching')
+      context.app.service('arts').patch(context.result._id, {$set:{updated:'moodboard_update_arts_embedding', embedding: embedding}})
+      
+      context.app.service('art_styles').find({query: {art_id:context.result._id}})
+      .then((res)=>{
+        console.log('color style patching')
+        context.app.service('art_styles').patch(res[0]._id, {$set:{style:style}})
+      })
+    }, (error)=>{
+      // console.log(error)
+      console.log('error')
+    })
+  }
+  
+}
+
 const artStyleRemove = async context =>{
   context.app.service('art_styles').find({query: {art_id: context.arguments[0]}})
   .then((res)=>{
@@ -57,7 +88,7 @@ module.exports = {
       get: [],
       create: [turnImageToEmbedding],
       update: [],
-      patch: [],
+      patch: [turnColorChangeToEmbedding],
       remove: []
     },
   

@@ -1,6 +1,7 @@
 import { keys } from '@feathersjs/transport-commons/lib/channels'
 import { resolve } from 'path'
 import React, {Component} from 'react'
+import Api from '../../middleware/api'
 import ProtoBoard from '../proto/protoboard'
 import MoodBoardColorAddController from './moodboard_color_add_controller'
 import MoodboardImage from './moodboard_image'
@@ -367,7 +368,13 @@ class MoodBoard extends ProtoBoard{
     moodBoardMouseInit(e){
         if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp') && this.state.action=='idle'){
             this.moveBoardInit(e)
+        }else if((this.state.control_state=='control_object') && this.state.action=='change_color'){
+            e.stopPropagation()
+            e.preventDefault()
+            this.setState({action:'idle'})
         }else if(this.state.control_state=='add_image' && this.state.action=='add_image'){
+            this.add_image_init(e)
+        }else if(this.state.control_state=='add_color' && this.state.action=='add_color'){
             this.add_image_init(e)
         }else if(this.state.control_state=='add_text'&& this.state.action=='idle'){
             this.add_text_init(e)
@@ -478,11 +485,40 @@ class MoodBoard extends ProtoBoard{
             current_selected_pos: art_pos.slice(), current_selected_ratio:ratio, current_image_resize_direction: 'top-left'})
     }
 
+    changeColor(){
+        if(this.state.current_image.length==1 && document.getElementById('color_swatch_picker')!=undefined){
+            var value = document.getElementById('color_swatch_picker').value
+            console.log('color', value)
+            var art_id=this.state.current_image[0]
+            console.log('art_id', art_id)
+            var art = this.state.arts[art_id]
+            console.log(art['color'])
+            if(art['color']!=undefined){
+                if(art['color']!=value){
+                    console.log('color update')
+                    var el = document.createElement('canvas')
+                    el.width = 224
+                    el.height = 224
+                    var canvas = el.getContext('2d')
+
+                    canvas.fillStyle=value
+                    canvas.fillRect(0,0,224,224)
+
+                    var src = el.toDataURL()
+                    Api.app.service('arts').patch(art_id, {$set: {file:src, color: value, updated: 'moodboard_color_swatch_change'}})
+                }
+            }
+        }
+        
+
+    }
+
     object_moving_init(e){
         console.log('init?')
         if(e.stopPropagation!=undefined){
             e.stopPropagation()
         }   
+
         var init_mouse_pos = this.getCurrentMouseOnBoard(e)
         var init_image_pos = {}
         console.log(this.state)
@@ -773,6 +809,17 @@ class MoodBoard extends ProtoBoard{
         }
     }
 
+    
+    colorChangeMode(action, e){
+        e.stopPropagation();
+        e.preventDefault()
+        this.setState({action:action})
+    }
+
+    colorChange(e){
+        this.setState({color:e.target.value})
+    }
+
     renderImageHandle(){
         // console.log(this.state.current_selected_pos)
         var smallx = (this.state.current_selected_pos[0]<this.state.current_selected_pos[2])?this.state.current_selected_pos[0]:this.state.current_selected_pos[2]
@@ -784,6 +831,15 @@ class MoodBoard extends ProtoBoard{
 
         var width = (bigx-smallx)* this.state.boardlength*this.state.boardzoom
         var height = (bigy-smally)* this.state.boardlength*this.state.boardzoom
+
+        var color_width = 50
+        var color_height = 40
+
+        var color 
+        if(this.state.current_image.length==1 && this.state.current_text.length==0 && this.state.arts[this.state.current_image[0]].color!=undefined){
+            color = this.state.arts[this.state.current_image[0]].color
+        }
+        console.log(color)
         return (<g>
             <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#333333' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onPointerDown={this.object_moving_init.bind(this)}></rect>
             
@@ -796,6 +852,13 @@ class MoodBoard extends ProtoBoard{
             <circle cx={x+width} cy={y} r='6' stroke='#333333' fill='white' style={{cursor:'ne-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-left')}></circle>
             <circle cx={x} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'sw-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-right')}></circle>
             <circle cx={x+width} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'se-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></circle>
+
+            {this.state.current_image.length==1 && this.state.current_text.length==0 && this.state.arts[this.state.current_image[0]].color!=undefined &&
+            <foreignObject x={x+width+5} y={y+height-color_height} width={color_width} height={color_height}>
+                {/* <div>yeah</div> */}
+                <input id='color_swatch_picker' className='colorHandle' type='color' value={this.state.color} onChange={this.colorChange.bind(this)} onPointerDown={this.colorChangeMode.bind(this, 'change_color')}></input>
+                <div className='btn tiny-btn' style={{width: '100%', height:'20px', lineHeight:'14px'}} onPointerDown={this.changeColor.bind(this)}>Apply</div>
+            </foreignObject>}
         </g>)
     }
 
@@ -810,7 +873,7 @@ class MoodBoard extends ProtoBoard{
         // select
     render(){
         var boardrender_cursor
-        if(this.state.control_state=='add_image' && this.state.action!='idle'){
+        if((this.state.control_state=='add_image'||this.state.control_state=='add_color') && this.state.action!='idle'){
             boardrender_cursor='crosshair'
         }else if(this.state.control_state=='add_comment'){
             boardrender_cursor='cell'

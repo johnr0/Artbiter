@@ -149,7 +149,7 @@ class BoardAI extends Board{
                     }
                     
                     Api.app.service('arts').find({query: {board_id: board_id, 
-                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file']
+                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color']
                     }})
                     .then((res)=>{
                         for(var i in res){
