@@ -2,6 +2,7 @@ import { keys } from '@feathersjs/transport-commons/lib/channels'
 import { resolve } from 'path'
 import React, {Component} from 'react'
 import ProtoBoard from '../proto/protoboard'
+import MoodBoardColorAddController from './moodboard_color_add_controller'
 import MoodboardImage from './moodboard_image'
 import MoodBoardImageAddController from './moodboard_image_add_controller'
 import MoodBoardMainController from './moodboard_main_controller'
@@ -336,7 +337,8 @@ class MoodBoard extends ProtoBoard{
             
                 var reader = new FileReader();
                 reader.onload = function(){
-                    _this.addAnImage(reader.result, document.getElementById(_this.state.boardname).offsetLeft,document.getElementById(_this.state.boardname).offsetTop+100,
+                    _this.addAnImage(reader.result, document.getElementById(_this.state.boardname).offsetLeft+document.getElementById(_this.state.boardname).querySelector('.boardrender').offsetLeft,
+                    document.getElementById(_this.state.boardname).offsetTop+document.getElementById(_this.state.boardname).querySelector('.boardrender').offsetTop,
                     _this.state.arts, counter, resolve)
                 }
                 reader.readAsDataURL(it)
@@ -862,6 +864,8 @@ class MoodBoard extends ProtoBoard{
                 <MoodBoardMainController mother_this={this} mother_state={this.state}></MoodBoardMainController>
                 {this.state.control_state=='add_image' && this.state.action=='idle' && 
                     <MoodBoardImageAddController mother_this={this} mother_state={this.state}></MoodBoardImageAddController>}
+                {this.state.control_state=='add_color' && this.state.action=='idle' && 
+                    <MoodBoardColorAddController mother_this={this} mother_state={this.state}></MoodBoardColorAddController>}
                 
             </div>
         </div>)

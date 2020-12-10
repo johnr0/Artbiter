@@ -18,6 +18,8 @@ class MoodBoardAI extends MoodBoard{
         search_image_selected: undefined,
         search_slider_values: {},
         search_slider_distances: {},
+
+        generate_slider_values: {},
         searched_arts: {},
 
         agreementPane: false,

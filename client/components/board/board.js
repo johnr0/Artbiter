@@ -495,8 +495,13 @@ class Board extends Component{
                 _this.refs.moodboard.setState({search_image_selected: data.search_image_selected})
             }else if(updated.indexOf('moodboard_search_slider_change')!=-1){
                 _this.refs.moodboard.setState({search_slider_values: data.search_slider_values})
+            }else if(updated.indexOf('moodboard_generate_slider_change')!=-1){
+                _this.refs.moodboard.setState({generate_slider_values: data.generate_slider_values})
             }else if(updated.indexOf('moodboard_search_slider_distances')!=-1){
-                _this.refs.moodboard.setState({search_slider_distances: data.search_slider_distances})
+                _this.refs.moodboard.setState({search_slider_distances: data.search_slider_distances, search_slider_values: data.search_slider_values,
+                generate_slider_values: data.generate_slider_values})
+            }else if(updated.indexOf('moodboard_search_mode_toggle')!=-1){
+                _this.refs.moodboard.setState({searchMode: data.searchMode})
             }
         })
 
@@ -880,6 +885,8 @@ class Board extends Component{
             var cur_canvas = el.getContext('2d')
             output_canvas.drawImage(el, 0, 0);
         }
+        output_canvas.fillStyle = 'white'
+        output_canvas.fillRect(0, 0, 1000, 1000);
         console.log('sketch image generated')
 
         var image = output_el.toDataURL()
@@ -898,6 +905,7 @@ class Board extends Component{
         }
 
         Promise.all([
+            _this.ChooseArtsTexts([],[],_this.refs.moodboard.state.current_image, _this.refs.moodboard.state.current_text),
             _this.AddArts([arts[id]],[id]),
             _this.refs.moodboard.setState({arts:arts, control_state:'control_object', action:'idle', current_image: [id], current_text:[], 
             current_selected_pos: [pos0, pos[1]-0.05, pos0+0.1,pos[1]+0.05], current_selected_ratio: 1})

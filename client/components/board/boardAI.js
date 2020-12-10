@@ -117,12 +117,17 @@ class BoardAI extends Board{
                     // find and retrieve layers
                     var arts = _this.refs.moodboard.state.arts
                     var searchPane=false
+                    var searchMode = 'search'
                     var search_image_selected = undefined
                     var search_slider_values = {}
                     var search_slider_distances = {}
+                    var generate_slider_values = {}
 
                     var agreementPane=false
                     
+                    if(res[0].searchMode!=undefined){
+                        searchMode = res[0].searchMode
+                    }
                     if(res[0].searchPane!=undefined){
                         searchPane = res[0].searchPane
                     }
@@ -134,6 +139,9 @@ class BoardAI extends Board{
                     }
                     if(res[0].search_slider_distances!=undefined){
                         search_slider_distances = res[0].search_slider_distances
+                    }
+                    if(res[0].generate_slider_values!=undefined){
+                        generate_slider_values = res[0].generate_slider_values
                     }
 
                     if(res[0].agreementPane!=undefined){
@@ -151,7 +159,8 @@ class BoardAI extends Board{
                         }
                         
                         _this.refs.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, 
-                            search_slider_values:search_slider_values, search_slider_distances: search_slider_distances,
+                            search_slider_values:search_slider_values, search_slider_distances: search_slider_distances, searchMode: searchMode,
+                            generate_slider_values: generate_slider_values, 
                             agreementPane: agreementPane})
                     })
 

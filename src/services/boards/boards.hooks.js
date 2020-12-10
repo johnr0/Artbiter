@@ -71,7 +71,7 @@ function sliderImpact(board_id, context){
         }).then((response)=>{
           console.log(response.data['distances'])
           var distances = JSON.parse(response.data['distances'])
-          context.app.service('boards').patch(board_id, {$set: {search_slider_distances:distances, updated:'moodboard_search_slider_distances'}})
+          context.app.service('boards').patch(board_id, {$set: {search_slider_distances:distances, search_slider_values: search_slider_values, updated:'moodboard_search_slider_distances'}})
         }, (error)=>{
           console.log('error')
         })
@@ -117,7 +117,7 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
 
 function generateImage(content, content_weight, styles, style_weights, context){
   console.log('run this how?')
-  console.log(JSON.stringify(content))
+  // console.log(JSON.stringify(content))
   axios.post(ml_server.ml_server+'generateImage', {
     content: JSON.stringify(content),
     content_weight: content_weight,
@@ -166,6 +166,7 @@ const boardSearchImage = async context => {
     var search_start_image = context.result.search_image_selected
     var search_slider_values = context.result.search_slider_values
     var search_slider_groups = Object.keys(search_slider_values)
+    console.log(search_slider_values)
     if(search_start_image!=undefined && search_slider_values!=undefined){
       console.log(search_start_image, search_slider_values)
       context.app.service('arts').find({query: {_id: search_start_image}})
@@ -194,64 +195,119 @@ const boardGenerateImage = async context =>{
     if(search_start_image==undefined){
       return
     }
-    var search_slider_values = JSON.parse(JSON.stringify(context.result.search_slider_values))
-    var search_slider_groups = Object.keys(search_slider_values)
-    for(var gk in search_slider_values){
-      search_slider_values[gk] = (search_slider_values[gk]+1)/2
-    }
+    console.log('hm?')
+    var generate_slider_values = JSON.parse(JSON.stringify(context.result.generate_slider_values))
+  
     context.app.service('groups').find({query:{board_id: context.result._id}})
     .then((groups)=>{
       var group_ids = []
       var groups_with_higher = {}
-      for(var i in groups){
-        if(groups_with_higher[groups[i].higher_group]==undefined){
-          groups_with_higher[groups[i].higher_group] = []
-        }
-        group_ids.push(groups[i]._id)
-        groups_with_higher[groups[i].higher_group].push(groups[i]._id)
+      // for(var i in groups){
+      //   if(groups_with_higher[groups[i].higher_group]==undefined){
+      //     groups_with_higher[groups[i].higher_group] = []
+      //   }
+      //   group_ids.push(groups[i]._id)
+      //   groups_with_higher[groups[i].higher_group].push(groups[i]._id)
         
-      }
-      for(var hk in groups_with_higher){
-        if(groups_with_higher[hk].length==2){
-          for(var i in groups_with_higher[hk]){
-            if(search_slider_values[groups_with_higher[hk][i]]==undefined){
-              var idx = 0
-              if(i==0){
-                idx=1
-              }
-              search_slider_values[groups_with_higher[hk][i]]= 1-search_slider_values[groups_with_higher[hk][idx]]
-            }
-          }
-        }
-      }
+      // }
+      // for(var hk in groups_with_higher){
+      //   if(groups_with_higher[hk].length==2){
+      //     for(var i in groups_with_higher[hk]){
+      //       if(search_slider_values[groups_with_higher[hk][i]]==undefined){
+      //         var idx = 0
+      //         if(i==0){
+      //           idx=1
+      //         }
+      //         search_slider_values[groups_with_higher[hk][i]]= 1-search_slider_values[groups_with_higher[hk][idx]]
+      //       }
+      //     }
+      //   }
+      // }
       var weight_sum = 0
-      for(var gk in search_slider_values){
-        weight_sum = weight_sum + search_slider_values[gk]
+      for(var gk in generate_slider_values){
+        weight_sum = weight_sum + generate_slider_values[gk]
       }
-      var art_weight = (Object.keys(search_slider_values).length-weight_sum)/Object.keys(search_slider_values).length
+      console.log(weight_sum, 'weight sum is...', generate_slider_values)
+      if(weight_sum==0){
+        return
+      }
+      var art_weight = generate_slider_values['selected_image']
+      if(art_weight==undefined){
+        art_weight = 0
+      }else{
+        delete generate_slider_values['selected_image']
+      }
+      art_weight = art_weight/weight_sum
       console.log(art_weight)
-      var art_weight = 0
-      for(var gk in search_slider_values){
-        search_slider_values[gk]= search_slider_values[gk]/weight_sum
-        // search_slider_values[gk]= search_slider_values[gk]/Object.keys(search_slider_values).length
+      // var art_weight = 0
+      for(var gk in generate_slider_values){
+        // search_slider_values[gk]= search_slider_values[gk]/weight_sum
+        generate_slider_values[gk]= generate_slider_values[gk]/weight_sum
+        group_ids.push(gk)
       }
 
-      console.log(search_slider_values)
+      console.log(generate_slider_values)
+      console.log(group_ids)
       context.app.service('group_styles').find({query: {group_id: {$in: group_ids}}})
       .then((group_styles)=>{
+        console.log('pass?')
         var styles_of_groups = {}
         for(var i in group_styles){
           styles_of_groups[group_styles[i].group_id] = group_styles[i].style
         }
         context.app.service('art_styles').find({query: {art_id: search_start_image}})
         .then((art_styles)=>{
+          console.log('pass2?')
           var art_style = art_styles[0].style
 
-          generateImage(art_style, art_weight, styles_of_groups, search_slider_values, context)
+          generateImage(art_style, art_weight, styles_of_groups, generate_slider_values, context)
         })
       })
     })
 
+  }
+}
+
+const boardSearchSimilarImage = async context =>{
+  if(context.result.updated=='moodboard_search_similar_images'){
+    console.log('board similar search starts')
+    var search_start_image = context.result.search_image_selected
+    if(search_start_image!=undefined){
+      context.app.service('arts').find({query: {_id: search_start_image}})
+      .then((res1)=>{
+        var search_start_image_embedding = res1[0].embedding
+        searchImages(search_start_image_embedding, {}, {}, context)
+        
+      })
+    }
+  }
+}
+
+const boardSearchRandomImage = async context =>{
+  if(context.result.updated=='moodboard_search_random_images'){
+    axios.post(ml_server.ml_server+'randomSearchImage', {})
+    .then((response)=>{
+      var returned_images = JSON.parse(response.data['returned_images'])
+      console.log('returned images:', returned_images.length)
+
+      // TODO show returned images... 
+      context.app.service('searched_arts').find({query: {board_id: context.result._id}})
+      .then((res0)=>{
+        for(var i in res0){
+          context.app.service('searched_arts').remove(res0[i]._id)
+        }
+        for(var i in returned_images){
+          var searched_art = {
+            image: returned_images[i],
+            board_id: context.result._id,
+            order: i,
+          }
+          context.app.service('searched_arts').create(searched_art)
+        }
+      })
+    }, (error)=>{
+
+    })
   }
 }
 
@@ -285,7 +341,7 @@ module.exports = {
       get: [],
       create: [],
       update: [],
-      patch: [boardSearchImage, boardGenerateImage, afterSliderValuesChange, afterSearchImageSelected],
+      patch: [boardSearchImage, boardGenerateImage, boardSearchSimilarImage, boardSearchRandomImage, afterSliderValuesChange, afterSearchImageSelected],
       remove: []
     },
   

@@ -1,10 +1,17 @@
 var axios = require('axios')
 var ml_server = require('../../config')
 var nj = require('numjs');
+const { response } = require('@feathersjs/express');
 
 function sliderImpact(board_id, context){
   context.app.service('boards').find({query: {_id: board_id}})
   .then((res0)=>{
+
+    var generate_slider_values = res0[0].generate_slider_values
+    if(generate_slider_values==undefined){
+      generate_slider_values = {}
+    }
+
     var search_slider_values = res0[0].search_slider_values
     if(search_slider_values==undefined){
       search_slider_values = {}
@@ -20,6 +27,11 @@ function sliderImpact(board_id, context){
       for(var i in search_slider_values){
         if(ids.indexOf(i)==-1){
           delete search_slider_values[i]
+        }
+      }
+      for(var i in generate_slider_values){
+        if(ids.indexOf(i)==-1 && i!='selected_image'){
+          delete generate_slider_values[i]
         }
       }
 
@@ -69,7 +81,7 @@ function sliderImpact(board_id, context){
         }).then((response)=>{
           console.log(response.data['distances'])
           var distances = JSON.parse(response.data['distances'])
-          context.app.service('boards').patch(board_id, {$set: {search_slider_distances:distances, updated:'moodboard_search_slider_distances'}})
+          context.app.service('boards').patch(board_id, {$set: {search_slider_distances:distances, search_slider_values: search_slider_values, generate_slider_values: generate_slider_values, updated:'moodboard_search_slider_distances'}})
         }, (error)=>{
           console.log('error')
         })
@@ -110,8 +122,30 @@ function trainCAV(embeddings, context, board_id){
 
 }
 
+function averageStyles2(styles, context){
+  axios.post(ml_server.ml_server+'trainStyleCAV', {
+    styles: JSON.stringify(styles)
+  }).then((response)=>{
+    console.log('response')
+    var avg_styles = JSON.parse(response.data['styles'])
+    for(var i in avg_styles){
+      context.app.service('group_styles').find({query : {group_id: i}})
+      .then((res)=>{
+        if(res.length>0){
+          context.app.service('group_styles').patch(res._id, {$set: {style: avg_styles[i]}})
+        }else{
+          context.app.service('group_styles').create({style: avg_styles[i], group_id: i})
+        }
+      })
+    }
+  }, (error)=>{
+    console.log('error')
+  })
+}
+
 function averageStyles(styles, context){
   var avg_styles = {}
+  // var start = new Date().getTime();
     for(var i in styles){
       avg_styles[i] = {}
       for(var dim_key in styles[i][0]){
@@ -143,11 +177,12 @@ function averageStyles(styles, context){
         // console.log(l)
       }
     }
+    // console.log('ttttime.....', new Date().getTime()-start)
     for(var i in avg_styles){
       context.app.service('group_styles').find({query : {group_id: i}})
       .then((res)=>{
         if(res.length>0){
-          context.app.service('group_styles').patch(res._id, {$set: {style: avg_styles[i]}})
+          context.app.service('group_styles').patch(res[0]._id, {$set: {style: avg_styles[i]}})
         }else{
           context.app.service('group_styles').create({style: avg_styles[i], group_id: i})
         }
@@ -235,38 +270,23 @@ const RelateCAV = async context => {
         trainCAV(embeddings, context, context.result.board_id)
       })
 
-      context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
-      .then((res3)=>{
-        var art_styles = {}
-        for(var j in res3){
-          art_styles[res3[j].art_id] = res3[j].style
-        }
-        for(var i in res){
-          var group = res[i]
-          styles[group._id] = []
-          for(var j in group.art_ids){
-            var art_id = group.art_ids[j]
-            styles[group._id].push(art_styles[art_id])
-          }
-        }
-        averageStyles(styles, context)
-      })
-      // console.log(res)
-      // if(res.length==2){
-      //   context.app.service('boards').find({query: {_id: context.result.board_id}})
-      //   .then((res3)=>{
-      //     var search_slider_values = res3[0].search_slider_values
-      //     delete search_slider_values[context.result._id]
-      //     context.app.service('boards').patch(res3[0]._id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
-      //   })
-      // }else if(res.length>2){
-      //   context.app.service('boards').find({query: {_id: context.result.board_id}})
-      //   .then((res3)=>{
-      //     var search_slider_values = res3[0].search_slider_values
-      //     delete search_slider_values[context.result._id]
-      //     context.app.service('boards').patch(res3[0]._id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
-      //   })
-      // }
+      // context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
+      // .then((res3)=>{
+      //   var art_styles = {}
+      //   for(var j in res3){
+      //     art_styles[res3[j].art_id] = res3[j].style
+      //   }
+      //   for(var i in res){
+      //     var group = res[i]
+      //     styles[group._id] = []
+      //     for(var j in group.art_ids){
+      //       var art_id = group.art_ids[j]
+      //       styles[group._id].push(art_styles[art_id])
+      //     }
+      //   }
+      //   averageStyles(styles, context)
+      // })
+      
     })
 
     
@@ -310,33 +330,27 @@ const UnrelateCAV = async context => {
             
           })
 
-          context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
-          .then((res4)=>{
-            var art_styles = {}
-            for(var j in res4){
-              art_styles[res4[j].art_id] = res4[j].style
-            }
-            for(var i in res2){
-              var styles = {}
-              var group = res2[i]
-              if(group._id!=context.arguments[0]){
-                styles[group._id] = []
-                for(var j in group.art_ids){
-                  var art_id = group.art_ids[j]
-                  styles[group._id].push(art_styles[art_id])
-                }
-                averageStyles(styles, context)
-              }
-            }
+          // context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
+          // .then((res4)=>{
+          //   var art_styles = {}
+          //   for(var j in res4){
+          //     art_styles[res4[j].art_id] = res4[j].style
+          //   }
+          //   for(var i in res2){
+          //     var styles = {}
+          //     var group = res2[i]
+          //     if(group._id!=context.arguments[0]){
+          //       styles[group._id] = []
+          //       for(var j in group.art_ids){
+          //         var art_id = group.art_ids[j]
+          //         styles[group._id].push(art_styles[art_id])
+          //       }
+          //       averageStyles(styles, context)
+          //     }
+          //   }
             
-          })
+          // })
         })
-        // context.app.service('boards').find({query: {_id: res[0].board_id}})
-        // .then((res4)=>{
-        //   var search_slider_values = res4[0].search_slider_values
-        //   search_slider_values[context.arguments[0]]=0
-        //   context.app.service('boards').patch(res4[0]._id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
-        // })
       })
       
   }
@@ -436,26 +450,26 @@ const RemoveGroupCAV = async context => {
         }
       })
 
-      context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
-      .then((res4)=>{
-        var art_styles = {}
-        for(var j in res4){
-          art_styles[res4[j].art_id] = res4[j].style
-        }
-        for(var i in res2){
-          var styles = {}
-          var group = res2[i]
-          if(group._id!=context.arguments[0]){
-            styles[group._id] = []
-            for(var j in group.art_ids){
-              var art_id = group.art_ids[j]
-              styles[group._id].push(art_styles[art_id])
-            }
-            averageStyles(styles, context)
-          }
-        }
+      // context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
+      // .then((res4)=>{
+      //   var art_styles = {}
+      //   for(var j in res4){
+      //     art_styles[res4[j].art_id] = res4[j].style
+      //   }
+      //   for(var i in res2){
+      //     var styles = {}
+      //     var group = res2[i]
+      //     if(group._id!=context.arguments[0]){
+      //       styles[group._id] = []
+      //       for(var j in group.art_ids){
+      //         var art_id = group.art_ids[j]
+      //         styles[group._id].push(art_styles[art_id])
+      //       }
+      //       averageStyles(styles, context)
+      //     }
+      //   }
         
-      })
+      // })
     })
   })
 }

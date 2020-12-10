@@ -217,9 +217,21 @@ module.exports = function(app) {
           data_to_return['search_slider_values'] = data.search_slider_values
         }else if(data.updated=='moodboard_search_images'){
           data_to_return['updated'] = data.updated
+        }else if(data.updated=='moodboard_search_similar_images'){
+          data_to_return['updated'] = data.updated
+        }else if(data.updated=='moodboard_search_random_images'){
+          data_to_return['updated'] = data.updated
         }else if(data.updated=='moodboard_search_slider_distances'){
           data_to_return['updated'] = data.updated
           data_to_return['search_slider_distances'] = data.search_slider_distances
+          data_to_return['search_slider_values'] = data.search_slider_values
+          data_to_return['generate_slider_values'] = data.generate_slider_values
+        }else if(data.updated=='moodboard_search_mode_toggle'){
+          data_to_return['updated']=data.updated
+          data_to_return['searchMode']=data.searchMode
+        }else if(data.updated=='moodboard_generate_slider_change'){
+          data_to_return['updated'] = data.updated
+          data_to_return['generate_slider_values'] = data.generate_slider_values
         }else{
           data_to_return = data
           
@@ -321,7 +333,7 @@ module.exports = function(app) {
         delete data_to_return['avg_style']
       }  
       
-      console.log(data.board_id, data)
+      console.log(data.board_id)
 
 
       return [app.channel(`boards/${data.board_id}`).send(data_to_return)]

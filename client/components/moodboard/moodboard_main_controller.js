@@ -51,10 +51,10 @@ class MoodBoardMainController extends Component{
                 onClick={this.changeControlState.bind(this, 'add_text')}>
                 <i className="controller_button_icon material-icons">title</i>
             </div>
-            {/* <div className='controller_button' style={{color: (this.props.mother_state.control_state=='move_board')?'white':'#888888'}}
-                onClick={this.changeControlState.bind(this, 'move_board')}>
-                <i className="controller_button_icon material-icons">pan_tool</i>
-            </div> */}
+            <div className='controller_button' style={{color: (this.props.mother_state.control_state=='add_color')?'white':'#888888'}}
+                onClick={this.changeControlState.bind(this, 'add_color')}>
+                <i className="controller_button_icon material-icons">color_lens</i>
+            </div>
             <div className='controller_button' style={{color: (this.props.mother_state.control_state=='control_object')?'white':'#888888'}}
                 onClick={this.changeControlState.bind(this, 'control_object')}>
                 <i className="controller_button_icon fa fa-mouse-pointer"></i>
