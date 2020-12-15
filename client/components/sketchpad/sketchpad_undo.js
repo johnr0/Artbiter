@@ -50,7 +50,7 @@ class SketchpadUndo extends Component{
                 }
             }
         }
-        console.log(idx, skip)
+        // console.log(idx, skip)
         return [idx, skip]
     }
 

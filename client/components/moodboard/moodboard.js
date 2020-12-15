@@ -146,7 +146,7 @@ class MoodBoard extends ProtoBoard{
     dropImage(e){
         e.stopPropagation();
         e.preventDefault();
-        if(this.state.control_state=='content-stamp'){
+        if(this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp'){
             return  
         }
         
@@ -257,6 +257,8 @@ class MoodBoard extends ProtoBoard{
                 file: imgsrc,
                 position: [origin[0], origin[1], cur[0], cur[1]], 
                 ratio:  this.width/this.height,
+                width: this.width,
+                height: this.height, 
                 choosen_by: _this.props.board_this.state.user_id, 
             }
             if(typeof resolve === 'function'){
@@ -366,7 +368,9 @@ class MoodBoard extends ProtoBoard{
     }
 
     moodBoardMouseInit(e){
-        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp') && this.state.action=='idle'){
+        
+        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp') && this.state.action=='idle'){
+            console.log('init starts at here? or?')
             this.moveBoardInit(e)
         }else if((this.state.control_state=='control_object') && this.state.action=='change_color'){
             e.stopPropagation()
@@ -385,7 +389,7 @@ class MoodBoard extends ProtoBoard{
         // var pos = this.getCurrentMouseOnBoard(e)
         // this.props.board_this.setMoodboardPosition(pos[0], pos[1]);
 
-        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp') && this.state.action=='move_board'){
+        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp') && this.state.action=='move_board'){
             this.moveMouse(e)
         }else if(this.state.control_state=='control_object' && this.state.action=='object_resizing'){
             this.object_resizing(e)
@@ -397,7 +401,7 @@ class MoodBoard extends ProtoBoard{
 
 
     moodBoardMouseEnd(e){
-        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp') && this.state.action=='move_board'){
+        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp') && this.state.action=='move_board'){
             this.moveBoardEnd(e)
         }else if(this.state.control_state=='control_object' && this.state.action=='object_resizing'){
             this.end_object_resizing(e)
@@ -433,11 +437,14 @@ class MoodBoard extends ProtoBoard{
             this.props.board_this.ChooseArtsTexts([],[],this.state.current_image.slice(0), this.state.current_text.slice(0)),
             this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids)
         ]
+        var _this = this
         if(del_texts.length>0){
             promises.push(this.props.board_this.RemoveArtsTexts([], del_texts))
         }
         promises.push(this.setState({action:'idle', current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined, 
-        move_board_init: undefined, move_board_mouse_init: undefined}))
+        move_board_init: undefined, move_board_mouse_init: undefined}, function(){
+            _this.props.board_this.refs.sketchpad.setState({})
+        })) 
         Promise.all(promises)
     }
 
@@ -886,7 +893,7 @@ class MoodBoard extends ProtoBoard{
         }
         return (<div className='col s6 oneboard'>
             <h2>Moodboard</h2>
-            <div id='moodboard' className='moodboard' onWheel={this.zoom_board_wheel.bind(this)} 
+            <div id='moodboard' className='moodboard select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
                 //onPointerOut={this.moveBoardEnd.bind(this)}
                 
                 

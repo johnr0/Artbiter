@@ -6,7 +6,7 @@ class MoodboardImage extends Component{
         e.stopPropagation();
     }
 
-    select_new_image(e){
+    select_new_image(obj_moving, e){
         var arts = this.props.mother_state.arts
         if(arts[this.props.art_key].choosen_by==''){
             var pos = arts[this.props.art_key].position.slice()
@@ -21,7 +21,10 @@ class MoodboardImage extends Component{
             Promise.all([
                 this.props.mother_this.props.board_this.ChooseArtsTexts([this.props.art_key],[],this.props.mother_state.current_image.slice(0),this.props.mother_state.current_text.slice(0)),
                 this.props.mother_this.setState({current_image:[this.props.art_key], current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
-                    _this.props.mother_this.object_moving_init(e)
+                    if(obj_moving){
+                        _this.props.mother_this.object_moving_init(e)
+                    }
+                    _this.props.mother_this.props.board_this.refs.sketchpad.setState({})
                 })
             ])
             
@@ -29,7 +32,7 @@ class MoodboardImage extends Component{
         
     }
 
-    add_an_image(e){
+    add_an_image(obj_moving, e){
         var arts = this.props.mother_state.arts
         if(arts[this.props.art_key].choosen_by==''){
             var texts = this.props.mother_state.texts
@@ -75,7 +78,10 @@ class MoodboardImage extends Component{
             Promise.all([
                 this.props.mother_this.props.board_this.ChooseArtsTexts([this.props.art_key],[], [],[]),
                 this.props.mother_this.setState({current_image:current_image, current_selected_pos: pos, current_selected_ratio: ratio}, function(){
-                    _this.props.mother_this.object_moving_init(e)
+                    if(obj_moving){
+                        _this.props.mother_this.object_moving_init(e)
+                    }
+                    _this.props.mother_this.props.board_this.refs.sketchpad.setState({})
                 })
             ])
             
@@ -90,16 +96,16 @@ class MoodboardImage extends Component{
         var ecopied = {pageX: e.pageX, pageY: e.pageY}
         if(this.props.mother_state.control_state=='control_object'){
             if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
-                this.select_new_image(ecopied)
+                this.select_new_image(true, ecopied)
             }else if(this.props.mother_state.shift_down==false){
-                this.select_new_image(ecopied)
+                this.select_new_image(true, ecopied)
             }else{
-                this.add_an_image(ecopied)
+                this.add_an_image(true, ecopied)
             }
             
         }else if(this.props.mother_state.control_state=='content-stamp'){
             console.log('yeah')
-            this.select_new_image(ecopied)
+            this.select_new_image(false, ecopied)
         }
 
     }

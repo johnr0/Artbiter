@@ -179,10 +179,13 @@ function averageStyles(styles, context){
     }
     // console.log('ttttime.....', new Date().getTime()-start)
     for(var i in avg_styles){
-      context.app.service('group_styles').find({query : {group_id: i}})
+      context.app.service('group_styles').find({query: {group_id: i}})
       .then((res)=>{
         if(res.length>0){
-          context.app.service('group_styles').patch(res[0]._id, {$set: {style: avg_styles[i]}})
+          console.log('printed are', i, res[0]._id, res[0].group_id)
+          if(res[0].group_id==i){
+            context.app.service('group_styles').patch(res[0]._id, {$set: {style: avg_styles[i]}})
+          }
         }else{
           context.app.service('group_styles').create({style: avg_styles[i], group_id: i})
         }

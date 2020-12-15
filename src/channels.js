@@ -232,6 +232,8 @@ module.exports = function(app) {
         }else if(data.updated=='moodboard_generate_slider_change'){
           data_to_return['updated'] = data.updated
           data_to_return['generate_slider_values'] = data.generate_slider_values
+        }else if(data.updated=='sketchpad_style_apply'){
+          data_to_return['updated'] = data.updated
         }else{
           data_to_return = data
           
@@ -254,6 +256,7 @@ module.exports = function(app) {
       if(data.updated.indexOf('sketchpad_layers_choosen')!=-1){
         data_to_return._id = data._id
         data_to_return.choosen_by = data.choosen_by
+        data_to_return.board_id = data.board_id
       }else if(data.updated=='sketchpad_add_a_layer'){
         data_to_return = data
       }else{

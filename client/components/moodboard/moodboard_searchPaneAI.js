@@ -225,7 +225,7 @@ class MoodBoardSearchPaneAI extends Component{
                                 </defs>
                             <rect fill={'url(#grad'+idx+')'} style={{width:'100%', height:'100%'}}></rect>
                             </svg>
-                            <input type='range' style={{margin: '5px 0'}} min={-100} max={100} value={val} onChange={this.changeSliders.bind(this, group._id)} onMouseUp={this.doneChangeSliders.bind(this, group._id)}></input>
+                            <input type='range' style={{margin: '5px 0'}} min={-100} max={100} value={val} onChange={this.changeSliders.bind(this, group._id)} onPointerUp={this.doneChangeSliders.bind(this, group._id)}></input>
                         </div>
                         
                         

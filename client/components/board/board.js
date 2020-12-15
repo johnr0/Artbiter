@@ -94,7 +94,7 @@ class Board extends Component{
                     // find and retrieve layers
                     var arts = _this.refs.moodboard.state.arts
                     Api.app.service('arts').find({query: {board_id: board_id, 
-                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color']
+                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height']
                     }})
                     .then((res)=>{
                         console.log('art', res)
@@ -190,8 +190,34 @@ class Board extends Component{
             console.log('layer created', data)
             if(data.board_id==this.state.board_id){
                 var layer_dict = this.refs.sketchpad.state.layer_dict
+                // var layers = this.refs.sketchpad.state.layers
+                // var current_layer_id = layers[this.refs.sketchpad.state.current_layer]
+
                 layer_dict[data._id] = data
-                this.refs.sketchpad.setState({layer_dict})
+
+
+                
+                this.refs.sketchpad.setState({layer_dict}, function(){
+
+                    var checkExist = setInterval(function(){
+                        var el = document.getElementById('sketchpad_canvas_'+data._id)
+                        if(el!=null){
+                            clearInterval(checkExist)
+                            var ctx = el.getContext('2d')
+                            var temp_el = document.getElementById('temp_canvas')
+                            var temp_ctx = temp_el.getContext('2d')
+                            var im = new Image()
+                            im.src = data.image
+                            im.onload=function(){
+                                console.log('first')
+                                temp_ctx.drawImage(im, 0,0,1000,1000)
+                                ctx.clearRect(0,0,1000,1000)
+                                ctx.drawImage(im, 0,0,1000,1000)
+                                temp_ctx.clearRect(0,0,1000,1000)
+                            }   
+                        }
+                    },200)  
+                })
             }
         })
 
@@ -228,8 +254,18 @@ class Board extends Component{
             console.log('layer removed', data)
             if(data.board_id==this.state.board_id){
                 var layer_dict = this.refs.sketchpad.state.layer_dict
+                var layers = this.refs.sketchpad.state.layers
+                var current_layer_id = layers[this.refs.sketchpad.state.current_layer]
                 delete layer_dict[data._id]
-                this.refs.sketchpad.setState({layer_dict})
+                console.log(layers.length)
+                if(layers.indexOf(data._id)!=-1){
+                    layers.splice(layers.indexOf(data._id), 1)
+                }
+                
+                console.log(layers.length)
+                var current_layer = layers.indexOf(current_layer_id)
+                console.log(current_layer)
+                this.refs.sketchpad.setState({layer_dict, layers, current_layer})
             }
         })
 
@@ -311,6 +347,9 @@ class Board extends Component{
                 if(updated.indexOf('undo')==-1){
                     sketchundo.shift();
                     sketchundo.push(data.sketchundo)
+
+                    var current_layer_id = _this.refs.sketchpad.state.layers[current_layer]
+                    current_layer = layers.indexOf(current_layer_id)
                     
                 }else{
                     var undo_id = updated.split('.')[2] 

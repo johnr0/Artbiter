@@ -30,11 +30,62 @@ class MoodboardImageAI extends MoodboardImage{
 
     // }
 
+    deselectAnImage(){
+        var arts = this.props.mother_state.arts
+        if(arts[this.props.art_key].choosen_by==this.props.mother_this.props.board_this.state.user_id){
+            var pos = [Number.MAX_VALUE, Number.MAX_VALUE, Number.MIN_VALUE, Number.MIN_VALUE]
+            var current_image = this.props.mother_state.current_image
+            current_image.splice(current_image.indexOf(this.props.art_key), 1)
+            var _this = this
+            for (var i in current_image){
+                var key = current_image[i]
+                var cur_pos = arts[key].position.slice()
+                if(cur_pos[0]<pos[0]){
+                    pos[0] = cur_pos[0]    
+                }
+                if(cur_pos[1]<pos[1]){
+                    pos[1] = cur_pos[1]    
+                }
+                if(cur_pos[2]>pos[2]){
+                    pos[2] = cur_pos[2]    
+                }
+                if(cur_pos[3]>pos[3]){
+                    pos[3] = cur_pos[3]    
+                }
+            }
+        
+            var ratio = (pos[2]-pos[0])/(pos[3]-pos[1])
+            Promise.all([
+                this.props.mother_this.props.board_this.ChooseArtsTexts([],[], [this.props.art_key],[]),
+                this.props.mother_this.setState({current_image:current_image, current_selected_pos: pos, current_selected_ratio: ratio}, function(){
+                    _this.props.mother_this.props.board_this.refs.sketchpad.setState({})
+                })
+            ])
+        }
+    }
+
     choose_image(e){
+        console.log('choooose imaaaage')
         super.choose_image(e)
+        var ecopied = {pageX: e.pageX, pageY: e.pageY}
         if(this.props.mother_state.control_state=='search_image_select'){
             Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {search_image_selected: this.props.art_key, updated:'moodboard_search_image_select'}})
             this.props.mother_this.setState({control_state: 'control_object'})
+        }else if(this.props.mother_state.control_state=='style-stamp'){
+            console.log(this.props.mother_state.current_image, this.props.art_key)
+            if(this.props.mother_state.current_image.indexOf(this.props.art_key)==-1){
+                if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
+                    this.select_new_image(false, ecopied)
+                }else if(this.props.mother_state.shift_down==false){
+                    this.select_new_image(false, ecopied)
+                }else{
+                    this.add_an_image(false, ecopied)
+                }
+            }else{
+                console.log('heh?')
+                this.deselectAnImage()
+            }
+            
         }
     }
 
@@ -152,7 +203,7 @@ class MoodboardImageAI extends MoodboardImage{
         return (<g onPointerDown={this.test.bind(this)}>
             <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)}></image>
             {color!='' && <g>
-            <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>
+            <rect onPointerDown={this.choose_image.bind(this)} x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>
             {renderUser && this.renderUsers(userGroup,x,y, width)}
             </g>}
             

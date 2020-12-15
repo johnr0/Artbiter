@@ -119,8 +119,7 @@ class BoardListPage extends Component{
 
         var sketchundo = []
         var moodboardundo = []
-        sketchundo.length = 20
-        moodboardundo.length = 20
+        sketchundo.length = 10
         var board= {
             _id: _id,
             name:'new board',
@@ -129,7 +128,6 @@ class BoardListPage extends Component{
             collaborators: [],
             current_collaborators: {},
             sketchundo: sketchundo,
-            moodboardundo: moodboardundo,
         }
         Api.app.service('boards').create(board)
         Api.app.service('layers').create(a_layer)

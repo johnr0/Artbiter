@@ -142,13 +142,12 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .select_disabled{
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    pointer-events: none;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; 
 }
 
 .textSelectdisabled{
@@ -170,6 +169,16 @@ h1, h2, h3, h4, h5, h6{
     position: absolute;
     width: 50px; 
     height: 270px;
+    
+    left: 10px;
+    top: 10px;
+    
+}
+
+.sketchpad_main_controllerAI{
+    position: absolute;
+    width: 50px; 
+    height: 312px;
     
     left: 10px;
     top: 10px;
@@ -232,6 +241,24 @@ input[type=range][orient=vertical]
     
     left: 60px;
     top: 0px;   
+}
+
+.sketchpad_style_controller{
+    position: absolute;
+    width: 220px; 
+    height: 46px;
+    
+    left: 60px;
+    top: 0px;   
+}
+
+.sketchpad_style_controller2{
+    position: absolute;
+    width: calc(100% - 20px); 
+    height: 45%;
+    left: 10px;
+    
+    bottom: 0px;   
 }
 
 .sketchpad_erase_size_controller{

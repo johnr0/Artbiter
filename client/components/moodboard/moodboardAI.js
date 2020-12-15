@@ -8,6 +8,7 @@ import MoodBoardSearchPaneAI from './moodboard_searchPaneAI'
 import MoodboardSelfAI from './moodboard_selfAI'
 import MoodBoardText from './moodboard_text'
 import MoodBoardColorAddController from './moodboard_color_add_controller'
+import MoodboardStyleSketchControlAI from './moodboard_style_sketch_controlAI'
 
 class MoodBoardAI extends MoodBoard{
     // for state
@@ -551,7 +552,7 @@ class MoodBoardAI extends MoodBoard{
         }
         return (<div className='col s6 oneboard'>
             <h2>Moodboard</h2>
-            <div id='moodboard' className='moodboard' onWheel={this.zoom_board_wheel.bind(this)} 
+            <div id='moodboard' className='moodboard select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
                 //onPointerOut={this.moveBoardEnd.bind(this)}
                 
                 
@@ -585,9 +586,10 @@ class MoodBoardAI extends MoodBoard{
                         {this.rendereditingTexts()}
                         {this.renderGroupFront()}
                         {this.renderGrouper()}
-                        
+                        {/* {this.state.control_state=='style-stamp' && <MoodboardStyleSketchControlAI ref={'stylecontrol'} mother_this={this} mother_state={this.state}></MoodboardStyleSketchControlAI>} */}
                     </svg>
                     {this.props.board_this.renderCollaboratorsOnMoodBoard()}
+                    
                     
 
                 </div>

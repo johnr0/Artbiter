@@ -151,6 +151,55 @@ function generateImage(content, content_weight, styles, style_weights, context){
   })
 }
 
+function generateImageWithScaling(content, styles, context){
+  axios.post(ml_server.ml_server+'generateImageWithScaling', {
+    content: JSON.stringify(content),
+    styles: JSON.stringify(styles)
+  }).then((response)=>{
+    var returned_image = response.data['returned_image']
+
+    // add layer
+    console.log(returned_image)
+    var layer_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    console.log(context.arguments[2]['user'])
+    var layer = {
+      _id: layer_id, 
+      board_id: context.arguments[0],
+      image: returned_image,
+      opacity: 1,
+      choosen_by: '',
+      updated: 'sketchpad_add_a_layer',
+    }
+    var push ={
+      layers: {
+        $each: [layer_id],
+        $position: content['current_layer'],
+      },
+      sketchundo: {
+        undo_id: Math.random().toString(36).substring(2, 15), 
+        user_id: context.arguments[2]['user']['_id'],
+        type: 'layer_add',
+        layer_idx: content['current_layer'],
+        layer_id: layer_id,
+        layer: layer
+      }
+    }
+    var set ={
+      updated: 'sketchpad_add_a_layer'
+    }
+
+    context.app.service('layers').create(layer).then(()=>{
+      context.app.service('boards').patch(context.arguments[0], {$set:set, $push:push}).then(()=>{
+        context.app.service('boards').patch(context.arguments[0], {$set:{updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
+      })
+    })
+  
+    // context.app.service('boards').patch(context.arguments[0], {$set: {sketchpad_style_image: returned_image, updated:'sketchpad_style_result'}})
+  }, (error)=>{
+
+  })
+}
+
 const onBoardUpdate = async context =>{
 
     context.app.service('boards').emit('changed', {
@@ -323,6 +372,27 @@ const afterSearchImageSelected = async context =>{
   }
 }
 
+const sketchpadStyleApply = async context => {
+  if(context.arguments[1]['$set']!=undefined){
+
+  
+    if(context.arguments[1]['$set'].updated == 'sketchpad_style_apply'){
+      var content = context.arguments[1]['$set'].content
+      delete context.arguments[1]['$set'].content 
+      var styles = context.arguments[1]['$set'].styles
+      delete context.arguments[1]['$set'].styles
+
+      console.log(context.arguments[1])
+      // do something fun
+
+      // console.log(content)
+
+      generateImageWithScaling(content, styles, context)
+
+      return context
+    }
+  }
+}
 
 module.exports = {
     before: {
@@ -331,7 +401,7 @@ module.exports = {
       get: [],
       create: [],
       update: [],
-      patch: [],
+      patch: [sketchpadStyleApply],
       remove: []
     },
   

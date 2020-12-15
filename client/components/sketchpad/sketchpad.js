@@ -24,6 +24,8 @@ class SketchPad extends ProtoBoard {
 
         erase_size: 20,
 
+        stamp_size: 20,
+
         layers: [
             {
                 layer_id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
@@ -96,6 +98,9 @@ class SketchPad extends ProtoBoard {
         if(this.state.control_state=='erase' && this.state.action=='size'){
             return
         }
+        if(this.state.control_state=='style-stamp' && this.state.action=='size'){
+            return
+        }
         if(this.state.control_state=='move-layer' && this.state.action=='rotate-layer'){
             return
         }
@@ -115,6 +120,8 @@ class SketchPad extends ProtoBoard {
         }else if(this.state.control_state=='brush' && this.state.action=='size'){
             this.setState({action:'idle'})
         }else if(this.state.control_state=='erase' && this.state.action=='size'){
+            this.setState({action:'idle'})
+        }else if(this.state.control_state=='style-stamp' && this.state.action=='size'){
             this.setState({action:'idle'})
         }else if(this.state.control_state=='area' && this.state.action=='idle'){
             this.lassoInit(e)
@@ -1210,8 +1217,8 @@ class SketchPad extends ProtoBoard {
 
     render(){
         return (<div className='col s6 oneboard'>
-        <h2>SketchPad</h2>
-        <div id='sketchpad' className='sketchpad' onWheel={this.zoom_board_wheel.bind(this)} 
+        <h2 className='select_disabled'>SketchPad</h2>
+        <div id='sketchpad' className='sketchpad select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
             onPointerOut={this.moveBoardEnd.bind(this)}
             onPointerMove={this.sketchPadMouseMove.bind(this)}> 
             <div className={'boardrender'} onPointerDown={this.sketchPadMouseMoveInit.bind(this)} onPointerUp={this.sketchPadMouseMoveEnd.bind(this)} 
@@ -1228,7 +1235,7 @@ class SketchPad extends ProtoBoard {
                 {this.renderCanvas()}
                 <svg id='sketch_pad_svg' width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength} style={{position: 'absolute', top: '0', left: '0'}}>
                     {/* {this.renderAdjuster()} */}
-                    {this.renderLasso()}
+                    {(this.state.control_state!='content-stamp' && this.state.control_state!='style-stamp') && this.renderLasso()}
                 </svg>
                 <canvas id='temp_canvas' width={1000} height={1000} style={{width: '100%', position:'absolute', top:'0', left: '0'}}></canvas>
                 <svg id='sketch_pad_svg2' width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength} style={{position: 'absolute', top: '0', left: '0'}}>
