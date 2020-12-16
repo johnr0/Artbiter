@@ -165,7 +165,6 @@ class MoodboardImageAI extends MoodboardImage{
                     userGroup = k
                 }  
             }
-
         }
         if(renderUser==false){
             for(var idx in included_groups){

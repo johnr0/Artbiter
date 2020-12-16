@@ -329,6 +329,10 @@ module.exports = function(app) {
           data_to_return._id = data._id
           data_to_return.board_id = data.board_id
           data_to_return.user_info= data.user_info
+        }else if(data.updated.indexOf('groups_reveal_disagreement')!=-1){
+          data_to_return = JSON.parse(JSON.stringify(data))
+          delete data_to_return['cav']
+          delete data_to_return['avg_style']
         }else{
           data_to_return = JSON.parse(JSON.stringify(data))
           delete data_to_return['cav']

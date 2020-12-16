@@ -486,6 +486,61 @@ const groupStyleRemove = async context =>{
   })
 }
 
+const revealDisagreement = async context => {
+  if(context.result.updated == 'groups_reveal_disagreement'){
+    console.log(context.result.user_info)
+    var users = {}
+    // context.app.service('arts').find({query: {_}})
+    context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
+    .then((res1)=>{
+      var art_ids = []
+      for(var i in res1){
+        for(var j in context.result.user_info){
+          art_ids = art_ids.concat(res1[i].user_info[j].arts)
+        }
+      }
+
+      context.app.service('arts').find({query: {_id:{$in: art_ids}}})
+      .then((res2)=>{
+        var art_cavs = {}
+        for(var k in res2){
+          art_cavs[res2[k]._id] = res2[k].embedding
+        }
+        for(var i in res1){
+          var group_id = res1[i]._id
+            for(var user in context.result.user_info){
+              if(users[user]==undefined){
+                users[user] = {}
+              }
+              if(users[user][group_id]==undefined){
+                users[user][group_id] = []
+              }
+              var user_info_arts = res1[i].user_info[user].arts
+              for(var l in user_info_arts){
+                users[user][group_id].push(art_cavs[user_info_arts[l]])
+              }
+              
+            
+          }
+        }
+
+        console.log('users', users)
+        axios.post(ml_server.ml_server+'revealDisagreement', {
+          users: JSON.stringify(users),
+          group_id: context.result._id
+        }).then((response)=>{
+
+        }, (error)=>{
+          console.log('error')
+        })
+      })
+    })
+
+
+    
+  }
+}
+
 module.exports = {
     before: {
       all: [],
@@ -503,7 +558,7 @@ module.exports = {
       get: [],
       create: [createTrainCAV],
       update: [],
-      patch: [RelateCAV, AddRemoveArtCAV],
+      patch: [RelateCAV, AddRemoveArtCAV, revealDisagreement],
       remove: []
     },
   

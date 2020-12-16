@@ -9,6 +9,7 @@ import MoodboardSelfAI from './moodboard_selfAI'
 import MoodBoardText from './moodboard_text'
 import MoodBoardColorAddController from './moodboard_color_add_controller'
 import MoodboardStyleSketchControlAI from './moodboard_style_sketch_controlAI'
+import MoodboardDisagreementRevealerAI from './moodboard_disagreement_revealerAI'
 
 class MoodBoardAI extends MoodBoard{
     // for state
@@ -600,7 +601,7 @@ class MoodBoardAI extends MoodBoard{
                 {this.state.control_state=='add_color' && this.state.action=='idle' && 
                     <MoodBoardColorAddController mother_this={this} mother_state={this.state}></MoodBoardColorAddController>}
                 <MoodBoardSearchPaneAI mother_this={this} mother_state={this.state}></MoodBoardSearchPaneAI>
-
+                <MoodboardDisagreementRevealerAI mother_this={this} mother_state={this.state}></MoodboardDisagreementRevealerAI>
             </div>
         </div>)
     }
