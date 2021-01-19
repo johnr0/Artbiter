@@ -18,7 +18,8 @@
   "scripts": {
     "test": "npm run jshint && npm run mocha",
     "jshint": "jshint src/. test/. --config",
-    "start": "node src/",
+    "start": "node src/index.js",
+    "dev": "node src/",
     "mocha": "mocha test/ --recursive"
   },
   "dependencies": {
@@ -68,7 +69,10 @@
     "redux-thunk": "^2.1.0",
     "serve-favicon": "^2.3.0",
     "socket.io-client": "^1.4.8",
-    "winston": "^3.3.0"
+    "winston": "^3.3.0",
+    "webpack": "^1.13.2",
+    "webpack-dev-middleware": "^1.6.1",
+    "webpack-hot-middleware": "^2.12.2"
   },
   "devDependencies": {
     "babel-core": "^6.14.0",
@@ -97,8 +101,6 @@
     "rimraf": "^2.5.4",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
-    "webpack": "^1.13.2",
-    "webpack-dev-middleware": "^1.6.1",
-    "webpack-hot-middleware": "^2.12.2"
+    
   }
 }
