@@ -1,6 +1,6 @@
 var axios = require('axios')
 var ml_server = require('../../config')
-var nj = require('numjs');
+// var nj = require('numjs');
 const { response } = require('@feathersjs/express');
 
 function sliderImpact(board_id, context){
@@ -149,26 +149,21 @@ function averageStyles(styles, context){
     for(var i in styles){
       avg_styles[i] = {}
       for(var dim_key in styles[i][0]){
-        var sum_vec = undefined
-        for(var k in styles[i]){
-          var vec = styles[i][k][dim_key]
-          var vec = nj.array(vec);
-          if(sum_vec==undefined){
-            sum_vec = vec
-          }else{
-            sum_vec.add(vec, false)
-          }
-        }
-        // console.log('fail?')
+        console.log('fail?')
         var l = []
-        for(var n1=0; n1<sum_vec.shape[0]; n1++){
+        for(var n1=0; n1<styles[i][0][dim_key].length; n1++){
           l.push([])
-          for(var n2=0; n2<sum_vec.shape[1]; n2++){
+          for(var n2=0; n2<styles[i][0][dim_key][0].length; n2++){
             l[n1].push([])
-            for(var n3=0; n3<sum_vec.shape[2]; n3++){
+            for(var n3=0; n3<styles[i][0][dim_key][0][0].length; n3++){
               l[n1][n2].push([])
-              for(var n4=0; n4<sum_vec.shape[3]; n4++){
-                l[n1][n2][n3].push(sum_vec.get(n1,n2,n3,n4)/styles[i].length)
+              for(var n4=0; n4<styles[i][0][dim_key][0][0][0].length; n4++){
+                //
+                var sum = 0
+                for(var k in styles[i]){
+                  sum = sum + styles[i][k][dim_key][n1][n2][n3][n4]
+                }
+                l[n1][n2][n3].push(sum/styles[i].length)
               }
             }
           }

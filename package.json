@@ -55,7 +55,6 @@
     "materialize-css": "^1.0.0-rc.2",
     "mongodb": "^2.2.19",
     "mongoose": "^5.10.14",
-    "numjs": "^0.16.0",
     "passport": "^0.3.2",
     "path": "^0.12.7",
     "react": "^16.14.0",
@@ -68,7 +67,6 @@
     "redux": "^3.6.0",
     "redux-thunk": "^2.1.0",
     "serve-favicon": "^2.3.0",
-    "sharp": "^0.27.0",
     "socket.io-client": "^1.4.8",
     "winston": "^3.3.0"
   },
