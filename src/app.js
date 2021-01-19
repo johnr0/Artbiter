@@ -42,10 +42,10 @@ app.use(cors());
 app.use(compress());
 app.use(express.json({limit: '200mb'}));
 app.use(express.urlencoded({ limit: '200mb', extended: true}));
-app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
+// app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
 // Host the public folder
 console.log(app.get('public'))
-app.use('/static/', express.static(app.get('public')+'/static'));
+// app.use('/static/', express.static(app.get('public')+'/static'));
 app.use('/', express.static(app.get('public')));
 app.use('/boardlist', express.static(app.get('public')));
 app.use('/boards_baseline', express.static(app.get('public')));
