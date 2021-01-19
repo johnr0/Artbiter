@@ -22,7 +22,7 @@ const authentication = require('./authentication');
 const mongodb = require('./mongodb');
 
 const app = express(feathers());
-
+console.log(process.env.NODE_ENV)
 const configType = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
 const config = require(`../webpack.config.${configType}.js`);
 const compiler = webpack(config);
