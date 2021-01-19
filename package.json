@@ -71,7 +71,8 @@
     "socket.io-client": "^1.4.8",
     "winston": "^3.3.0",
     "webpack": "^1.13.2",
-    
+    "webpack-dev-middleware": "^1.6.1",
+    "webpack-hot-middleware": "^2.12.2",
     "html-webpack-plugin": "^2.22.0"
   },
   "devDependencies": {
@@ -101,8 +102,7 @@
     "rimraf": "^2.5.4",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
-    "webpack-dev-middleware": "^1.6.1",
-    "webpack-hot-middleware": "^2.12.2"
+    
     
   }
 }
