@@ -5,7 +5,7 @@ import store, { history } from './store'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 // import injectTapEventPlugin from 'react-tap-event-plugin'
 
-import App from './App'
+// import App from './App'
 import Home from './containers/Home'
 import Interface from './containers/Interface'
 import NotFound from './containers/NotFound'
