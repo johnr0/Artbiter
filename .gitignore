@@ -30,3 +30,6 @@ node_modules
 lib/
 data/
 yarn.lock
+npm-debug.log
+.DS_Store
+/*.env
