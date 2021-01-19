@@ -4,11 +4,11 @@ const app = require('./app');
 const port = process.env.PORT || app.get('port');
 const express = require('@feathersjs/express');
 
-// app.use(express.static('./client'));
+app.use(express.static('./client'));
 
-// app.get('/*', function (req, res) {
-//   res.sendFile(path.join(__dirname, './client', 'index.html'));
-// });
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, './client', 'index.html'));
+});
 
 const server = app.listen(port);
 
