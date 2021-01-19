@@ -67,7 +67,7 @@ class SketchPad extends ProtoBoard {
         super.componentDidMount()
         var brush_img = new Image();
         // brush_img.crossOrigin="Anonymous"
-        brush_img.src = 'img/brush.png'//'http://www.tricedesigns.com/wp-content/uploads/2012/01/brush2.png';
+        brush_img.src = location.protocol+'//'+location.host+'/img/brush.png'//'http://www.tricedesigns.com/wp-content/uploads/2012/01/brush2.png';
         console.log(brush_img)
         this.setState({brush_img})
     }

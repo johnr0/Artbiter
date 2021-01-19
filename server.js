@@ -14,13 +14,14 @@
 
 var path = require('path');
 // var express = require('express');
-const logger = require(path.join(__dirname, 'src/logger'));
-console.log(path.join(__dirname, 'src/app'))
-const app = require(path.join(__dirname, 'src/app'));
+const logger = require('./src/logger');
+console.log('./src/app')
+const app = require('./src/app2');
 const port = process.env.PORT || app.get('port');
 const express = require('@feathersjs/express');
 
 app.use(express.static(path.join(__dirname, 'dist')));
+console.log('express2', path.join(__dirname, 'client/img'))
 app.use('/img', express.static(path.join(__dirname, 'client/img')));
 // app.get('/*', function (req, res) {
 //   res.sendFile(path.join(__dirname, './client', 'index.html'));

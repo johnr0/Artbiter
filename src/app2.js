@@ -47,11 +47,13 @@ app.use(express.urlencoded({ limit: '200mb', extended: true}));
 console.log('public path:', app.get('public'))
 // app.use('/static/', express.static(app.get('public')));
 
-app.use('/static/', express.static(app.get('public')+'/static'));
+app.use('/static/', express.static(app.get('public')));
 app.use('/', express.static(app.get('public')));
 app.use('/boardlist', express.static(app.get('public')));
 app.use('/boards_baseline', express.static(app.get('public')));
 app.use('/boards_AI', express.static(app.get('public')));
+console.log(path.join(__dirname, 'client/img'))
+app.use('/img', express.static(path.join(__dirname, '../client/img')));
 
 
 // Set up Plugins and providers
