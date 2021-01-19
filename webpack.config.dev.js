@@ -1,6 +1,14 @@
 var path = require('path');
 var webpack = require('webpack');
 
+var HTMLWebpackPlugin = require('html-webpack-plugin');
+
+var HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
+  template: path.join(__dirname, 'client', 'index.html'),
+  filename: 'index.html',
+  inject: 'body'
+});
+
 module.exports = {
   devtool: 'cheap-module-source-map',
   externals: {
@@ -23,7 +31,8 @@ module.exports = {
     new webpack.NoErrorsPlugin(),
     new webpack.ProvidePlugin({
       'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
-    })
+    }),
+    HTMLWebpackPluginConfig
   ],
   module: {
     loaders: [
