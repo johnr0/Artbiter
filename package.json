@@ -20,7 +20,7 @@
     "jshint": "jshint src/. test/. --config",
     "start": "node src/index.js",
     "dev": "node src/",
-    "build": "webpack --mode production --config ./webpack.config.dev.js",
+    "build": "webpack --mode production --config ./webpack.config.prod.js",
     "mocha": "mocha test/ --recursive"
   },
   "dependencies": {
