@@ -157,11 +157,11 @@ function generateImageWithScaling(content, styles, context){
     styles: JSON.stringify(styles)
   }).then((response)=>{
     var returned_image = response.data['returned_image']
-
+    console.log('got response')
     // add layer
-    console.log(returned_image)
+    // console.log(returned_image)
     var layer_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-    console.log(context.arguments[2]['user'])
+    console.log(content['current_layer'])
     var layer = {
       _id: layer_id, 
       board_id: context.arguments[0],
@@ -173,7 +173,7 @@ function generateImageWithScaling(content, styles, context){
     var push ={
       layers: {
         $each: [layer_id],
-        $position: content['current_layer'],
+        $position: parseInt(content['current_layer']),
       },
       sketchundo: {
         undo_id: Math.random().toString(36).substring(2, 15), 
@@ -196,7 +196,7 @@ function generateImageWithScaling(content, styles, context){
   
     // context.app.service('boards').patch(context.arguments[0], {$set: {sketchpad_style_image: returned_image, updated:'sketchpad_style_result'}})
   }, (error)=>{
-
+    console.log('error in style transferring')
   })
 }
 
@@ -385,7 +385,7 @@ const sketchpadStyleApply = async context => {
       console.log(context.arguments[1])
       // do something fun
 
-      // console.log(content)
+      console.log(styles)
 
       generateImageWithScaling(content, styles, context)
 

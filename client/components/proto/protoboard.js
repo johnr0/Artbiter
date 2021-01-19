@@ -89,10 +89,10 @@ class ProtoBoard extends Component {
         return (<div className='col s6 oneboard'>
             <h2>Protoboard</h2>
             <div id={this.state.boardname} className={this.state.boardname} onWheel={this.zoom_board_wheel.bind(this)} 
-                //onMouseOut={this.moveBoardEnd.bind(this)}
-                //onMouseMove={this.moveMouse.bind(this)}
+                //onPointerOut={this.moveBoardEnd.bind(this)}
+                //onPointerMove={this.moveMouse.bind(this)}
                 > 
-                <div className='boardrender' //onMouseDown={this.moveBoardInit.bind(this)} onMouseUp={this.moveBoardEnd.bind(this)} 
+                <div className='boardrender' //onPointerDown={this.moveBoardInit.bind(this)} onPointerUp={this.moveBoardEnd.bind(this)} 
                 
                 style={{
                     width:this.state.boardzoom*this.state.boardlength, 

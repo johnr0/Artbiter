@@ -251,7 +251,7 @@ class MoodBoardSearchPaneAI extends Component{
                     <div style={{display:'inline-block', float:'left'}}>0</div>
                 </div>
                 <div>
-                    <input type='range' style={{margin: '5px 0'}} min={0} max={100} value={val} onChange={this.changeGenSliders.bind(this, 'selected_image')} onMouseUp={this.doneChangeGenSliders.bind(this, 'selected_image')}></input>
+                    <input type='range' style={{margin: '5px 0'}} min={0} max={100} value={val} onChange={this.changeGenSliders.bind(this, 'selected_image')} onPointerUp={this.doneChangeGenSliders.bind(this, 'selected_image')}></input>
                  </div>
             </div>
             {this.renderGenerateSlidersFromGroups()}
@@ -290,7 +290,7 @@ class MoodBoardSearchPaneAI extends Component{
                             <div style={{display:'inline-block', float:'left'}}>0</div>
                         </div>
                         <div>
-                            <input type='range' style={{margin: '5px 0'}} min={0} max={100} value={val} onChange={this.changeGenSliders.bind(this, group._id)} onMouseUp={this.doneChangeGenSliders.bind(this, group._id)}></input>
+                            <input type='range' style={{margin: '5px 0'}} min={0} max={100} value={val} onChange={this.changeGenSliders.bind(this, group._id)} onPointerUp={this.doneChangeGenSliders.bind(this, group._id)}></input>
                         </div>
                     </div>)
                 })}
@@ -312,7 +312,7 @@ class MoodBoardSearchPaneAI extends Component{
         //             <div style={{display:'inline-block', float:'left'}}>0</div>
         //         </div>
         //         <div>
-        //             <input type='range' style={{margin: '5px 0'}} min={0} max={100} value={val} onChange={this.changeGenSliders.bind(this, group._id)} onMouseUp={this.doneChangeGenSliders.bind(this, group._id)}></input>
+        //             <input type='range' style={{margin: '5px 0'}} min={0} max={100} value={val} onChange={this.changeGenSliders.bind(this, group._id)} onPointerUp={this.doneChangeGenSliders.bind(this, group._id)}></input>
         //          </div>
         //     </div>)
         // })
@@ -334,7 +334,7 @@ class MoodBoardSearchPaneAI extends Component{
         return searched_arts.map((val,idx)=>{
             return (<div style={{display:'inline-block', height: 'calc(100% - 6px)', padding: '3px', position: 'relative'}}>
                 <div className='btn' style={{position: 'absolute', top: '10px', right: '10px', width:'30px', height:'30px', fontSize:'30', lineHeight:'26px', padding: 0}}
-                    onMouseDown={this.addSearchedImageToMoodboard.bind(this, val)}
+                    onPointerDown={this.addSearchedImageToMoodboard.bind(this, val)}
                 >+</div>
                 <img src={val[1]} style={{height: '100%', maxWidth: '100%'}}></img>
             </div>)
@@ -367,7 +367,7 @@ class MoodBoardSearchPaneAI extends Component{
         
         if(this.props.mother_state.searchPane){
             return (<div className='moodboard_search_pane controller'>
-                <div className='moodboard_search_pane_close' style={{marginBottom: '5px'}} onMouseDown={this.toggleSearchPane.bind(this)}>
+                <div className='moodboard_search_pane_close' style={{marginBottom: '5px'}} onPointerDown={this.toggleSearchPane.bind(this)}>
                 ▽ Collaborative Search
                 </div>
                 <div className='row' style={{position:'relative'}}>
@@ -377,19 +377,19 @@ class MoodBoardSearchPaneAI extends Component{
                                 <img src={art.file} style={{maxHeight: '100%', maxWidth: '100%'}}></img>
                             </div>
                             {this.props.mother_state.control_state!='search_image_select' &&
-                                <div className='btn' onMouseDown={this.selectSearchImageChoose.bind(this)}>Select Image</div>
+                                <div className='btn' onPointerDown={this.selectSearchImageChoose.bind(this)}>Select Image</div>
                             }
                             {this.props.mother_state.control_state=='search_image_select' &&
-                                <div className='btn red' onMouseDown={this.cancelSearchImageChoose.bind(this)}>Cancel</div>
+                                <div className='btn red' onPointerDown={this.cancelSearchImageChoose.bind(this)}>Cancel</div>
                             }
                         </div>}
                         {!art_exist && <div className='moodboard_search_pane_subpane_div'>
                             <div>Select an art before performing the search.</div>
                             {this.props.mother_state.control_state!='search_image_select' &&
-                                <div className='btn' onMouseDown={this.selectSearchImageChoose.bind(this)}>Select Image</div>
+                                <div className='btn' onPointerDown={this.selectSearchImageChoose.bind(this)}>Select Image</div>
                             }
                             {this.props.mother_state.control_state=='search_image_select' &&
-                                <div className='btn red' onMouseDown={this.cancelSearchImageChoose.bind(this)}>Cancel</div>
+                                <div className='btn red' onPointerDown={this.cancelSearchImageChoose.bind(this)}>Cancel</div>
                             }
                             
                         </div>}
@@ -397,9 +397,9 @@ class MoodBoardSearchPaneAI extends Component{
                     <div className='col s3 moodboard_search_pane_subpane' style={{textAlign:'center'}}>
                         {group_exist && <div style={{position: 'absolute', top: '-30px'}}>
                             <div className='btn tiny-btn' style={{marginRight:'3px', backgroundColor: (this.props.mother_state.searchMode!='search')?'#333333':''}} 
-                            disabled={(!art_exist||!group_exist)} onMouseUp={this.searchModeToggle.bind(this, 'search')}>Search</div>
+                            disabled={(!art_exist||!group_exist)} onPointerUp={this.searchModeToggle.bind(this, 'search')}>Search</div>
                             <div className='btn tiny-btn' style={{marginRight:'3px', backgroundColor: (this.props.mother_state.searchMode=='search')?'#333333':''}}
-                            disabled={(!art_exist||!group_exist)} onMouseUp={this.searchModeToggle.bind(this, 'generate')}>Generate</div>
+                            disabled={(!art_exist||!group_exist)} onPointerUp={this.searchModeToggle.bind(this, 'generate')}>Generate</div>
                         </div>}
                         {group_exist && <div className='moodboard_search_pane_subpane_div' style={{overflowY: 'auto'}} onWheel={this.searchWheel.bind(this)}>
                             <div style={{borderBottom: 'solid 2px white'}}>{(this.props.mother_state.searchMode=='search')?'Search':'Gen'} Controls</div>
@@ -416,14 +416,14 @@ class MoodBoardSearchPaneAI extends Component{
                     </div>
                     <div className='col s6 moodboard_search_pane_subpane' style={{position:'relative'}}>
                         <div style={{position: 'absolute', top: '-30px'}}>
-                            {this.props.mother_state.searchMode=='search' && (art_exist&&group_exist) && <div className='btn tiny-btn' onMouseUp={this.search.bind(this)}>Run Search</div>}
-                            {this.props.mother_state.searchMode=='generate' && (art_exist&&group_exist) && <div className='btn tiny-btn' onMouseUp={this.generate.bind(this)}>Run Generation</div>}
+                            {this.props.mother_state.searchMode=='search' && (art_exist&&group_exist) && <div className='btn tiny-btn' onPointerUp={this.search.bind(this)}>Run Search</div>}
+                            {this.props.mother_state.searchMode=='generate' && (art_exist&&group_exist) && <div className='btn tiny-btn' onPointerUp={this.generate.bind(this)}>Run Generation</div>}
                         </div>
                         <div style={{position: 'absolute', top: '-30px', right: '13'}}>
-                            {this.props.mother_state.searchMode=='search' && art_exist && <div className='btn tiny-btn' style={{marginRight:'5px'}} onMouseUp={this.search_similar.bind(this)}>Similar</div>}
-                            {this.props.mother_state.searchMode=='search' && <div className='btn tiny-btn' onMouseUp={this.search_random.bind(this)}>Random</div>}
-                            {this.props.mother_state.searchMode=='generate' && art_exist && !group_exist && <div className='btn tiny-btn' style={{marginRight:'5px'}} onMouseUp={this.search_similar.bind(this)}>Similar</div>}
-                            {this.props.mother_state.searchMode=='generate' && (!art_exist||!group_exist) && <div className='btn tiny-btn' onMouseUp={this.search_random.bind(this)}>Random</div>}
+                            {this.props.mother_state.searchMode=='search' && art_exist && <div className='btn tiny-btn' style={{marginRight:'5px'}} onPointerUp={this.search_similar.bind(this)}>Similar</div>}
+                            {this.props.mother_state.searchMode=='search' && <div className='btn tiny-btn' onPointerUp={this.search_random.bind(this)}>Random</div>}
+                            {this.props.mother_state.searchMode=='generate' && art_exist && !group_exist && <div className='btn tiny-btn' style={{marginRight:'5px'}} onPointerUp={this.search_similar.bind(this)}>Similar</div>}
+                            {this.props.mother_state.searchMode=='generate' && (!art_exist||!group_exist) && <div className='btn tiny-btn' onPointerUp={this.search_random.bind(this)}>Random</div>}
                         </div>
                         <div className='moodboard_search_pane_subpane_div' style={{overflowY: 'auto'}} onWheel={this.searchWheel.bind(this)}>
                             {this.renderSearchedArts()}
@@ -432,7 +432,7 @@ class MoodBoardSearchPaneAI extends Component{
                 </div>
             </div>)
         }else{
-            return (<div className='moodboard_search_pane_open controller' onMouseDown={this.toggleSearchPane.bind(this)}>
+            return (<div className='moodboard_search_pane_open controller' onPointerDown={this.toggleSearchPane.bind(this)}>
                 △ Collaborative Search
             </div>)
         }

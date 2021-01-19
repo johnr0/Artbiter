@@ -63,8 +63,8 @@ class MoodBoardImageAddController extends Component {
         return (<div className='controller moodboard_image_add_controller'>
             <div>
                 <ul id='moodboard_image_add_tab' className="tabs" style={{backgroundColor:'#333333', color: 'white'}}>
-                    <li className="tab col s6"><a href='#moodboard_image_upload' style={{borderRadius:'10px'}}>Upload</a></li>
-                    <li className="tab col s6"><a href='#moodboard_image_url' style={{borderRadius:'10px'}}>Url</a></li>
+                    <li className="tab col s12"><a href='#moodboard_image_upload' style={{borderRadius:'10px'}}>Upload</a></li>
+                    {/* <li className="tab col s6"><a href='#moodboard_image_url' style={{borderRadius:'10px'}}>Url</a></li> */}
                 </ul>
             </div>
             <div id='moodboard_image_upload' className='controller col s12' style={{width: '100%'}}>
@@ -72,11 +72,11 @@ class MoodBoardImageAddController extends Component {
                 <div><input id='moodboard_image_upload_input' type='file' accept='image/*' style={{width: '100%'}}></input></div>
                 <div className='btn' style={{float:'right'}} onClick={this.upload_image.bind(this)}>Upload</div>
             </div>
-            <div id='moodboard_image_url' className='controller col sq2' style={{width: '100%'}}>
+            {/* <div id='moodboard_image_url' className='controller col sq2' style={{width: '100%'}}>
                 <div>Link the url of image</div>
                 <div><input id='moodboard_image_url_input' type='link' style={{width: '100%'}}></input></div>
                 <div className='btn' style={{float:'right'}} onClick={this.url_image.bind(this)}>Upload</div>
-            </div>
+            </div> */}
         </div>)
     }
 

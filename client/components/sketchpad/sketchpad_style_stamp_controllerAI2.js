@@ -349,9 +349,16 @@ class SketchpadStyleStampControllerAI2 extends Component{
         for(var i in current_image){
             
             var art_id = current_image[i]
+            console.log(arts[art_id])
             var cur_art_file = arts[art_id].file
             var cur_art_width = arts[art_id].width
             var cur_art_height = arts[art_id].height
+            if(cur_art_width==undefined){
+                cur_art_width=128
+            }
+            if(cur_art_height==undefined){
+                cur_art_height=128
+            }
             var cur_art_weight = document.getElementById('sketchpad_style_weight_'+art_id).value/100
             var cur_art_area = style_area[art_id]
             var cur_art_scale = this.state.style_ratio[art_id]
@@ -382,7 +389,7 @@ class SketchpadStyleStampControllerAI2 extends Component{
 
         return (<div style={{display:(this.props.mother_state.control_state=='style-stamp')?'':'none'}}>
             <div className="controller sketchpad_style_controller2" style={{display:(this.state.open)?'':'none'}}>
-                <div className='moodboard_search_pane_close' style={{marginBottom: '5px'}} onMouseDown={this.toggleOpen.bind(this)}>
+                <div className='moodboard_search_pane_close' style={{marginBottom: '5px'}} onPointerDown={this.toggleOpen.bind(this)}>
                     ▽ Style Configure
                     </div>
                 <div className='row' style={{position: 'relative'}}>
@@ -427,7 +434,7 @@ class SketchpadStyleStampControllerAI2 extends Component{
                     </div>
                 </div>
             </div>
-            <div style={{width: 'fit-content'}} className='moodboard_search_pane_open controller' style={{display:(!this.state.open)?'':'none'}} onMouseDown={this.toggleOpen.bind(this)}>
+            <div style={{width: 'fit-content'}} className='moodboard_search_pane_open controller' style={{display:(!this.state.open)?'':'none'}} onPointerDown={this.toggleOpen.bind(this)}>
                 △ Style Configure
             </div>
         </div>)

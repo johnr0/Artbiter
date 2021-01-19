@@ -489,6 +489,7 @@ const groupStyleRemove = async context =>{
 const revealDisagreement = async context => {
   if(context.result.updated == 'groups_reveal_disagreement'){
     console.log(context.result.user_info)
+    console.log(context.result)
     var users = {}
     // context.app.service('arts').find({query: {_}})
     context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
@@ -503,8 +504,14 @@ const revealDisagreement = async context => {
       context.app.service('arts').find({query: {_id:{$in: art_ids}}})
       .then((res2)=>{
         var art_cavs = {}
+        var group_art_cavs = {}
         for(var k in res2){
-          art_cavs[res2[k]._id] = res2[k].embedding
+          if(art_ids.indexOf(res2[k]._id)!=-1){
+            art_cavs[res2[k]._id] = res2[k].embedding
+            if(context.result.art_ids.indexOf(res2[k]._id)!=-1){
+              group_art_cavs[res2[k]._id] = res2[k].embedding
+            }
+          }
         }
         for(var i in res1){
           var group_id = res1[i]._id
@@ -527,8 +534,34 @@ const revealDisagreement = async context => {
         console.log('users', users)
         axios.post(ml_server.ml_server+'revealDisagreement', {
           users: JSON.stringify(users),
-          group_id: context.result._id
+          group_id: context.result._id,
+          group_arts: JSON.stringify(group_art_cavs),
         }).then((response)=>{
+          console.log('error-1?')
+          var returned_images = JSON.parse(response.data['returned_images'])
+          console.log('error0?')
+          context.app.service('disagreed_arts').find({query: {board_id: context.result.board_id}})
+          .then((res0)=>{
+            for(var i in res0){
+              context.app.service('disagreed_arts').remove(res0[i]._id)
+            }
+            for(var i in returned_images){
+              var disagreed_art = {
+                image: returned_images[i].image_file,
+                user_decisions: returned_images[i].user_decisions,
+                board_id: context.result.board_id,
+                order: i,
+              }
+              context.app.service('disagreed_arts').create(disagreed_art)
+            }
+          })
+          console.log('error1?')
+          context.app.service('boards').patch(context.result.board_id, {$set: {
+            agreementPane: true, 
+            updated: 'moodboard_disagreement_search'
+          }})
+          console.log('error2?')
+
 
         }, (error)=>{
           console.log('error')

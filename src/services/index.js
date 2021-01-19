@@ -3,9 +3,10 @@ const boards = require('./boards/boards.service.js');
 const layers = require('./layers/layers.service.js');
 const arts = require('./arts/arts.service.js');
 const groups = require('./groups/groups.service.js');
-const searched_arts = require('./searched_arts/searched_arts.service.js')
-const art_styles = require('./art_styles/art_styles.service.js')
-const group_styles = require('./group_styles/group_styles.service.js')
+const searched_arts = require('./searched_arts/searched_arts.service.js');
+const art_styles = require('./art_styles/art_styles.service.js');
+const group_styles = require('./group_styles/group_styles.service.js');
+const disagreed_arts = require('./disagreed_arts/disagreed_arts.service.js');
 
 module.exports = function (app) {
   app.configure(users);
@@ -16,4 +17,5 @@ module.exports = function (app) {
   app.configure(searched_arts);
   app.configure(art_styles);
   app.configure(group_styles);
+  app.configure(disagreed_arts);
 };

@@ -64,6 +64,21 @@ class BoardAI extends Board{
             this.refs.moodboard.setState({searched_arts})
         
         })
+
+        Api.app.service('disagreed_arts').on('created', (data)=>{
+            if(data.board_id==this.state.board_id){
+                var disagreed_arts = this.refs.moodboard.state.disagreed_arts
+                disagreed_arts[data._id] = data
+                this.refs.moodboard.setState({disagreed_arts})
+            }
+        })
+
+        Api.app.service('disagreed_arts').on('removed', (data)=>{
+            var disagreed_arts = this.refs.moodboard.state.disagreed_arts
+            delete disagreed_arts[data._id]
+            this.refs.moodboard.setState({disagreed_arts})
+        
+        })
         
 
 
@@ -124,6 +139,7 @@ class BoardAI extends Board{
                     var generate_slider_values = {}
 
                     var agreementPane=false
+                    var agreement_userSelection = {}
                     
                     if(res[0].searchMode!=undefined){
                         searchMode = res[0].searchMode
@@ -147,6 +163,9 @@ class BoardAI extends Board{
                     if(res[0].agreementPane!=undefined){
                         agreementPane = res[0].agreementPane
                     }
+                    if(res[0].agreement_userSelection!=undefined){
+                        agreement_userSelection = res[0]['agreement_userSelection']
+                    }
                     
                     Api.app.service('arts').find({query: {board_id: board_id, 
                         $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height']
@@ -161,7 +180,7 @@ class BoardAI extends Board{
                         _this.refs.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, 
                             search_slider_values:search_slider_values, search_slider_distances: search_slider_distances, searchMode: searchMode,
                             generate_slider_values: generate_slider_values, 
-                            agreementPane: agreementPane})
+                            agreementPane: agreementPane, agreement_userSelection: agreement_userSelection})
                     })
 
                     var groups = _this.refs.moodboard.state.groups
@@ -187,12 +206,23 @@ class BoardAI extends Board{
                         _this.refs.moodboard.setState({searched_arts:searched_arts})
                     })
 
+                    var disagreed_arts = _this.refs.moodboard.state.disagreed_arts
+                    Api.app.service('disagreed_arts').find({query: {board_id: board_id}})
+                    .then((res)=>{
+                        for(var i in res){
+                            disagreed_arts[res[i]._id] = res[i]
+                        }
+                        console.log('disagreed arts', disagreed_arts)
+                        _this.refs.moodboard.setState({disagreed_arts:disagreed_arts})
+                    })
+
 
                     // var arts = res[0]['arts']
                     var texts = res[0]['texts']
                     var sketchundo = res[0]['sketchundo']
                     var moodboardundo = res[0]['moodboardundo']
                     var current_collaborators = res[0]['current_collaborators']
+                    
                     current_collaborators[user_id] = {
                         sketch_pos:[-1,-1],
                         moodboard_pos: [-1, -1],
@@ -240,7 +270,7 @@ class BoardAI extends Board{
                 </div>
                 <div style={{position:'absolute', left: 'calc(50% - 30px)', top: 'calc(50% + 38px)', 
                 width:'60px', height:'60px', borderRadius: '50%', backgroundColor: '#333333',
-                color: 'white', textAlign:'center', fontSize: '40px', cursor:'default'}} onMouseDown={this.addSketchIntoMoodboard.bind(this)}>
+                color: 'white', textAlign:'center', fontSize: '40px', cursor:'default'}} onPointerDown={this.addSketchIntoMoodboard.bind(this)}>
                     →
                 </div>
             </div>)

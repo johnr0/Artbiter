@@ -37,18 +37,18 @@ class MoodboardSelfAI extends Component{
         if(user_info==undefined){
             return (<g>
                 <circle cx={x+width-renderWidth/2} cy={y+renderWidth/2} r={renderWidth/2}
-                fill='white' stroke='black' onMouseDown={this.toggleInclusion.bind(this, group_key, true)}></circle>
+                fill='white' stroke='black' onPointerDown={this.toggleInclusion.bind(this, group_key, true)}></circle>
             </g>)
         }else{
             if(user_info.arts.indexOf(this.props.art_key)!=-1){
                 return (<g>
                     <circle cx={x+width-renderWidth/2} cy={y+renderWidth/2} r={renderWidth/2}
-                    fill='black' stroke='white' onMouseDown={this.toggleInclusion.bind(this, group_key, false)}></circle>
+                    fill='black' stroke='white' onPointerDown={this.toggleInclusion.bind(this, group_key, false)}></circle>
                 </g>)
             }else{
                 return (<g>
                     <circle cx={x+width-renderWidth/2} cy={y+renderWidth/2} r={renderWidth/2}
-                    fill='white' stroke='black' onMouseDown={this.toggleInclusion.bind(this, group_key, true)}></circle>
+                    fill='white' stroke='black' onPointerDown={this.toggleInclusion.bind(this, group_key, true)}></circle>
                 </g>)
             }
         }

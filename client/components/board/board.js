@@ -112,6 +112,7 @@ class Board extends Component{
                     var sketchundo = res[0]['sketchundo']
                     var moodboardundo = res[0]['moodboardundo']
                     var current_collaborators = res[0]['current_collaborators']
+                    
                     current_collaborators[user_id] = {
                         sketch_pos:[-1,-1],
                         moodboard_pos: [-1, -1],
@@ -163,7 +164,6 @@ class Board extends Component{
                 var arts = this.refs.moodboard.state.arts
                 delete arts[data._id]
                 this.refs.moodboard.setState({arts})
-            
         })
 
         Api.app.service('arts').on('patched', (data)=>{
@@ -180,9 +180,6 @@ class Board extends Component{
                 arts[data._id].file=data.file
                 arts[data._id].color = data.color
             }
-            
-            
-
             this.refs.moodboard.setState({arts})
         })
 
@@ -549,6 +546,10 @@ class Board extends Component{
                 generate_slider_values: data.generate_slider_values})
             }else if(updated.indexOf('moodboard_search_mode_toggle')!=-1){
                 _this.refs.moodboard.setState({searchMode: data.searchMode})
+            }else if(updated.indexOf('moodboard_disagreement_search')!=-1){
+                _this.refs.moodboard.setState({agreementPane: data.agreementPane, agreement_userSelection: data.agreement_userSelection})
+            }else if(updated.indexOf('moodboard_disagreement_user_selection')!=-1){
+                _this.refs.moodboard.setState({agreement_userSelection: data.agreement_userSelection})
             }
         })
 
@@ -1097,7 +1098,7 @@ class Board extends Component{
             </div>
             <div style={{position:'absolute', left: 'calc(50% - 30px)', top: 'calc(50% + 38px)', 
             width:'60px', height:'60px', borderRadius: '50%', backgroundColor: '#333333',
-            color: 'white', textAlign:'center', fontSize: '40px', cursor:'default'}} onMouseDown={this.addSketchIntoMoodboard.bind(this)}>
+            color: 'white', textAlign:'center', fontSize: '40px', cursor:'default'}} onPointerDown={this.addSketchIntoMoodboard.bind(this)}>
                 →
             </div>
         </div>)

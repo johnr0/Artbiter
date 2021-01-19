@@ -203,7 +203,7 @@ class SketchpadStyleStampControllerAI extends Component{
         return (
         <div className="controller sketchpad_style_controller">
             <div className='controller_button' style={{display:'inline-block', marginBottom:'0px'}}>
-                <div style={{fontSize: 12, border: 'solid 4px white', width: 34, height: 34, margin: 'auto', paddingTop:'3px'}} onMouseDown={this.toggleSize.bind(this)}>
+                <div style={{fontSize: 12, border: 'solid 4px white', width: 34, height: 34, margin: 'auto', paddingTop:'3px'}} onPointerDown={this.toggleSize.bind(this)}>
                     Size
                 </div>
             </div>

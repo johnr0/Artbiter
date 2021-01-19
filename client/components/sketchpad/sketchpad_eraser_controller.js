@@ -19,7 +19,7 @@ class SketchpadEraserController extends Component{
     render(){
         return (<div className="controller sketchpad_erase_controller">
             <div className='controller_button'>
-                <div style={{fontSize: 12, border: 'solid 4px white', width: 34, height: 34, margin: 'auto', paddingTop:'3px'}} onMouseDown={this.toggleSize.bind(this)}>
+                <div style={{fontSize: 12, border: 'solid 4px white', width: 34, height: 34, margin: 'auto', paddingTop:'3px'}} onPointerDown={this.toggleSize.bind(this)}>
                     Size
                 </div>
             </div>

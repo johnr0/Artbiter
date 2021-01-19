@@ -234,6 +234,13 @@ module.exports = function(app) {
           data_to_return['generate_slider_values'] = data.generate_slider_values
         }else if(data.updated=='sketchpad_style_apply'){
           data_to_return['updated'] = data.updated
+        }else if(data.updated=='moodboard_disagreement_search'){
+          data_to_return['updated'] = data.updated
+          data_to_return['agreementPane']=data.agreementPane
+          data_to_return['agreement_userSelection']=data.agreement_userSelection
+        }else if(data.updated=='moodboard_disagreement_user_selection'){
+          data_to_return['updated'] = data.updated
+          data_to_return['agreement_userSelection']=data.agreement_userSelection
         }else{
           data_to_return = data
           
@@ -351,6 +358,12 @@ module.exports = function(app) {
     })
 
     app.service('searched_arts').publish((data)=>{
+
+      return [app.channel(`boards/${data.board_id}`).send(data)]
+      
+    })
+
+    app.service('disagreed_arts').publish((data)=>{
 
       return [app.channel(`boards/${data.board_id}`).send(data)]
       

@@ -25,8 +25,11 @@ class MoodBoardAI extends MoodBoard{
         generate_slider_values: {},
         searched_arts: {},
 
+        disagreed_arts: {},
+
         agreementPane: false,
 
+        agreement_userSelection: {},
 
     }
             
@@ -399,7 +402,7 @@ class MoodBoardAI extends MoodBoard{
                 return (<g>
                     <rect x={xpos-70} y={ypos-20} width='140' height='40' fill='white' stroke='black'>
                     </rect>
-                    <text x={xpos-63} y={ypos+7} fontSize='20' onMouseDown={this.createAGroup.bind(this, this.state.current_selected_pos.slice())}
+                    <text x={xpos-63} y={ypos+7} fontSize='20' onPointerDown={this.createAGroup.bind(this, this.state.current_selected_pos.slice())}
                     >Create a group</text>
                 </g>)
                 
@@ -472,43 +475,43 @@ class MoodBoardAI extends MoodBoard{
 
             return (<g>
                 <rect x={backx+width/2-zwidth/2} y={backy+height/2-zheight/2}  width={zwidth} height={zheight} fill={group.higher_group}
-                    onMouseDown={this.selectGroup.bind(this, key)}></rect>
+                    onPointerDown={this.selectGroup.bind(this, key)}></rect>
                 <text x={backx+width/2} y={backy+height/2+fontSize/4} textAnchor='middle' fontSize={fontSize}
-                    onMouseDown={this.selectGroup.bind(this, key)}>{group.group_name}</text>
+                    onPointerDown={this.selectGroup.bind(this, key)}>{group.group_name}</text>
                 {removable && 
                 <g>
                     <rect x={backx+width/2+zwidth/2-10} y={backy+height/2-20} width="20" height="20" fill='#eb4542' rx='4'
-                        onMouseDown={this.removeFromGroup.bind(this, key)}></rect>
+                        onPointerDown={this.removeFromGroup.bind(this, key)}></rect>
                     <text x={backx+width/2+zwidth/2} y={backy+height/2-5.5} textAnchor='middle' fontSize='17'
-                        onMouseDown={this.removeFromGroup.bind(this, key)}>-</text>
+                        onPointerDown={this.removeFromGroup.bind(this, key)}>-</text>
                 </g>}
                 {addable && 
                 <g>
                     <rect x={backx+width/2+zwidth/2-10} y={backy+height/2-20} width="20" height="20" fill='#35cc67' rx='4'
-                        onMouseDown={this.addToAGroup.bind(this, key)}></rect>
+                        onPointerDown={this.addToAGroup.bind(this, key)}></rect>
                     <text x={backx+width/2+zwidth/2} y={backy+height/2-5.5} textAnchor='middle' fontSize='17'
-                        onMouseDown={this.addToAGroup.bind(this, key)}>+</text>
+                        onPointerDown={this.addToAGroup.bind(this, key)}>+</text>
                 </g>}
                 {deletable && 
                 <g>
                     <rect x={backx+width/2+zwidth/2-10} y={backy+height/2-20} width="20" height="20" fill='#eb4542' rx='4'
-                        onMouseDown={this.deleteGroup.bind(this, key)}></rect>
+                        onPointerDown={this.deleteGroup.bind(this, key)}></rect>
                     <text x={backx+width/2+zwidth/2} y={backy+height/2-5.5} textAnchor='middle' fontSize='17'
-                        onMouseDown={this.deleteGroup.bind(this, key)}>x</text>
+                        onPointerDown={this.deleteGroup.bind(this, key)}>x</text>
                 </g>}
                 {relatable && 
                 <g>
                     <rect x={backx+width/2+zwidth/2-10} y={backy+height/2+0} width="20" height="20" fill='#fcba03' rx='4'
-                        onMouseDown={this.relateGroup.bind(this, key2, key)}></rect>
+                        onPointerDown={this.relateGroup.bind(this, key2, key)}></rect>
                     <text x={backx+width/2+zwidth/2} y={backy+height/2+15.5} textAnchor='middle' fontSize='17'
-                        onMouseDown={this.relateGroup.bind(this, key2, key)}>R</text>
+                        onPointerDown={this.relateGroup.bind(this, key2, key)}>R</text>
                 </g>}
                 {unrelatable && 
                 <g>
                     <rect x={backx+width/2+zwidth/2-10} y={backy+height/2+0} width="20" height="20" fill='#9803fc' rx='4'
-                        onMouseDown={this.unrelateGroup.bind(this, key2)}></rect>
+                        onPointerDown={this.unrelateGroup.bind(this, key2)}></rect>
                     <text x={backx+width/2+zwidth/2} y={backy+height/2+15.5} textAnchor='middle' fontSize='17'
-                        onMouseDown={this.unrelateGroup.bind(this, key2)}>U</text>
+                        onPointerDown={this.unrelateGroup.bind(this, key2)}>U</text>
                 </g>}
             </g>)
         })
