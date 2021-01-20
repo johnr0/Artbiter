@@ -1,7 +1,7 @@
 {
   "host": "artbiter.herokuapp.com",
   "port": 80,
-  "mongodb": "mongodb+srv://jjyc:RJuMOKuygbyGLQmE@artbiter.zklbs.mongodb.net/artbiter?retryWrites=true&w=majority",
+  "mongodb": "mongodb+srv://jjyc:CymPV598Urlgdqh4@artbiter.zklbs.mongodb.net/artbiter?retryWrites=true&w=majority",
   "public": "../dist/",
   "auth": {
     "token": {
