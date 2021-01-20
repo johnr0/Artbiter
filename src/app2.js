@@ -33,7 +33,7 @@ app.use(require('webpack-dev-middleware')(compiler, {
 }));
 
 app.use(require('webpack-hot-middleware')(compiler));
-
+console.log(configuration())
 // Load app configuration
 app.configure(configuration());
 // Enable security, CORS, compression, favicon and body parsing

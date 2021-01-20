@@ -7,8 +7,9 @@ const turnImageToEmbedding = async context => {
   // console.log(context)
   var image = context.arguments[0].file
   console.log('ml_server', ml_server)
+  console.log(context.app.get('ml_server'))
 
-  axios.post(ml_server.ml_server+'image_to_embedding', {
+  axios.post(context.app.get('ml_server')+'image_to_embedding', {
     image: image,
   }).then((response)=>{
     // console.log(response.data)
@@ -36,7 +37,7 @@ const turnColorChangeToEmbedding = async context =>{
     var image = context.result.file
     console.log('ml_server', ml_server)
 
-    axios.post(ml_server.ml_server+'image_to_embedding', {
+    axios.post(context.app.get('ml_server')+'image_to_embedding', {
       image: image,
     }).then((response)=>{
       // console.log(response.data)

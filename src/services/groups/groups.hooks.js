@@ -74,7 +74,7 @@ function sliderImpact(board_id, context){
       .then((res2)=>{
         console.log(search_image_selected, res2[0]._id)
         var embedding = res2[0].embedding
-        axios.post(ml_server.ml_server+'sliderImpact', {
+        axios.post(context.app.get('ml_server')+'sliderImpact', {
           search_slider_values: JSON.stringify(search_slider_values),
           cavs: JSON.stringify(cavs),
           cur_image: JSON.stringify(embedding),
@@ -97,7 +97,7 @@ function sliderImpact(board_id, context){
 function trainCAV(embeddings, context, board_id){
   console.log('embedding--', Object.keys(embeddings))
   // console.log(JSON.stringify(styles))
-  axios.post(ml_server.ml_server+'trainCAV', {
+  axios.post(context.app.get('ml_server')+'trainCAV', {
     embeddings: JSON.stringify(embeddings),
   }).then((response)=>{
     // console.log(response.data)
@@ -123,7 +123,7 @@ function trainCAV(embeddings, context, board_id){
 }
 
 function averageStyles2(styles, context){
-  axios.post(ml_server.ml_server+'trainStyleCAV', {
+  axios.post(context.app.get('ml_server')+'trainStyleCAV', {
     styles: JSON.stringify(styles)
   }).then((response)=>{
     console.log('response')
@@ -527,7 +527,7 @@ const revealDisagreement = async context => {
         }
 
         console.log('users', users)
-        axios.post(ml_server.ml_server+'revealDisagreement', {
+        axios.post(context.app.get('ml_server')+'revealDisagreement', {
           users: JSON.stringify(users),
           group_id: context.result._id,
           group_arts: JSON.stringify(group_art_cavs),

@@ -64,7 +64,7 @@ function sliderImpact(board_id, context){
       .then((res2)=>{
         console.log(search_image_selected, res2[0]._id)
         var embedding = res2[0].embedding
-        axios.post(ml_server.ml_server+'sliderImpact', {
+        axios.post(context.app.get('ml_server')+'sliderImpact', {
           search_slider_values: JSON.stringify(search_slider_values),
           cavs: JSON.stringify(cavs),
           cur_image: JSON.stringify(embedding),
@@ -86,7 +86,7 @@ function sliderImpact(board_id, context){
 
 
 function searchImages(search_start_image_embedding, cavs, search_slider_values, context){
-  axios.post(ml_server.ml_server+'searchImages', {
+  axios.post(context.app.get('ml_server')+'searchImages', {
     search_start_image_embedding: JSON.stringify(search_start_image_embedding),
     cavs: JSON.stringify(cavs),
     search_slider_values: JSON.stringify(search_slider_values)
@@ -118,7 +118,7 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
 function generateImage(content, content_weight, styles, style_weights, context){
   console.log('run this how?')
   // console.log(JSON.stringify(content))
-  axios.post(ml_server.ml_server+'generateImage', {
+  axios.post(context.app.get('ml_server')+'generateImage', {
     content: JSON.stringify(content),
     content_weight: content_weight,
     styles: JSON.stringify(styles),
@@ -152,7 +152,7 @@ function generateImage(content, content_weight, styles, style_weights, context){
 }
 
 function generateImageWithScaling(content, styles, context){
-  axios.post(ml_server.ml_server+'generateImageWithScaling', {
+  axios.post(context.app.get('ml_server')+'generateImageWithScaling', {
     content: JSON.stringify(content),
     styles: JSON.stringify(styles)
   }).then((response)=>{
@@ -334,7 +334,7 @@ const boardSearchSimilarImage = async context =>{
 
 const boardSearchRandomImage = async context =>{
   if(context.result.updated=='moodboard_search_random_images'){
-    axios.post(ml_server.ml_server+'randomSearchImage', {})
+    axios.post(context.app.get('ml_server')+'randomSearchImage', {})
     .then((response)=>{
       var returned_images = JSON.parse(response.data['returned_images'])
       console.log('returned images:', returned_images.length)

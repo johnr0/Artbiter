@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 const logger = require('./logger');
-const app = require('./app');
+const app = require('./app2');
 const port = process.env.PORT || app.get('port');
 const express = require('@feathersjs/express');
 
