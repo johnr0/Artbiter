@@ -84,6 +84,9 @@ class SketchpadStyleStampControllerAI2 extends Component{
     }
 
     renderStyles(side_length){
+        if(this.props.mother_this.props.board_this.refs.moodboard==undefined){
+            return
+        }
         return this.props.mother_this.props.board_this.refs.moodboard.state.current_image.map((art_key, idx)=>{
             var art = this.props.mother_this.props.board_this.refs.moodboard.state.arts[art_key]
             var style_ratio
