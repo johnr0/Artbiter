@@ -3,7 +3,7 @@
   "port": 80,
   "mongodb": "mongodb+srv://jjyc:CymPV598Urlgdqh4@artbiter.zklbs.mongodb.net/artbiter?retryWrites=true&w=majority",
   "public": "../dist/",
-  "ml_server": "http://5ebcef048e18.ngrok.io/",
+  "ml_server": "http://bdd1e211a27e.ngrok.io/",
   "auth": {
     "token": {
       "secret": "FEATHERS_AUTH_SECRET"
