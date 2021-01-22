@@ -9,6 +9,8 @@ const turnImageToEmbedding = async context => {
   console.log('ml_server', ml_server)
   console.log(context.app.get('ml_server'))
 
+  console.log(Object.keys(context.arguments[0]))
+
   axios.post(context.app.get('ml_server')+'image_to_embedding', {
     image: image,
   }).then((response)=>{
