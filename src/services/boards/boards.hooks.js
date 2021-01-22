@@ -398,6 +398,55 @@ const sketchpadStyleApply = async context => {
   }
 }
 
+const afterRemove = async context => {
+  var _id = context.result._id
+  context.app.service('group_styles').find({query:{board_id: _id}}).then((res)=>{
+    for(var i in res){
+      context.app.service('group_styles').remove(res[i]._id)
+    }
+  })
+  context.app.service('groups').find({query:{board_id: _id}}).then((res)=>{
+    for(var i in res){
+      context.app.service('groups').remove(res[i]._id)
+    }
+  })
+
+  context.app.service('disagreed_arts').find({query:{board_id: _id}}).then((res)=>{
+    for(var i in res){
+      context.app.service('disagreed_arts').remove(res[i]._id)
+    }
+  })
+  context.app.service('searched_arts').find({query:{board_id: _id}}).then((res)=>{
+    for(var i in res){
+      context.app.service('searched_arts').remove(res[i]._id)
+    }
+  })
+
+  context.app.service('art_styles').find({query:{board_id: _id}}).then((res)=>{
+    for(var i in res){
+      context.app.service('art_styles').remove(res[i]._id)
+    }
+  })
+  context.app.service('arts').find({query:{board_id: _id}}).then((res)=>{
+    for(var i in res){
+      context.app.service('arts').remove(res[i]._id)
+    }
+  })
+
+  context.app.service('texts').find({query:{board_id: _id}}).then((res)=>{
+    for(var i in res){
+      context.app.service('texts').remove(res[i]._id)
+    }
+  })
+
+  context.app.service('layers').find({query:{board_id: _id}}).then((res)=>{
+    for(var i in res){
+      context.app.service('layers').remove(res[i]._id)
+    }
+  })
+            
+}
+
 module.exports = {
     before: {
       all: [],
@@ -416,7 +465,7 @@ module.exports = {
       create: [],
       update: [],
       patch: [boardSearchImage, boardGenerateImage, boardSearchSimilarImage, boardSearchRandomImage, afterSliderValuesChange, afterSearchImageSelected],
-      remove: []
+      remove: [afterRemove]
     },
   
     error: {

@@ -112,6 +112,20 @@ class Board extends Component{
                     var sketchundo = res[0]['sketchundo']
                     var moodboardundo = res[0]['moodboardundo']
                     var current_collaborators = res[0]['current_collaborators']
+
+                    var noone=true
+                    console.log(current_collaborators)
+                    for(var _id in current_collaborators){
+                        if(current_collaborators[_id].active && user_id!=_id){
+                            noone=false
+                        }
+                    }
+                    console.log(noone)
+                    if(noone){
+                        console.log('harabangtang', Object.keys(this.refs.moodboard.state.arts))
+                        this.ChooseArtsTexts([],[],Object.keys(this.refs.moodboard.state.arts), Object.keys(this.refs.moodboard.state.texts))
+                        this.ChooseLayers([],this.refs.sketchpad.layers)
+                    }
                     
                     current_collaborators[user_id] = {
                         sketch_pos:[-1,-1],
@@ -582,8 +596,8 @@ class Board extends Component{
         window.addEventListener("beforeunload", function (e) {
             _this.updateCollaboratorStatus(false);
           
-            (e || window.event).returnValue = null;
-            return null;
+            // (e || window.event).returnValue = null;
+            // return null;
           });
     }
 
@@ -922,8 +936,16 @@ class Board extends Component{
         // var pull = {}
         // pull['current_collaborators.'+user_id] = current_collaborators[user_id]
         // unset everyithing that are selected
+        var noone=true
+        console.log(this.state.current_collaborators)
+        for(var _id in this.state.current_collaborators){
+            if(this.state.current_collaborators[_id].active && _id!=this.state.user_id){
+                noone=false
+            }
+        }
         console.log(Object.keys(this.state.current_collaborators).length)
-        if(Object.keys(this.state.current_collaborators).length>1){
+        if(noone==false){
+            // this.ChooseArtsTexts([],[],Object.keys(this.refs.moodboard.state.arts), Object.keys(this.refs.moodboard.state.texts))
             this.ChooseArtsTexts([],[], this.refs.moodboard.state.current_image.slice(0), this.refs.moodboard.state.current_text.slice(0))
             if(this.refs.sketchpad.state.current_layer!=-1){
                 this.ChooseLayers([],[this.refs.sketchpad.state.layers[this.refs.sketchpad.state.current_layer]])

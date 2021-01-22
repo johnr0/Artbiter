@@ -83,7 +83,7 @@ class BoardListPage extends Component{
             if(board.owner==_this.state.user_id){
                 delete boards[board['_id']]
                 _this.setState({boards})
-            }else if(board.collaborators.indexOf(_this.state.user_id)!=-1){
+            }else if(board.current_collaborators[_this.state.user_id]!=undefined){
                 delete boards[board['_id']]
                 _this.setState({boards})
             }
@@ -139,9 +139,19 @@ class BoardListPage extends Component{
     }
 
     deleteBoard(_id){
+        var boards = this.state.boards
+        var board = boards[_id]
+        for(var i in board.current_collaborators){
+            if(board.current_collaborators[i].active){
+                alert('You cannot delete as there is an active user in the board.')
+                return
+            }
+        }
         if(confirm("Are you sure to delete this board?")){
+            
             Api.app.service('boards').remove(_id)
-            var boards = this.state.boards
+            
+            
             delete boards[_id]
             this.setState({boards})
         }

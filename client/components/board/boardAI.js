@@ -222,6 +222,20 @@ class BoardAI extends Board{
                     var sketchundo = res[0]['sketchundo']
                     var moodboardundo = res[0]['moodboardundo']
                     var current_collaborators = res[0]['current_collaborators']
+
+                    var noone=true
+                    console.log(current_collaborators)
+                    for(var _id in current_collaborators){
+                        if(current_collaborators[_id].active && user_id!=_id){
+                            noone=false
+                        }
+                    }
+                    console.log(noone)
+                    // if(noone){
+                    //     console.log('harabangtang', Object.keys(this.refs.moodboard.state.arts))
+                    //     this.ChooseArtsTexts([],[],Object.keys(this.refs.moodboard.state.arts), Object.keys(this.refs.moodboard.state.texts))
+                    //     this.ChooseLayers([],this.refs.sketchpad.layers)
+                    // }
                     
                     current_collaborators[user_id] = {
                         sketch_pos:[-1,-1],
