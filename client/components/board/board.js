@@ -94,7 +94,7 @@ class Board extends Component{
                     // find and retrieve layers
                     var arts = _this.refs.moodboard.state.arts
                     Api.app.service('arts').find({query: {board_id: board_id, 
-                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height']
+                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height', 'enabled']
                     }})
                     .then((res)=>{
                         console.log('art', res)
@@ -169,13 +169,17 @@ class Board extends Component{
         Api.app.service('arts').on('patched', (data)=>{
             console.log('patched!')
             var arts = this.refs.moodboard.state.arts
-            if(data.updated!='moodboard_color_swatch_change'){
+            if(data.updated!='moodboard_color_swatch_change' && data.updated!='moodboard_update_arts_embedding'){
                 if(data.position!=undefined){
                     arts[data._id].position = data.position
                 }
                 if(data.choosen_by!=undefined){
                     arts[data._id].choosen_by = data.choosen_by
                 }
+            }else if(data.updated.indexOf('moodboard_update_arts_embedding')!=-1){
+                // TODO
+                arts[data._id]['enabled']=data.enabled
+                
             }else{
                 arts[data._id].file=data.file
                 arts[data._id].color = data.color
@@ -391,6 +395,24 @@ class Board extends Component{
 
                       
                 })
+
+                if(updated.indexOf('sketchpad_add_a_layer')!=-1 && updated.indexOf('style_stamp')!=-1){
+                    console.log('come to here?')
+                    var id_inside = updated.split('_')
+                    if(id_inside[id_inside.length-1]==this.state.user_id){
+                        if(this.refs.sketchpad.refs.stylestampcontroller!=undefined){
+                            this.refs.sketchpad.refs.stylestampcontroller.setState({generating:false})
+                            if(this.refs.sketchpad.state.control_state=='style-stamp'){
+                                // change layer
+                                
+                                // this.refs.sketchpad.initializeMoveLayer();
+                                this.refs.sketchpad.setState({control_state: 'move'})
+                            }   
+                            
+                        }
+                        
+                    }
+                }
             }else if(updated.indexOf('sketchpad_reorder_layers')!=-1){
                 var layers = data.layers
                 var current_layer_id=undefined
@@ -550,6 +572,10 @@ class Board extends Component{
                 _this.refs.moodboard.setState({agreementPane: data.agreementPane, agreement_userSelection: data.agreement_userSelection})
             }else if(updated.indexOf('moodboard_disagreement_user_selection')!=-1){
                 _this.refs.moodboard.setState({agreement_userSelection: data.agreement_userSelection})
+            }else if(updated=='moodboard_search_images'||updated=='moodboard_search_similar_images'||updated=='moodboard_search_random_images'||updated=='moodboard_generate_image'){
+                _this.refs.moodboard.setState({searching:data.searching})
+            }else if(updated=='moodboard_search_done'){
+                _this.refs.moodboard.setState({searching:data.searching})
             }
         })
 

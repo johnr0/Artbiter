@@ -14,8 +14,18 @@ class MoodBoardSearchPaneAI extends Component{
 
     selectSearchImageChoose(){
         if(this.props.mother_state.control_state=='control_object'){
-            var promises = [this.props.mother_this.props.board_this.ChooseArtsTexts([],[],this.props.mother_state.current_image.slice(0), this.props.mother_state.current_text.slice(0))]
+            if(this.props.mother_state.current_text.length==0 && this.props.mother_state.current_image.length==1){
+
+                if(this.props.mother_state.arts[this.props.mother_state.current_image[0]].enabled){
+                    Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {search_image_selected: this.props.mother_state.current_image[0], updated:'moodboard_search_image_select'}})
+                    return 
+                }
+                // return
+            }
             
+            
+            var promises = [this.props.mother_this.props.board_this.ChooseArtsTexts([],[],this.props.mother_state.current_image.slice(0), this.props.mother_state.current_text.slice(0))]
+        
             var del_texts = []
             var replace_texts = []
             var replace_text_ids = []
@@ -35,9 +45,11 @@ class MoodBoardSearchPaneAI extends Component{
             }
             promises.push(this.props.mother_this.setState({current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined}))
             Promise.all(promises)
+
+            this.props.mother_this.setState({control_state:'search_image_select'})
             
         }
-        this.props.mother_this.setState({control_state:'search_image_select'})
+        
     }
 
     cancelSearchImageChoose(){
@@ -84,19 +96,19 @@ class MoodBoardSearchPaneAI extends Component{
     }
 
     search(){
-        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_images'}})
+        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_images', searching: true}})
     }
 
     search_similar(){
-        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_similar_images'}})
+        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_similar_images', searching: true}})
     }
 
     search_random(){
-        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_random_images'}})
+        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_random_images', searching: true}})
     }
 
     generate(){
-        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_generate_image'}})
+        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_generate_image', searching: true}})
     }
 
     addSearchedImageToMoodboard(val){
@@ -364,9 +376,59 @@ class MoodBoardSearchPaneAI extends Component{
         if(Object.keys(this.props.mother_state.groups).length==0){
             group_exist= false
         }
+
+        var paddingTop = 0
+
+        if(document.getElementById('moodboard')!=undefined){
+            paddingTop = document.getElementById('moodboard').offsetHeight * 0.42 * 0.5 -32
+        }
         
         if(this.props.mother_state.searchPane){
             return (<div className='moodboard_search_pane controller'>
+                {this.props.mother_state.searching && <div
+                    style={{borderRadius: '10px', position:'absolute', left: 0, top: 0, width:'100%', height: '100%',  paddingTop: paddingTop, backgroundColor: 'rgba(255,255,255,0.8)', zIndex:10000}}>
+                        <div style={{display:'block', margin: 'auto',}} class="preloader-wrapper big active">
+                            <div class="spinner-layer spinner-blue">
+                                <div class="circle-clipper left">
+                                <div class="circle"></div>
+                                </div><div class="gap-patch">
+                                <div class="circle"></div>
+                                </div><div class="circle-clipper right">
+                                <div class="circle"></div>
+                                </div>
+                            </div>
+
+                            <div class="spinner-layer spinner-red">
+                                <div class="circle-clipper left">
+                                <div class="circle"></div>
+                                </div><div class="gap-patch">
+                                <div class="circle"></div>
+                                </div><div class="circle-clipper right">
+                                <div class="circle"></div>
+                                </div>
+                            </div>
+
+                            <div class="spinner-layer spinner-yellow">
+                                <div class="circle-clipper left">
+                                <div class="circle"></div>
+                                </div><div class="gap-patch">
+                                <div class="circle"></div>
+                                </div><div class="circle-clipper right">
+                                <div class="circle"></div>
+                                </div>
+                            </div>
+
+                            <div class="spinner-layer spinner-green">
+                                <div class="circle-clipper left">
+                                <div class="circle"></div>
+                                </div><div class="gap-patch">
+                                <div class="circle"></div>
+                                </div><div class="circle-clipper right">
+                                <div class="circle"></div>
+                                </div>
+                            </div>
+                            </div>
+                    </div>}
                 <div className='moodboard_search_pane_close' style={{marginBottom: '5px'}} onPointerDown={this.toggleSearchPane.bind(this)}>
                 ▽ Collaborative Search
                 </div>
@@ -430,6 +492,7 @@ class MoodBoardSearchPaneAI extends Component{
                         </div>
                     </div>
                 </div>
+                
             </div>)
         }else{
             return (<div className='moodboard_search_pane_open controller' onPointerDown={this.toggleSearchPane.bind(this)}>

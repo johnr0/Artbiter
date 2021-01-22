@@ -108,6 +108,8 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
         }
         context.app.service('searched_arts').create(searched_art)
       }
+      // search end
+      context.app.service('boards').patch(context.result._id, {$set: {searching:false, updated:'moodboard_search_done'}})
     })
     
   }, (error)=>{
@@ -145,6 +147,7 @@ function generateImage(content, content_weight, styles, style_weights, context){
         }
         context.app.service('searched_arts').create(searched_art)
       }
+      context.app.service('boards').patch(context.result._id, {$set: {searching:false, updated:'moodboard_search_done'}})
     })
   }, (error)=>{
     console.log('error')
@@ -185,7 +188,7 @@ function generateImageWithScaling(content, styles, context){
       }
     }
     var set ={
-      updated: 'sketchpad_add_a_layer'
+      updated: 'sketchpad_add_a_layer_style_stamp_'+context.arguments[2]['user']['_id']
     }
 
     context.app.service('layers').create(layer).then(()=>{
@@ -353,6 +356,7 @@ const boardSearchRandomImage = async context =>{
           }
           context.app.service('searched_arts').create(searched_art)
         }
+        context.app.service('boards').patch(context.result._id, {$set: {searching:false, updated:'moodboard_search_done'}})
       })
     }, (error)=>{
 

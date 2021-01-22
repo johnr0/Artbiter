@@ -3,7 +3,7 @@
   "port": 3030,
   "mongodb": "mongodb://localhost:27017/MemoryGame05",
   "public": "../client/",
-  "ml_server": "http://194.61.20.90/",
+  "ml_server": "http://127.0.0.1:5000/",
   "authentication": {
     "entity": "user",
     "service": "users",

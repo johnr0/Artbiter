@@ -17,8 +17,21 @@ class SketchpadMainControllerAI extends SketchpadMainController{
                 if(moodboard_state.current_text.length>0){
                     this.props.mother_this.props.board_this.refs.moodboard.deSelect();
                 }
+
+                if(moodboard_state.current_image.length>0){
+                    for(var i in moodboard_state.current_image){
+                        if(moodboard_state.arts[moodboard_state.current_image[i]].enabled!=true){
+                            // this.props.mother_this.props.board_this.ChooseArtsTexts([],[],[moodboard_state.current_image[i]], [])
+                            this.props.mother_this.props.board_this.refs.moodboard.deSelect();
+                            break
+                        }
+                    }
+                }
+
+                this.props.mother_this.sketchPadStyleContentFinalize()
             }
             if(control_state!='style-stamp'&&control_state!='content-stamp'&&this.props.mother_state.control_state=='style-stamp'){
+
                 this.props.mother_this.props.board_this.refs.moodboard.setState({control_state:'control_object', action: 'idle'})
             }
         }

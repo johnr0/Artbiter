@@ -107,6 +107,8 @@ class MoodboardImage extends Component{
             console.log('yeah')
             this.select_new_image(false, ecopied)
         }
+        
+        
 
     }
 
@@ -132,7 +134,7 @@ class MoodboardImage extends Component{
         }
         // console.log(this.props.art)
         return (<g onPointerDown={this.test.bind(this)}>
-            <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)}></image>
+            <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)} opacity={(this.props.art.enabled)?'1':'0.3'}></image>
             {color!='' && <g>
             <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>
             </g>}

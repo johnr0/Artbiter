@@ -24,7 +24,8 @@ class SketchPad extends ProtoBoard {
 
         erase_size: 20,
 
-        stamp_size: 20,
+        stamp_size: 40,
+        stamp_blur: 0.5, 
 
         layers: [
             {
@@ -98,7 +99,7 @@ class SketchPad extends ProtoBoard {
         if(this.state.control_state=='erase' && this.state.action=='size'){
             return
         }
-        if(this.state.control_state=='style-stamp' && this.state.action=='size'){
+        if(this.state.control_state=='style-stamp' && (this.state.action=='size'||this.state.action=='blur')){
             return
         }
         if(this.state.control_state=='move-layer' && this.state.action=='rotate-layer'){
@@ -121,12 +122,62 @@ class SketchPad extends ProtoBoard {
             this.setState({action:'idle'})
         }else if(this.state.control_state=='erase' && this.state.action=='size'){
             this.setState({action:'idle'})
-        }else if(this.state.control_state=='style-stamp' && this.state.action=='size'){
+        }else if(this.state.control_state=='style-stamp' && (this.state.action=='size'||this.state.action=='blur')){
             this.setState({action:'idle'})
         }else if(this.state.control_state=='area' && this.state.action=='idle'){
             this.lassoInit(e)
         }else if(this.state.control_state=='content-stamp' && this.state.action=='idle' && this.props.board_this.refs.moodboard.state.current_image.length==1){
             this.contentStampInit(e)
+        }else if(this.state.control_state=='move-layer' && this.state.action=='idle'){
+            console.log('consome')
+            if(this.isOutSideMovableArea(e)){
+                this.moveBoardInit(e)
+            }
+            
+        }
+    }
+
+    isOutSideMovableArea(e){
+        var xmax=Number.MIN_VALUE
+            var ymax = Number.MIN_VALUE
+            var xmin = Number.MAX_VALUE
+            var ymin = Number.MAX_VALUE
+        if(this.state.lasso.length>0){
+            
+
+            for(var i in this.state.lasso){
+                var cur_p = this.state.lasso[i]
+                if(cur_p[0]>xmax){
+                    xmax = cur_p[0]
+                }else if(cur_p[0]<xmin){
+                    xmin = cur_p[0]
+                }
+
+                if(cur_p[1]>ymax){
+                    ymax = cur_p[1]
+                }else if(cur_p[1]<ymin){
+                    ymin = cur_p[1]
+                }
+            }
+        }else if(this.state.nonlasso_ret!=undefined){
+            var ret = this.state.nonlasso_ret
+            xmin = ret.left
+            xmax = ret.left+ret.width
+            ymin = ret.top
+            ymax = ret.top+ret.height
+        }
+
+        if(this.state.lasso.length>0 || this.state.nonlasso_ret!=undefined){
+            console.log(xmin, xmax, ymin, ymax)
+            var mpos = this.getCurrentMouseOnBoard(e)
+
+            if(mpos[0]>xmin && mpos[0]<xmax && mpos[1]>ymin && mpos[1]<ymax){
+                return false
+            }else{
+                return true
+            }
+        }else{
+            return true
         }
     }
 
@@ -135,7 +186,7 @@ class SketchPad extends ProtoBoard {
         // var pos = this.getCurrentMouseOnBoard(e)
         // this.props.board_this.setSketchpadPosition(pos[0], pos[1]);
 
-        if(this.state.control_state=='move' && this.state.action=='move_board'){
+        if((this.state.control_state=='move'||this.state.control_state=='move-layer') && this.state.action=='move_board'){
             this.moveMouse(e)
         }else if(this.state.control_state=='brush' && this.state.action=='brush'){
             this.brushMove(e)
@@ -154,7 +205,7 @@ class SketchPad extends ProtoBoard {
     }
 
     sketchPadMouseMoveEnd(e){
-        if(this.state.control_state=='move' && this.state.action=='move_board'){
+        if((this.state.control_state=='move'||this.state.control_state=='move-layer') && this.state.action=='move_board'){
             this.moveBoardEnd(e)
         }else if (this.state.control_state=='brush'&&this.state.action=='brush'){
             this.brushEnd(e)

@@ -20,7 +20,7 @@ const turnImageToEmbedding = async context => {
     var style = JSON.parse(response.data.style)
     console.log(Object.keys(style))
     // console.log(context.arguments[0]._id)
-    context.app.service('arts').patch(context.arguments[0]._id, {$set:{updated:'moodboard_update_arts_embedding', embedding: embedding}})
+    context.app.service('arts').patch(context.arguments[0]._id, {$set:{updated:'moodboard_update_arts_embedding', embedding: embedding, enabled:true}})
     
     context.app.service('art_styles').create({
       art_id: context.arguments[0]._id,

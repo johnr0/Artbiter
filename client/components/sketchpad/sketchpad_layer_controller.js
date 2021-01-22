@@ -51,6 +51,9 @@ class SketchpadLayerController extends Component{
             if(_this.props.mother_state.control_state=='move-layer'){
                 _this.props.mother_this.initializeMoveLayer()
             }
+            if(_this.props.mother_state.control_state=='style-stamp'){
+                _this.props.mother_this.sketchPadStyleContentFinalize()
+            }
         })
         
         
@@ -77,6 +80,10 @@ class SketchpadLayerController extends Component{
                 this.props.mother_this.props.board_this.RemoveALayer(remove_idx, removed_layer, origin_layers),
                 this.props.mother_this.setState({layers:layers, current_layer: current_layer})
             ])
+
+            if(this.props.mother_state.control_state=='move-layer'){
+                this.props.mother_this.setState({control_state:'move'})
+            }
             
         }
         

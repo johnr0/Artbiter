@@ -394,6 +394,11 @@ class MoodBoardAI extends MoodBoard{
                         }
                     }
                 }
+                for(var j in this.state.current_image){
+                    if(this.state.arts[this.state.current_image[j]].enabled!=true){
+                        return
+                    }
+                }
                 var xpos = (this.state.current_selected_pos[0]+this.state.current_selected_pos[2])/2
                 var ypos = (this.state.current_selected_pos[1]+this.state.current_selected_pos[3])/2
                 xpos = xpos*this.state.boardlength*this.state.boardzoom

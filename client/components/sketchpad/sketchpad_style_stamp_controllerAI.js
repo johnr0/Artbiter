@@ -96,9 +96,23 @@ class SketchpadStyleStampControllerAI extends Component{
         }
         
     }
+    toggleBlur(e){
+        console.log('toggle blur', this.props.mother_state.action)
+        e.stopPropagation();
+        if(this.props.mother_state.action=='idle'){
+            this.props.mother_this.setState({action:'blur'})
+        }else{
+            this.props.mother_this.setState({action:'idle'})
+        }
+        
+    }
 
     change_stamp_size(e){
         this.props.mother_this.setState({stamp_size: e.target.value})
+    }
+
+    change_stamp_blur(e){
+        this.props.mother_this.setState({stamp_blur: e.target.value/100})
     }
 
     setStyleStampMode(mode, e){
@@ -108,7 +122,8 @@ class SketchpadStyleStampControllerAI extends Component{
     resetStyleStamp(){
         var el = document.getElementById('style-stamp-canvas')
         var canvas = el.getContext('2d')
-        canvas.fill='black'
+        console.log('why?')
+        canvas.fillStyle='black'
         canvas.fillRect(0,0,1000,1000)
     }
 
@@ -200,11 +215,17 @@ class SketchpadStyleStampControllerAI extends Component{
             disabled=true
         }
 
+        var perc =100/Math.sqrt(2)
         return (
         <div className="controller sketchpad_style_controller">
             <div className='controller_button' style={{display:'inline-block', marginBottom:'0px'}}>
                 <div style={{fontSize: 12, border: 'solid 4px white', width: 34, height: 34, margin: 'auto', paddingTop:'3px'}} onPointerDown={this.toggleSize.bind(this)}>
                     Size
+                </div>
+            </div>
+            <div className='controller_button' style={{display:'inline-block', marginBottom:'0px'}}>
+                <div style={{fontSize: 12, border: 'solid 4px white', width: 34, height: 34, margin: 'auto', paddingTop:'3px'}} onPointerDown={this.toggleBlur.bind(this)}>
+                    Blur
                 </div>
             </div>
             <div style={{display:'inline-block', border: 'solid 1px white', cursor:'default', marginLeft:'5px', marginRight:'8px', padding: '3px', fontSize: '12px', lineHeight: '27px', verticalAlign:'middle', borderRadius: '3px'}}>
@@ -218,21 +239,24 @@ class SketchpadStyleStampControllerAI extends Component{
                 <div className='btn' style={{width:'calc(50% - 2px)', padding: 0}} onPointerDown={this.applyStyleTransfer.bind(this)} disabled={disabled}>Apply</div>
             </div> */}
 
-            <div className='controller sketchpad_erase_size_controller' style={{border: 'solid 3px #333333', backgroundColor: '#eeeeee',
-                display: (this.props.mother_state.control_state=='style-stamp' && this.props.mother_state.action=='size')?'inline-block':'none' }}>
-            <div style={{width:'10%', height: '100%', display: 'inline-block', verticalAlign:'bottom'}}>
-                <input value={this.props.mother_state.stamp_size} type='range' min='1' max='200' orient='vertical' onChange={this.change_stamp_size.bind(this)}></input>
-            </div>
-            <div style={{width:'90%', height: '100%', display: 'inline-block', overflow:'hidden', position:'relative'}}>
-                <div id='stamp_size_canvas' width={this.props.mother_state.brush_img.width} height={this.props.mother_state.brush_img.height} 
-                style={{width: this.props.mother_state.stamp_size/1000*this.props.mother_state.boardlength*this.props.mother_state.boardzoom, 
-                height: this.props.mother_state.stamp_size/1000*this.props.mother_state.boardlength*this.props.mother_state.boardzoom,
-                position:'absolute', left: 165.6/2-this.props.mother_state.stamp_size/1000*this.props.mother_state.boardlength*this.props.mother_state.boardzoom/2,
-                top: 184/2-this.props.mother_state.stamp_size/1000*this.props.mother_state.boardlength*this.props.mother_state.boardzoom/2,
-                borderRadius: '50%', border: 'solid 1px #333333'
-                }}
-                ></div>
-            </div>    
+            <div className='controller sketchpad_erase_size_controller' style={{left: (this.props.mother_state.action=='size')?60:100, border: 'solid 3px #333333', backgroundColor: '#eeeeee',
+                display: (this.props.mother_state.control_state=='style-stamp' && (this.props.mother_state.action=='size'||this.props.mother_state.action=='blur'))?'inline-block':'none' }}>
+                <div style={{width:'10%', height: '100%', display: (this.props.mother_state.action=='size')?'inline-block':'none', verticalAlign:'bottom'}}>
+                    <input value={this.props.mother_state.stamp_size} type='range' min='1' max='200' orient='vertical' onChange={this.change_stamp_size.bind(this)}></input>
+                </div>
+                <div style={{width:'10%', height: '100%', display: (this.props.mother_state.action=='blur')?'inline-block':'none', verticalAlign:'bottom'}}>
+                    <input value={this.props.mother_state.stamp_blur*100} type='range' min='1' max='100' orient='vertical' onChange={this.change_stamp_blur.bind(this)}></input>
+                </div>
+                <div style={{width:'90%', height: '100%', display: 'inline-block', overflow:'hidden', position:'relative'}}>
+                    <div id='stamp_size_canvas' width={this.props.mother_state.brush_img.width} height={this.props.mother_state.brush_img.height} 
+                    style={{width: this.props.mother_state.stamp_size/1000*this.props.mother_state.boardlength*this.props.mother_state.boardzoom, 
+                    height: this.props.mother_state.stamp_size/1000*this.props.mother_state.boardlength*this.props.mother_state.boardzoom,
+                    position:'absolute', left: 165.6/2-this.props.mother_state.stamp_size/1000*this.props.mother_state.boardlength*this.props.mother_state.boardzoom/2,
+                    top: 184/2-this.props.mother_state.stamp_size/1000*this.props.mother_state.boardlength*this.props.mother_state.boardzoom/2,
+                    borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,0,0,'+this.props.mother_state.stamp_blur.toString()+') 0%, rgba(0,0,0, '+this.props.mother_state.stamp_blur.toString()+') '+(this.props.mother_state.stamp_blur*100).toString()+'%,rgba(0,0,0,0) '+perc.toString()+'%)'
+                    }}
+                    ></div>
+                </div>    
             </div>
 
         </div>)

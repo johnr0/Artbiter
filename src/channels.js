@@ -217,10 +217,19 @@ module.exports = function(app) {
           data_to_return['search_slider_values'] = data.search_slider_values
         }else if(data.updated=='moodboard_search_images'){
           data_to_return['updated'] = data.updated
+          data_to_return['searching']=data.searching
         }else if(data.updated=='moodboard_search_similar_images'){
           data_to_return['updated'] = data.updated
+          data_to_return['searching']=data.searching
         }else if(data.updated=='moodboard_search_random_images'){
           data_to_return['updated'] = data.updated
+          data_to_return['searching']=data.searching
+        }else if (data.updated=='moodboard_generate_image'){
+          data_to_return['updated'] = data.updated
+          data_to_return['searching']=data.searching
+        }else if(data.updated=='moodboard_search_done'){
+          data_to_return['updated'] = data.updated
+          data_to_return['searching']=data.searching
         }else if(data.updated=='moodboard_search_slider_distances'){
           data_to_return['updated'] = data.updated
           data_to_return['search_slider_distances'] = data.search_slider_distances
@@ -296,6 +305,9 @@ module.exports = function(app) {
         data_to_return._id = data._id
         data_to_return.color=data.color
         data_to_return.file = data.file
+      }else if(data.updated=='moodboard_update_arts_embedding'){
+        data_to_return._id = data._id
+        data_to_return.enabled = data.enabled
       }else{
         data_to_return = JSON.parse(JSON.stringify(data))
         delete data_to_return['embedding']

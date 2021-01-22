@@ -17,7 +17,7 @@ class SketchPadAI extends SketchPad{
         super.componentDidMount()
         var el = document.getElementById('style-stamp-canvas')
                 var canvas = el.getContext('2d')
-                canvas.fill='black'
+                canvas.fillStyle='black'
                 canvas.fillRect(0,0,1000,1000)
     }
 
@@ -26,15 +26,26 @@ class SketchPadAI extends SketchPad{
         if(this.state.control_state=='style-stamp' && this.state.action=='idle'){
             var el = document.getElementById('style-stamp-canvas')
             var ctx = el.getContext('2d');
-            ctx.lineWidth = this.state.stamp_size
-            ctx.beginPath();
-            if(this.state.style_stamp_mode=='add'){
-                ctx.strokeStyle = '#ffffff'
-            }else if(this.state.style_stamp_mode=='subtract'){
-                ctx.strokeStyle = '#000000'
-            }
+            
             var brush_cur = this.getCurrentMouseOnBoard(e).slice()
-            ctx.moveTo(brush_cur[0], brush_cur[1])
+            ctx.beginPath();
+            var brush_cur = this.getCurrentMouseOnBoard(e).slice()
+
+            var gradient = ctx.createRadialGradient(brush_cur[0], brush_cur[1], 0, brush_cur[0], brush_cur[1], this.state.stamp_size/2);
+            if(this.state.style_stamp_mode=='add'){
+                gradient.addColorStop(0, 'rgba(255,255,255,'+this.state.stamp_blur.toString()+')')
+                gradient.addColorStop(this.state.stamp_blur, 'rgba(255,255,255,'+this.state.stamp_blur.toString()+')')
+                gradient.addColorStop(1, 'rgba(255,255,255,0)')
+            }else if (this.state.style_stamp_mode=='subtract'){
+                gradient.addColorStop(0, 'rgba(0,0,0,'+this.state.stamp_blur.toString()+')')
+                gradient.addColorStop(this.state.stamp_blur, 'rgba(0,0,0,'+this.state.stamp_blur.toString()+')')
+                gradient.addColorStop(1, 'rgba(0,0,0,0)')
+            }
+            ctx.arc(brush_cur[0], brush_cur[1], this.state.stamp_size/2, 0, 2*Math.PI)
+            ctx.fillStyle=gradient;
+            console.log(ctx.fill)
+            ctx.fill()
+            ctx.closePath();
             this.setState({action:'style-brush', style_brush_cur: brush_cur})
         }   
     }  
@@ -44,10 +55,28 @@ class SketchPadAI extends SketchPad{
         if(this.state.control_state=='style-stamp' && this.state.action=='style-brush'){
             var el = document.getElementById('style-stamp-canvas')
             var ctx = el.getContext('2d');
+            // var brush_cur = this.getCurrentMouseOnBoard(e).slice()
+            // ctx.lineJoin = ctx.lineCap='round';
+            // ctx.lineTo(brush_cur[0], brush_cur[1])
+            // ctx.stroke()
+            ctx.beginPath();
             var brush_cur = this.getCurrentMouseOnBoard(e).slice()
-            ctx.lineJoin = ctx.lineCap='round';
-            ctx.lineTo(brush_cur[0], brush_cur[1])
-            ctx.stroke()
+
+            var gradient = ctx.createRadialGradient(brush_cur[0], brush_cur[1], 0, brush_cur[0], brush_cur[1], this.state.stamp_size/2);
+            if(this.state.style_stamp_mode=='add'){
+                gradient.addColorStop(0, 'rgba(255,255,255,'+this.state.stamp_blur.toString()+')')
+                gradient.addColorStop(this.state.stamp_blur, 'rgba(255,255,255,'+this.state.stamp_blur.toString()+')')
+                gradient.addColorStop(1, 'rgba(255,255,255,0)')
+            }else if (this.state.style_stamp_mode=='subtract'){
+                gradient.addColorStop(0, 'rgba(0,0,0,'+this.state.stamp_blur.toString()+')')
+                gradient.addColorStop(this.state.stamp_blur, 'rgba(0,0,0,'+this.state.stamp_blur.toString()+')')
+                gradient.addColorStop(1, 'rgba(0,0,0,0)')
+            }
+            ctx.arc(brush_cur[0], brush_cur[1], this.state.stamp_size/2, 0, 2*Math.PI)
+            ctx.fillStyle=gradient;
+            console.log(ctx.fill)
+            ctx.fill()
+            ctx.closePath();
             this.setState({style_brush_cur: brush_cur})
             
         }
@@ -138,10 +167,8 @@ class SketchPadAI extends SketchPad{
         return false;
     }
 
-    sketchPadMouseMoveEnd(e){
-        super.sketchPadMouseMoveEnd(e)
-        if(this.state.control_state=='style-stamp' && this.state.action=='style-brush'){
-            var el = document.getElementById('style-stamp-canvas')
+    sketchPadStyleContentFinalize(){
+        var el = document.getElementById('style-stamp-canvas')
             var canvas = el.getContext('2d')
             // get content image
             var content_bbox = this.getCanvasBoundingBoxBW(canvas)
@@ -160,6 +187,12 @@ class SketchPadAI extends SketchPad{
                 var content_image = content_el.toDataURL();
                 this.setState({action:'idle', style_brush_cur: undefined, style_content_image: content_image})
             }
+    }
+
+    sketchPadMouseMoveEnd(e){
+        super.sketchPadMouseMoveEnd(e)
+        if(this.state.control_state=='style-stamp' && this.state.action=='style-brush'){
+            this.sketchPadStyleContentFinalize()
         }
     }
 
@@ -196,7 +229,7 @@ class SketchPadAI extends SketchPad{
             <SketchpadMainControllerAI mother_state={this.state} mother_this={this}></SketchpadMainControllerAI>
             <SketchpadLayerController mother_state={this.state} mother_this={this}></SketchpadLayerController>
             <SketchpadUndo mother_state={this.state} mother_this={this}></SketchpadUndo>
-            <SketchpadStyleStampControllerAI2 mother_state={this.state} mother_this={this}></SketchpadStyleStampControllerAI2>
+            <SketchpadStyleStampControllerAI2 ref='stylestampcontroller' mother_state={this.state} mother_this={this}></SketchpadStyleStampControllerAI2>
             
         </div>
     </div>)

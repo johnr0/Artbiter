@@ -11,6 +11,7 @@ class SketchpadStyleStampControllerAI2 extends Component{
         style_area: {},
         crop: false,
         cropping: false,
+        generating:false,
     }
 
     toggleOpen(){
@@ -315,6 +316,7 @@ class SketchpadStyleStampControllerAI2 extends Component{
     }
 
     applyTransfer(){
+        this.setState({generating:true})
         var el = document.getElementById('style-stamp-canvas')
         var canvas = el.getContext('2d')
         // get content image
@@ -390,8 +392,57 @@ class SketchpadStyleStampControllerAI2 extends Component{
         var side_length_height = (document.getElementById('sketchpad').offsetHeight* 0.45-50-40)-20
         var side_length = (side_length_height>side_length_width)?side_length_width:side_length_height
 
+        var paddingTop = 0
+
+        if(document.getElementById('sketchpad')!=undefined){
+            paddingTop = document.getElementById('sketchpad').offsetHeight * 0.45 * 0.5 -32
+        }
+
         return (<div style={{display:(this.props.mother_state.control_state=='style-stamp')?'':'none'}}>
             <div className="controller sketchpad_style_controller2" style={{display:(this.state.open)?'':'none'}}>
+                {this.state.generating && <div style={{borderRadius: '10px', position:'absolute', width: '100%', height: '100%', top:0, left:0, paddingTop: paddingTop, backgroundColor: 'rgba(255,255,255,0.8)', zIndex:10000}}>
+                    <div style={{display:'block', margin: 'auto',}} class="preloader-wrapper big active">
+                            <div class="spinner-layer spinner-blue">
+                                <div class="circle-clipper left">
+                                <div class="circle"></div>
+                                </div><div class="gap-patch">
+                                <div class="circle"></div>
+                                </div><div class="circle-clipper right">
+                                <div class="circle"></div>
+                                </div>
+                            </div>
+
+                            <div class="spinner-layer spinner-red">
+                                <div class="circle-clipper left">
+                                <div class="circle"></div>
+                                </div><div class="gap-patch">
+                                <div class="circle"></div>
+                                </div><div class="circle-clipper right">
+                                <div class="circle"></div>
+                                </div>
+                            </div>
+
+                            <div class="spinner-layer spinner-yellow">
+                                <div class="circle-clipper left">
+                                <div class="circle"></div>
+                                </div><div class="gap-patch">
+                                <div class="circle"></div>
+                                </div><div class="circle-clipper right">
+                                <div class="circle"></div>
+                                </div>
+                            </div>
+
+                            <div class="spinner-layer spinner-green">
+                                <div class="circle-clipper left">
+                                <div class="circle"></div>
+                                </div><div class="gap-patch">
+                                <div class="circle"></div>
+                                </div><div class="circle-clipper right">
+                                <div class="circle"></div>
+                                </div>
+                            </div>
+                            </div>
+                </div>}
                 <div className='moodboard_search_pane_close' style={{marginBottom: '5px'}} onPointerDown={this.toggleOpen.bind(this)}>
                     ▽ Style Configure
                     </div>
