@@ -9,7 +9,7 @@ const turnImageToEmbedding = async context => {
   console.log('ml_server', ml_server)
   console.log(context.app.get('ml_server'))
 
-  console.log(file)
+  console.log(image)
 
   axios.post(context.app.get('ml_server')+'image_to_embedding', {
     image: image,
@@ -27,7 +27,7 @@ const turnImageToEmbedding = async context => {
       style: style
     })
   }, (error)=>{
-    // console.log(error)
+    console.log(error)
     console.log('error')
   })
   return context
