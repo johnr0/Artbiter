@@ -231,11 +231,11 @@ class BoardAI extends Board{
                         }
                     }
                     console.log(noone)
-                    // if(noone){
-                    //     console.log('harabangtang', Object.keys(this.refs.moodboard.state.arts))
-                    //     this.ChooseArtsTexts([],[],Object.keys(this.refs.moodboard.state.arts), Object.keys(this.refs.moodboard.state.texts))
-                    //     this.ChooseLayers([],this.refs.sketchpad.layers)
-                    // }
+                    if(noone){
+                        console.log('harabangtang', Object.keys(this.refs.moodboard.state.arts))
+                        this.ChooseArtsTexts([],[],Object.keys(this.refs.moodboard.state.arts), Object.keys(this.refs.moodboard.state.texts))
+                        this.ChooseLayers([],this.refs.sketchpad.layers)
+                    }
                     
                     current_collaborators[user_id] = {
                         sketch_pos:[-1,-1],

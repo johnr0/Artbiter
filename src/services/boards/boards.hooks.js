@@ -400,6 +400,7 @@ const sketchpadStyleApply = async context => {
 
 const afterRemove = async context => {
   var _id = context.result._id
+  console.log(_id)
   context.app.service('group_styles').find({query:{board_id: _id}}).then((res)=>{
     for(var i in res){
       context.app.service('group_styles').remove(res[i]._id)
@@ -411,11 +412,7 @@ const afterRemove = async context => {
     }
   })
 
-  context.app.service('disagreed_arts').find({query:{board_id: _id}}).then((res)=>{
-    for(var i in res){
-      context.app.service('disagreed_arts').remove(res[i]._id)
-    }
-  })
+  
   context.app.service('searched_arts').find({query:{board_id: _id}}).then((res)=>{
     for(var i in res){
       context.app.service('searched_arts').remove(res[i]._id)
@@ -433,15 +430,21 @@ const afterRemove = async context => {
     }
   })
 
-  context.app.service('texts').find({query:{board_id: _id}}).then((res)=>{
-    for(var i in res){
-      context.app.service('texts').remove(res[i]._id)
-    }
-  })
+  // context.app.service('texts').find({query:{board_id: _id}}).then((res)=>{
+  //   for(var i in res){
+  //     context.app.service('texts').remove(res[i]._id)
+  //   }
+  // })
 
   context.app.service('layers').find({query:{board_id: _id}}).then((res)=>{
     for(var i in res){
       context.app.service('layers').remove(res[i]._id)
+    }
+  })
+
+  context.app.service('disagreed_arts').find({query:{board_id: _id}}).then((res)=>{
+    for(var i in res){
+      context.app.service('disagreed_arts').remove(res[i]._id)
     }
   })
             
