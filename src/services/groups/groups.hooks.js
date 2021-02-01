@@ -94,7 +94,7 @@ function sliderImpact(board_id, context){
   
 }
 
-function trainCAV(embeddings, context, board_id){
+function trainCAV(embeddings, context, board_id, added_id=undefined){
   console.log('embedding--', Object.keys(embeddings))
   // console.log(JSON.stringify(styles))
   axios.post(context.app.get('ml_server')+'trainCAV', {
@@ -111,9 +111,42 @@ function trainCAV(embeddings, context, board_id){
       promises.push(context.app.service('groups').patch(i, {$set: {cav: cavs[i], updated: 'moodboard_group_cav_update'}}))
     }
 
+    context.app.service('group_models').find({query:{board_id: context.result.board_id}})
+    .then((res)=>{
+      to_remove=[]
+      for(var i in res){
+        console.log('overlap is', res[i].groups.filter(value => Object.keys(cavs).includes(value)))
+        if(res[i].groups.filter(value => Object.keys(cavs).includes(value)).length>0){
+          to_remove.push(context.app.service('group_models').remove(res[i]._id))
+        }
+      }
+      context.app.service('groups').find({query: {_id: {$in: Object.keys(cavs)}}})
+      .then((res2)=>{
+        Promise.all(to_remove).then(data=>{
+          var _id = res2[0].higher_group
+          console.log('id of high', _id)
+          context.app.service('group_models').find({query:{_id:_id}})
+          .then((res_fin)=>{
+            if(res_fin.length==0){
+              context.app.service('group_models').create({ '_id': _id, board_id: context.result.board_id, 
+                'group_model': response.data['group_model'], 'l2t': response.data['l2t'], 'dec': response.data['dec'], groups: Object.keys(cavs)
+              })
+            }
+          })
+          
+        }).catch(function(err){
+          console.log('err')
+        })
+      })
+      
+      
+    })
+
     Promise.all(promises).then(data=>{
       console.log('all')
       sliderImpact(board_id, context)
+    }).catch(function(err){
+      console.log('err')
     })
   }, (error)=>{
     console.log('error')
@@ -209,7 +242,7 @@ const createTrainCAV = async context => {
     }
     // console.log(embeddings)
 
-    trainCAV(embeddings, context, res[0].board_id)
+    trainCAV(embeddings, context, res[0].board_id, context.result._id)
     // averageStyles(style)
   })
 
@@ -265,7 +298,7 @@ const RelateCAV = async context => {
           }
         }
         console.log(embeddings, 'embeddings')
-        trainCAV(embeddings, context, context.result.board_id)
+        trainCAV(embeddings, context)
       })
 
       // context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
@@ -414,6 +447,16 @@ const RemoveGroupCAV = async context => {
     .then((res2)=>{
       console.log(res2.length)
       var art_ids = []
+
+      if(res2.length==1){
+        context.app.service('group_models').find({query:{_id: res[0].higher_group}})
+        .then((res_gm)=>{
+          if(res_gm.length>0){
+            context.app.service('group_models').remove(res[0].higher_group)
+          }
+        })
+        
+      }
       
       for(var i in res2){
         var group = res2[i]
@@ -423,11 +466,33 @@ const RemoveGroupCAV = async context => {
         
       }
 
+      context.app.service('arts').find({query:{board_id: res[0].board_id}})
+      .then((res_arts)=>{
+        for(var k in res_arts){
+          if(res_arts[k].labels!=undefined){
+            var labels = JSON.parse(JSON.stringify(res_arts[k].labels))
+            console.log(labels, context.arguments[0])
+            if(labels[context.arguments[0]]!=undefined){
+              var unset = {}
+              var set = {}
+              unset['labels.'+context.arguments[0]] =1
+              set['updated'] = 'arts_label'
+              context.app.service('arts').patch(res_arts[k]._id, {$set:set, $unset: unset})
+            }
+            
+          }
+        }
+        
+
+      })
+
       context.app.service('arts').find({query:{_id:{$in:art_ids}}})
       .then((res3)=>{
         var art_embeddings = {}
         for(var j in res3){
           art_embeddings[res3[j]._id] = res3[j].embedding
+          // remove the group label from images
+          
         }
         for(var i in res2){
           var embeddings = {}

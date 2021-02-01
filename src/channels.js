@@ -308,6 +308,9 @@ module.exports = function(app) {
       }else if(data.updated=='moodboard_update_arts_embedding'){
         data_to_return._id = data._id
         data_to_return.enabled = data.enabled
+      }else if(data.updated=='arts_label'){
+        data_to_return._id = data._id
+        data_to_return.labels = data.labels
       }else{
         data_to_return = JSON.parse(JSON.stringify(data))
         delete data_to_return['embedding']

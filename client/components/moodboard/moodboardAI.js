@@ -31,6 +31,10 @@ class MoodBoardAI extends MoodBoard{
 
         agreement_userSelection: {},
 
+        label_art: undefined,
+
+
+
     }
             
 
@@ -300,7 +304,9 @@ class MoodBoardAI extends MoodBoard{
         // this.setState({action:'idle'})
     }
 
-    relateGroup(key, key2){
+    relateGroup(key, key2, e){
+        e.stopPropagation()
+        e.preventDefault()
         var standard_group = this.state.groups[key2]
         // var cur_group = this.state.groups[key]
         // var search_slider_values = this.state.search_slider_values
@@ -330,7 +336,9 @@ class MoodBoardAI extends MoodBoard{
         Api.app.service('groups').patch(key, {$set: {updated:'groups_relate_r', higher_group: standard_group.higher_group}})
     }
 
-    unrelateGroup(key){
+    unrelateGroup(key,e){
+        e.stopPropagation()
+        e.preventDefault()
         var standard_group = this.state.groups[key]
         // var search_slider_values = this.state.search_slider_values
         // var num = 0
@@ -546,6 +554,50 @@ class MoodBoardAI extends MoodBoard{
         })
     }
 
+    renderLabel(){
+
+    }
+
+    renderLabels(){
+        if(this.state.current_image.length==1 && this.state.current_text.length==0 && this.state.action=='idle'){
+            if(this.state.label_art==this.state.current_image[0]){
+
+                var art = this.state.arts[this.state.current_image[0]]
+                if(art!=undefined){
+                    if(art.labels!=undefined){
+                        var smallx = (art.position[0]<art.position[2])?art.position[0]:art.position[2]
+                        var bigx = (art.position[0]<art.position[2])?art.position[2]:art.position[0]
+                        var smally = (art.position[1]<art.position[3])?art.position[1]:art.position[3]
+                        var bigy = (art.position[1]<art.position[3])?art.position[3]:art.position[1]
+                        var x = bigx* this.state.boardlength*this.state.boardzoom+5
+                        var y = smally* this.state.boardlength*this.state.boardzoom-5
+
+                        var width = 100//(bigx-smallx)*this.props.boardlength
+                        var height = 200//(bigy-smally)*this.props.boardlength
+                        var _this = this
+                        return (<div style={{position:'absolute', left:x, top: y, width:'fit-content', height: 'fit-content'}} className='controller'>
+                            <div><b>Machine label</b></div>
+                            {Object.keys(art.labels).map(function(key, idx){
+                                if(art.labels[key]!=0){
+                                    var label_width = (art.labels[key]*50>100)?100:art.labels[key]*50
+                                    
+                                    return (<div>
+                                        <div style={{display:'inline-block'}}>{_this.state.groups[key].group_name}</div>
+                                        <div style={{display:'inline-block', marginLeft:'3px', height:'10px', width:label_width, backgroundColor:'#eeeeee'}}></div>
+                                        </div>)
+                                }
+                                
+                            })}
+                        </div>)
+                    }
+                }
+                
+
+            }
+            
+        }
+    }
+
     render(){
         var boardrender_cursor
         if((this.state.control_state=='add_image'||this.state.control_state=='add_color') && this.state.action!='idle'){
@@ -598,7 +650,7 @@ class MoodBoardAI extends MoodBoard{
                         {/* {this.state.control_state=='style-stamp' && <MoodboardStyleSketchControlAI ref={'stylecontrol'} mother_this={this} mother_state={this.state}></MoodboardStyleSketchControlAI>} */}
                     </svg>
                     {this.props.board_this.renderCollaboratorsOnMoodBoard()}
-                    
+                    {this.renderLabels()}
                     
 
                 </div>

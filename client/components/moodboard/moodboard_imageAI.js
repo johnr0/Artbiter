@@ -133,6 +133,38 @@ class MoodboardImageAI extends MoodboardImage{
         })
     }
 
+    // selectArtForLabel(){
+    //     if(this.props.mother_state.label_art!=undefined){
+    //         this.props.mother_this.setState({label_art: undefined})
+    //     }else{
+    //         this.props.mother_this.setState({label_art: this.props.art.id})
+    //     }
+        
+    // }
+
+    renderLSigs(x, y, width, group){
+        var renderWidth = 10//Math.min(20, width/10)
+        if(this.props.art.labels!=undefined){
+            if(this.props.art.labels[group._id]!=undefined){
+                renderWidth = renderWidth*this.props.art.labels[group._id]
+                renderWidth = (renderWidth>20)?20:renderWidth
+                return (<g>
+                    <circle cx={x} cy={y-3*renderWidth/4} r={renderWidth/2} fill={group.higher_group} strokeWidth='2' stroke='white'></circle>
+                </g>)
+            }
+        }
+        
+        
+    }
+
+    renderLabels(x, y){
+        return (<g>
+            <foreignObject x={x} y={y} width='200' height='200'>
+                <div className='controller' style={{height: '100%'}}></div>
+            </foreignObject>
+        </g>)
+    }
+
 
     
     render(){
@@ -142,11 +174,15 @@ class MoodboardImageAI extends MoodboardImage{
         var bigy = (this.props.art.position[1]>this.props.art.position[3])?this.props.art.position[1]:this.props.art.position[3]
         var x = smallx* this.props.boardlength
         var y = smally* this.props.boardlength
+        var x2 = bigx * this.props.boardlength
+        var y2 = bigy * this.props.boardlength
 
         var width = (bigx-smallx)* this.props.boardlength
         var height = (bigy-smally)* this.props.boardlength
 
         var color = ''
+
+        var multRender = false
 
         if(this.props.art.choosen_by==this.props.mother_this.props.board_this.state.user_id){
             color = '#aaaaff'
@@ -157,12 +193,24 @@ class MoodboardImageAI extends MoodboardImage{
             
         }
 
+        if(this.props.mother_state.current_image.length>1 || this.props.mother_state.current_text.length>1){
+            multRender = true
+        }
+
 
         var groups = this.props.mother_state.groups
         var current_image = this.props.mother_state.current_image
         var renderUser = false
         var userGroup = undefined
         var included_groups = []
+
+        var selected_groups = []//undefined
+
+
+        
+
+
+        // I selected
         for(var k in groups){
             if(groups[k].art_ids.indexOf(this.props.art_key)!=-1){
                 included_groups.push(k)
@@ -173,6 +221,8 @@ class MoodboardImageAI extends MoodboardImage{
                 }  
             }
         }
+
+        // others selected
         if(renderUser==false){
             for(var idx in included_groups){
                 var group = groups[included_groups[idx]]
@@ -202,7 +252,34 @@ class MoodboardImageAI extends MoodboardImage{
             }
         }
 
+        //////////////
+        for(var idx in groups){
+            var group = groups[idx]
+            var choosen_bys=[]
+            for(var jdx in group.art_ids){
+                var art_id = group.art_ids[jdx]
+                if(this.props.mother_state.arts[art_id]!=undefined){
+                    choosen_bys.push(this.props.mother_state.arts[art_id].choosen_by)
+                }
+            }
+            choosen_bys.sort()
+            if(choosen_bys[0]==choosen_bys[choosen_bys.length-1] && choosen_bys[0]!=''){
+                // var passed = true
+                // for(var k in this.props.mother_state.arts){
+                //     if(group.art_ids.indexOf(k)==-1){
+                //         if(this.props.mother_state.arts[k].choosen_by==choosen_bys[0]){
+                //             passed=false
+                //         }
+                //     }
+                // }
+                // if(passed){
+                    // renderUser=true
+                    selected_groups.push(group)
+                // }
+            }
 
+        }
+        /////////////////
 
         // console.log(this.props.art_key)
         // console.log(renderUser)
@@ -212,6 +289,7 @@ class MoodboardImageAI extends MoodboardImage{
             <rect onPointerDown={this.choose_image.bind(this)} x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>
             {renderUser && this.renderUsers(userGroup,x,y, width)}
             </g>}
+            {(selected_groups.length==1)&&this.renderLSigs((x+x2)/2, y2, width, selected_groups[0])}
             
         </g>)
     }
