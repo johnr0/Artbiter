@@ -1,6 +1,6 @@
 {
   "host": "0.0.0.0",
-  "port": 8052,
+  "port": 8005,
   "mongodb": "mongodb+srv://jjyc:CymPV598Urlgdqh4@artbiter.zklbs.mongodb.net/artbiter?retryWrites=true&w=majority",
   "public": "../dist/",
   "ml_server": "http://194.61.20.52/",
