@@ -1,5 +1,5 @@
 {
-  "host": "euler.si.umich.edu",
+  "host": "127.0.0.1",
   "port": 8052,
   "mongodb": "mongodb+srv://jjyc:CymPV598Urlgdqh4@artbiter.zklbs.mongodb.net/artbiter?retryWrites=true&w=majority",
   "public": "../dist/",
