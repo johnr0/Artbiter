@@ -126,7 +126,7 @@ class SketchPad extends ProtoBoard {
             this.setState({action:'idle'})
         }else if(this.state.control_state=='area' && this.state.action=='idle'){
             this.lassoInit(e)
-        }else if(this.state.control_state=='content-stamp' && this.state.action=='idle' && this.props.board_this.refs.moodboard.state.current_image.length==1){
+        }else if(this.state.control_state=='content-stamp' && this.state.action=='idle' && this.props.board_this.moodboard.state.current_image.length==1){
             this.contentStampInit(e)
         }else if(this.state.control_state=='move-layer' && this.state.action=='idle'){
             console.log('consome')
@@ -964,8 +964,8 @@ class SketchPad extends ProtoBoard {
     }
 
     contentStampInit(e){
-        var current_image_id = this.props.board_this.refs.moodboard.state.current_image[0]
-        var cur_art = this.props.board_this.refs.moodboard.state.arts[current_image_id].file
+        var current_image_id = this.props.board_this.moodboard.state.current_image[0]
+        var cur_art = this.props.board_this.moodboard.state.arts[current_image_id].file
         var im= new Image;
         var _this = this
         var p = _this.getCurrentMouseOnBoard(e)

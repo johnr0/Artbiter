@@ -12,17 +12,17 @@ class SketchpadMainControllerAI extends SketchpadMainController{
                 // var canvas = el.getContext('2d')
                 // canvas.fill='black'
                 // canvas.fillRect(0,0,1000,1000)
-                this.props.mother_this.props.board_this.refs.moodboard.setState({control_state:'style-stamp'})
-                var moodboard_state = this.props.mother_this.props.board_this.refs.moodboard.state
+                this.props.mother_this.props.board_this.moodboard.setState({control_state:'style-stamp'})
+                var moodboard_state = this.props.mother_this.props.board_this.moodboard.state
                 if(moodboard_state.current_text.length>0){
-                    this.props.mother_this.props.board_this.refs.moodboard.deSelect();
+                    this.props.mother_this.props.board_this.moodboard.deSelect();
                 }
 
                 if(moodboard_state.current_image.length>0){
                     for(var i in moodboard_state.current_image){
                         if(moodboard_state.arts[moodboard_state.current_image[i]].enabled!=true){
                             // this.props.mother_this.props.board_this.ChooseArtsTexts([],[],[moodboard_state.current_image[i]], [])
-                            this.props.mother_this.props.board_this.refs.moodboard.deSelect();
+                            this.props.mother_this.props.board_this.moodboard.deSelect();
                             break
                         }
                     }
@@ -32,7 +32,7 @@ class SketchpadMainControllerAI extends SketchpadMainController{
             }
             if(control_state!='style-stamp'&&control_state!='content-stamp'&&this.props.mother_state.control_state=='style-stamp'){
 
-                this.props.mother_this.props.board_this.refs.moodboard.setState({control_state:'control_object', action: 'idle'})
+                this.props.mother_this.props.board_this.moodboard.setState({control_state:'control_object', action: 'idle'})
             }
         }
         super.changeControlState(control_state)

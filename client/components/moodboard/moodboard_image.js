@@ -24,7 +24,7 @@ class MoodboardImage extends Component{
                     if(obj_moving){
                         _this.props.mother_this.object_moving_init(e)
                     }
-                    _this.props.mother_this.props.board_this.refs.sketchpad.setState({})
+                    _this.props.mother_this.props.board_this.sketchpad.setState({})
                 })
             ])
             
@@ -81,7 +81,7 @@ class MoodboardImage extends Component{
                     if(obj_moving){
                         _this.props.mother_this.object_moving_init(e)
                     }
-                    _this.props.mother_this.props.board_this.refs.sketchpad.setState({})
+                    _this.props.mother_this.props.board_this.sketchpad.setState({})
                 })
             ])
             

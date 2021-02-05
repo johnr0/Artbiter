@@ -24,12 +24,12 @@ class LoginPage extends Component{
     }
 
     localCreateAccount(){
-        console.log(this.validateEmail(this.refs.email.value))
-        if(this.refs.password.value==this.refs.password_retype.value && this.validateEmail(this.refs.email.value)){
+        console.log(this.validateEmail(this.email.value))
+        if(this.password.value==this.password_retype.value && this.validateEmail(this.email.value)){
             console.log('authenticating...')
             Api.createUser({
-                    email: this.refs.email.value,
-                    password: this.refs.password.value,
+                    email: this.email.value,
+                    password: this.password.value,
                 })
         }else{
             alert('The passwords should match!')
@@ -43,11 +43,11 @@ class LoginPage extends Component{
     }
 
     localLogIn(){
-        if(this.validateEmail(this.refs.email.value)){
+        if(this.validateEmail(this.email.value)){
             console.log('authenticating...')
             Api.authenticate({
-                    email: this.refs.email.value,
-                    password: this.refs.password.value,
+                    email: this.email.value,
+                    password: this.password.value,
                 })
         }
     }
@@ -60,16 +60,16 @@ class LoginPage extends Component{
         return (<div className="login">
             <h2>Artbiter</h2>
             <div className='row'>
-                <input ref='email' type='email' placeholder='your email'></input>
+                <input ref={c=>this.email=c} type='email' placeholder='your email'></input>
             </div>
 
             <div className='row'>
-                <input ref='password' type='password' placeholder='your password'></input>
+                <input ref={c=>this.password=c} type='password' placeholder='your password'></input>
             </div>
 
             {this.state.tosignup==true &&
                 <div className='row'>
-                    <input ref='password_retype' type='password' placeholder='retype password'></input>
+                    <input ref={c=>this.password_retype=c} type='password' placeholder='retype password'></input>
                 </div>
             } 
 

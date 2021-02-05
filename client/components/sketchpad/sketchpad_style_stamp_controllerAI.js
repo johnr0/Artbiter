@@ -127,53 +127,53 @@ class SketchpadStyleStampControllerAI extends Component{
         canvas.fillRect(0,0,1000,1000)
     }
 
-    applyStyleTransfer(){
-        var el = document.getElementById('style-stamp-canvas')
-        var canvas = el.getContext('2d')
-        // get content image
-        var content_bbox = this.getCanvasBoundingBoxBW(canvas)
-        console.log(content_bbox)
+    // applyStyleTransfer(){
+    //     var el = document.getElementById('style-stamp-canvas')
+    //     var canvas = el.getContext('2d')
+    //     // get content image
+    //     var content_bbox = this.getCanvasBoundingBoxBW(canvas)
+    //     console.log(content_bbox)
 
-        var content_el = document.createElement('canvas')
-        var content_canvas = content_el.getContext('2d')
-        content_el.width = content_bbox['width']
-        content_el.height = content_bbox['height']
+    //     var content_el = document.createElement('canvas')
+    //     var content_canvas = content_el.getContext('2d')
+    //     content_el.width = content_bbox['width']
+    //     content_el.height = content_bbox['height']
 
-        var target_layer = document.getElementById('sketchpad_canvas_'+this.props.mother_state.layers[this.props.mother_state.current_layer])
-        content_canvas.drawImage(target_layer, content_bbox.left, content_bbox.top, content_bbox.width, content_bbox.height, 0, 0, content_bbox.width, content_bbox.height)
+    //     var target_layer = document.getElementById('sketchpad_canvas_'+this.props.mother_state.layers[this.props.mother_state.current_layer])
+    //     content_canvas.drawImage(target_layer, content_bbox.left, content_bbox.top, content_bbox.width, content_bbox.height, 0, 0, content_bbox.width, content_bbox.height)
 
-        var content_image = content_el.toDataURL();
-        console.log(content_image)
+    //     var content_image = content_el.toDataURL();
+    //     console.log(content_image)
 
-        // get style images 
-        var current_image = this.props.mother_this.props.board_this.refs.moodboard.state.current_image
-        var arts = this.props.mother_this.props.board_this.refs.moodboard.state.arts
-        var art_weight = this.props.mother_this.props.board_this.refs.moodboard.refs.stylecontrol.state.art_weight
-        var art_area = this.props.mother_this.props.board_this.refs.moodboard.refs.stylecontrol.state.art_area
+    //     // get style images 
+    //     var current_image = this.props.mother_this.props.board_this.moodboard.state.current_image
+    //     var arts = this.props.mother_this.props.board_this.moodboard.state.arts
+    //     var art_weight = this.props.mother_this.props.board_this.moodboard.stylecontrol.state.art_weight
+    //     var art_area = this.props.mother_this.props.board_this.moodboard.stylecontrol.state.art_area
 
-        var styles = {}
-        var promises = []
-        for(var i in current_image){
+    //     var styles = {}
+    //     var promises = []
+    //     for(var i in current_image){
             
-            var art_id = current_image[i]
-            var cur_art_file = arts[art_id].file
-            var cur_art_width = arts[art_id].width
-            var cur_art_height = arts[art_id].height
-            var cur_art_weight = art_weight[art_id]
-            var cur_art_area = art_area[art_id]
+    //         var art_id = current_image[i]
+    //         var cur_art_file = arts[art_id].file
+    //         var cur_art_width = arts[art_id].width
+    //         var cur_art_height = arts[art_id].height
+    //         var cur_art_weight = art_weight[art_id]
+    //         var cur_art_area = art_area[art_id]
 
-            promises.push(this.getStyleObject(cur_art_file, cur_art_width, cur_art_height, cur_art_weight, cur_art_area, art_id))
+    //         promises.push(this.getStyleObject(cur_art_file, cur_art_width, cur_art_height, cur_art_weight, cur_art_area, art_id))
             
-            // styles[art_id] = cur_style
+    //         // styles[art_id] = cur_style
 
-        }
-        Promise.all(promises).then((value)=>{
-            console.log(value)
+    //     }
+    //     Promise.all(promises).then((value)=>{
+    //         console.log(value)
             
-        })
+    //     })
 
         
-    }
+    // }
 
     getStyleObject(cur_art_file, cur_art_width, cur_art_height, cur_art_weight, cur_art_area, art_id){
         var cur_style = {

@@ -85,11 +85,11 @@ class SketchpadStyleStampControllerAI2 extends Component{
     }
 
     renderStyles(side_length){
-        if(this.props.mother_this.props.board_this.refs.moodboard==undefined){
+        if(this.props.mother_this.props.board_this.moodboard==undefined){
             return
         }
-        return this.props.mother_this.props.board_this.refs.moodboard.state.current_image.map((art_key, idx)=>{
-            var art = this.props.mother_this.props.board_this.refs.moodboard.state.arts[art_key]
+        return this.props.mother_this.props.board_this.moodboard.state.current_image.map((art_key, idx)=>{
+            var art = this.props.mother_this.props.board_this.moodboard.state.arts[art_key]
             var style_ratio
             if(this.state.style_ratio[art_key]==undefined){
                 style_ratio = 1
@@ -345,8 +345,8 @@ class SketchpadStyleStampControllerAI2 extends Component{
         console.log(this.props.mother_state.current_layer)
 
         // get style images 
-        var current_image = this.props.mother_this.props.board_this.refs.moodboard.state.current_image
-        var arts = this.props.mother_this.props.board_this.refs.moodboard.state.arts
+        var current_image = this.props.mother_this.props.board_this.moodboard.state.current_image
+        var arts = this.props.mother_this.props.board_this.moodboard.state.arts
         var style_area = this.state.style_area
 
         var styles = {}
@@ -483,7 +483,7 @@ class SketchpadStyleStampControllerAI2 extends Component{
                         </div>
                         <div style={{position:'absolute', top:'-30px', right: '13px'}}>
                             {this.state.crop==false && <div className='btn tiny-btn' onPointerDown={this.applyTransfer.bind(this)} 
-                            disabled={this.props.mother_state.style_content_image==undefined || this.props.mother_this.props.board_this.refs.moodboard.state.current_image.length==0}>Apply</div>}
+                            disabled={this.props.mother_state.style_content_image==undefined || this.props.mother_this.props.board_this.moodboard.state.current_image.length==0}>Apply</div>}
                         </div>
                     </div>
                 </div>

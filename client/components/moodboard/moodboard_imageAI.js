@@ -58,7 +58,7 @@ class MoodboardImageAI extends MoodboardImage{
             Promise.all([
                 this.props.mother_this.props.board_this.ChooseArtsTexts([],[], [this.props.art_key],[]),
                 this.props.mother_this.setState({current_image:current_image, current_selected_pos: pos, current_selected_ratio: ratio}, function(){
-                    _this.props.mother_this.props.board_this.refs.sketchpad.setState({})
+                    _this.props.mother_this.props.board_this.sketchpad.setState({})
                 })
             ])
         }

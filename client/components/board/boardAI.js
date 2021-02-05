@@ -12,39 +12,39 @@ class BoardAI extends Board{
         // when groups are created
         Api.app.service('groups').on('created', (data)=>{
             if(data.board_id==this.state.board_id){
-                var groups = this.refs.moodboard.state.groups
+                var groups = this.moodboard.state.groups
                 groups[data._id] = data
-                this.refs.moodboard.setState({groups})
+                this.moodboard.setState({groups})
             }
         })
 
         Api.app.service('groups').on('removed', (data)=>{
-            var groups = this.refs.moodboard.state.groups
+            var groups = this.moodboard.state.groups
             delete groups[data._id]
-            this.refs.moodboard.setState({groups})
+            this.moodboard.setState({groups})
         
         })
 
         Api.app.service('groups').on('patched', (data)=>{
             if(data.board_id==this.state.board_id){
                 if(data.updated == 'groups_position'){
-                    var groups = this.refs.moodboard.state.groups
+                    var groups = this.moodboard.state.groups
                     groups[data._id].pos = data.pos
-                    this.refs.moodboard.setState({groups})
+                    this.moodboard.setState({groups})
                 }else if(data.updated == 'groups_add' || data.updated=='groups_remove'){
-                    var groups = this.refs.moodboard.state.groups
+                    var groups = this.moodboard.state.groups
                     groups[data._id].pos = data.pos
                     groups[data._id].art_ids = data.art_ids
                     groups[data._id].user_info = data.user_info
-                    this.refs.moodboard.setState({groups})
+                    this.moodboard.setState({groups})
                 }else if(data.updated.indexOf('groups_relate')!=-1){
-                    var groups = this.refs.moodboard.state.groups
+                    var groups = this.moodboard.state.groups
                     groups[data._id].higher_group = data.higher_group
-                    this.refs.moodboard.setState({groups})
+                    this.moodboard.setState({groups})
                 }else if(data.updated == 'groups_toggle_inclusion'){
-                    var groups = this.refs.moodboard.state.groups
+                    var groups = this.moodboard.state.groups
                     groups[data._id].user_info = data.user_info
-                    this.refs.moodboard.setState({groups})
+                    this.moodboard.setState({groups})
                 }
                 
             }
@@ -52,31 +52,31 @@ class BoardAI extends Board{
 
         Api.app.service('searched_arts').on('created', (data)=>{
             if(data.board_id==this.state.board_id){
-                var searched_arts = this.refs.moodboard.state.searched_arts
+                var searched_arts = this.moodboard.state.searched_arts
                 searched_arts[data._id] = data
-                this.refs.moodboard.setState({searched_arts})
+                this.moodboard.setState({searched_arts})
             }
         })
 
         Api.app.service('searched_arts').on('removed', (data)=>{
-            var searched_arts = this.refs.moodboard.state.searched_arts
+            var searched_arts = this.moodboard.state.searched_arts
             delete searched_arts[data._id]
-            this.refs.moodboard.setState({searched_arts})
+            this.moodboard.setState({searched_arts})
         
         })
 
         Api.app.service('disagreed_arts').on('created', (data)=>{
             if(data.board_id==this.state.board_id){
-                var disagreed_arts = this.refs.moodboard.state.disagreed_arts
+                var disagreed_arts = this.moodboard.state.disagreed_arts
                 disagreed_arts[data._id] = data
-                this.refs.moodboard.setState({disagreed_arts})
+                this.moodboard.setState({disagreed_arts})
             }
         })
 
         Api.app.service('disagreed_arts').on('removed', (data)=>{
-            var disagreed_arts = this.refs.moodboard.state.disagreed_arts
+            var disagreed_arts = this.moodboard.state.disagreed_arts
             delete disagreed_arts[data._id]
-            this.refs.moodboard.setState({disagreed_arts})
+            this.moodboard.setState({disagreed_arts})
         
         })
         
@@ -115,22 +115,22 @@ class BoardAI extends Board{
                     // propage board contents to sketchpad and moodboard
                     var layers = res[0]['layers']
                     
-                    _this.refs.sketchpad.setState({layers: layers, sketchundo: sketchundo}, function(){
+                    _this.sketchpad.setState({layers: layers, sketchundo: sketchundo}, function(){
                         for(var layer_idx in layers){
                             var layer_id = layers[layer_idx]
                             console.log(layer_id)
                             Api.app.service('layers').find({query: {_id: layer_id}})
                             .then((res)=>{
                                 console.log(res)
-                                var layer_dict = _this.refs.sketchpad.state.layer_dict
+                                var layer_dict = _this.sketchpad.state.layer_dict
                                 layer_dict[res[0]._id] = res[0]
-                                _this.refs.sketchpad.setState({layer_dict})
+                                _this.sketchpad.setState({layer_dict})
                                 _this.loadALayer(res[0])
                             })
                         }
                     })
                     // find and retrieve layers
-                    var arts = _this.refs.moodboard.state.arts
+                    var arts = _this.moodboard.state.arts
                     var searchPane=false
                     var searchMode = 'search'
                     var search_image_selected = undefined
@@ -177,13 +177,13 @@ class BoardAI extends Board{
                             
                         }
                         
-                        _this.refs.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, 
+                        _this.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, 
                             search_slider_values:search_slider_values, search_slider_distances: search_slider_distances, searchMode: searchMode,
                             generate_slider_values: generate_slider_values, 
                             agreementPane: agreementPane, agreement_userSelection: agreement_userSelection})
                     })
 
-                    var groups = _this.refs.moodboard.state.groups
+                    var groups = _this.moodboard.state.groups
 
                     Api.app.service('groups').find({query: {board_id: board_id,
                         $select: ['_id', 'art_ids', 'group_name', 'higher_group', 'board_id', 'pos', 'user_info', 'updated'],
@@ -193,27 +193,27 @@ class BoardAI extends Board{
                             var group = res[i]
                             groups[group._id] = group
                         }
-                        _this.refs.moodboard.setState({groups:groups})
+                        _this.moodboard.setState({groups:groups})
                     })
                     
-                    var searched_arts = _this.refs.moodboard.state.searched_arts
+                    var searched_arts = _this.moodboard.state.searched_arts
                     Api.app.service('searched_arts').find({query: {board_id: board_id}})
                     .then((res)=>{
                         for(var i in res){
                             searched_arts[res[i]._id] = res[i]
                         }
                         console.log('searched arts', searched_arts)
-                        _this.refs.moodboard.setState({searched_arts:searched_arts})
+                        _this.moodboard.setState({searched_arts:searched_arts})
                     })
 
-                    var disagreed_arts = _this.refs.moodboard.state.disagreed_arts
+                    var disagreed_arts = _this.moodboard.state.disagreed_arts
                     Api.app.service('disagreed_arts').find({query: {board_id: board_id}})
                     .then((res)=>{
                         for(var i in res){
                             disagreed_arts[res[i]._id] = res[i]
                         }
                         console.log('disagreed arts', disagreed_arts)
-                        _this.refs.moodboard.setState({disagreed_arts:disagreed_arts})
+                        _this.moodboard.setState({disagreed_arts:disagreed_arts})
                     })
 
 
@@ -232,9 +232,9 @@ class BoardAI extends Board{
                     }
                     console.log(noone)
                     if(noone){
-                        console.log('harabangtang', Object.keys(this.refs.moodboard.state.arts))
-                        this.ChooseArtsTexts([],[],Object.keys(this.refs.moodboard.state.arts), Object.keys(this.refs.moodboard.state.texts))
-                        this.ChooseLayers([],this.refs.sketchpad.layers)
+                        console.log('harabangtang', Object.keys(this.moodboard.state.arts))
+                        this.ChooseArtsTexts([],[],Object.keys(this.moodboard.state.arts), Object.keys(this.moodboard.state.texts))
+                        this.ChooseLayers([],this.sketchpad.layers)
                     }
                     
                     current_collaborators[user_id] = {
@@ -250,7 +250,7 @@ class BoardAI extends Board{
                     Api.app.service('boards').update(board_id, {$set: set})
                     .then((res)=>{
                         _this.setState({current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email}, function(){
-                            _this.refs.sketchpad.setState({sketchundo: sketchundo})
+                            _this.sketchpad.setState({sketchundo: sketchundo})
                                 // , function(){
                             //     var promises = []
                             //     for(var i in layers){
@@ -258,7 +258,7 @@ class BoardAI extends Board{
                             //     }
                             //     Promise.all(promises)
                             // })
-                            _this.refs.moodboard.setState({texts:texts})
+                            _this.moodboard.setState({texts:texts})
                         })
                     })
 
@@ -277,8 +277,8 @@ class BoardAI extends Board{
         return (
             <div id='board_whole' style={{flex: 'auto', width: '100%', position:'relative'}} className='row'>
     
-                <SketchPadAI board_this={this} board_state={this.state} ref='sketchpad'></SketchPadAI>
-                <MoodBoardAI board_this={this} board_state={this.state} ref='moodboard'></MoodBoardAI>
+                <SketchPadAI board_this={this} board_state={this.state} ref={c=>this.sketchpad=c}></SketchPadAI>
+                <MoodBoardAI board_this={this} board_state={this.state} ref={c=>this.moodboard=c}></MoodBoardAI>
                 <div style={{position:'absolute', right: '10px', top: '10px'}}>
                     {this.renderCollaboartorStatus()}
                 </div>

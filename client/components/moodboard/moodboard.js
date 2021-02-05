@@ -443,7 +443,7 @@ class MoodBoard extends ProtoBoard{
         }
         promises.push(this.setState({action:'idle', current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined, 
         move_board_init: undefined, move_board_mouse_init: undefined}, function(){
-            _this.props.board_this.refs.sketchpad.setState({})
+            _this.props.board_this.sketchpad.setState({})
         })) 
         Promise.all(promises)
     }

@@ -11,14 +11,14 @@ class SketchpadMainController extends Component{
             }
             if(control_state=='content-stamp'){
 
-                this.props.mother_this.props.board_this.refs.moodboard.setState({control_state:'content-stamp'})
-                var moodboard_state = this.props.mother_this.props.board_this.refs.moodboard.state
+                this.props.mother_this.props.board_this.moodboard.setState({control_state:'content-stamp'})
+                var moodboard_state = this.props.mother_this.props.board_this.moodboard.state
                 if(moodboard_state.current_image.length>1 || moodboard_state.current_text.length>0){
-                    this.props.mother_this.props.board_this.refs.moodboard.deSelect();
+                    this.props.mother_this.props.board_this.moodboard.deSelect();
                 }
             }
             if(control_state!='content-stamp'&&control_state!='style-stamp'&&this.props.mother_state.control_state=='content-stamp'){
-                this.props.mother_this.props.board_this.refs.moodboard.setState({control_state:'control_object', action: 'idle'})
+                this.props.mother_this.props.board_this.moodboard.setState({control_state:'control_object', action: 'idle'})
             }
             this.props.mother_this.setState({control_state: control_state})
         } 
