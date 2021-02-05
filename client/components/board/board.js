@@ -168,21 +168,21 @@ class Board extends Component{
         
         Api.app.service('arts').on('created', (data)=>{
             if(data.board_id==this.state.board_id){
-                var arts = this.refs.moodboard.state.arts
+                var arts = _this.refs.moodboard.state.arts
                 arts[data._id] = data
-                this.refs.moodboard.setState({arts})
+                _this.refs.moodboard.setState({arts})
             }
         })
 
         Api.app.service('arts').on('removed', (data)=>{
-                var arts = this.refs.moodboard.state.arts
+                var arts = _this.refs.moodboard.state.arts
                 delete arts[data._id]
-                this.refs.moodboard.setState({arts})
+                _this.refs.moodboard.setState({arts})
         })
 
         Api.app.service('arts').on('patched', (data)=>{
             console.log('patched!', data.updated)
-            var arts = this.refs.moodboard.state.arts
+            var arts = _this.refs.moodboard.state.arts
             if(data.updated=='arts_label'){
                 console.log('aaarrrrttttssss', data.labels)
                 arts[data._id]['labels'] = data.labels
@@ -201,21 +201,21 @@ class Board extends Component{
                 arts[data._id].file=data.file
                 arts[data._id].color = data.color
             }
-            this.refs.moodboard.setState({arts})
+            _this.refs.moodboard.setState({arts})
         })
 
         Api.app.service('layers').on('created', (data)=>{
             console.log('layer created', data)
             if(data.board_id==this.state.board_id){
-                var layer_dict = this.refs.sketchpad.state.layer_dict
-                // var layers = this.refs.sketchpad.state.layers
+                var layer_dict = _this.refs.sketchpad.state.layer_dict
+                // var layers = _this.refs.sketchpad.state.layers
                 // var current_layer_id = layers[this.refs.sketchpad.state.current_layer]
 
                 layer_dict[data._id] = data
 
 
                 
-                this.refs.sketchpad.setState({layer_dict}, function(){
+                _this.refs.sketchpad.setState({layer_dict}, function(){
 
                     var checkExist = setInterval(function(){
                         var el = document.getElementById('sketchpad_canvas_'+data._id)
@@ -602,7 +602,7 @@ class Board extends Component{
             // (e || window.event).returnValue = null;
             // return null;
           });
-    }
+    }///////
 
     loadALayer(layer){
         var el = document.getElementById('sketchpad_canvas_'+layer._id)
@@ -670,11 +670,11 @@ class Board extends Component{
     RemoveALayer(layer_idx, layer, layers){
         var _this = this
         var set={}
-        // var layers = this.refs.sketchpad.state.layers.slice()
+        // var layers = _this.refs.sketchpad.state.layers.slice()
         console.log(layers)
         set['updated'] = 'sketchpad_remove_a_layer'
         
-        set['layers'] =  this.refs.sketchpad.state.layers.slice()
+        set['layers'] =  _this.refs.sketchpad.state.layers.slice()
         console.log(layers)
         // layer = JSON.parse(JSON.stringify(layer))
         layer.choosen_by=''
@@ -749,19 +749,19 @@ class Board extends Component{
                 })
             })
             // if(undo_obj.cond=='lasso'){
-            //     this.refs.sketchpad.setState({lasso:undo_obj.selection}, function(){
+            //     _this.refs.sketchpad.setState({lasso:undo_obj.selection}, function(){
             //         Promise.all([_this.refs.sketchpad.lassoEnd(),
             //         _this.refs.sketchpad.initializeMoveLayer()])
             //     })
             // }else if(undo_obj.cond=='nonlasso'){
-            //     this.refs.sketchpad.setState({nonlasso_ret:undo_obj.selection}, function(){
+            //     _this.refs.sketchpad.setState({nonlasso_ret:undo_obj.selection}, function(){
             //         _this.refs.sketchpad.initializeMoveLayer();
             //     })
             // }
             
         }else if(undo_obj.type=='layer_add'){
             set['updated'] = 'sketchpad_undo_add_a_layer.'+undo_obj.layer_id+'.'+undo_obj.undo_id
-           var layers = this.refs.sketchpad.state.layers.slice()
+           var layers = _this.refs.sketchpad.state.layers.slice()
             var idx=-1
             for(var i in layers){
                 if(layers[i]==undo_obj.layer_id){
@@ -791,7 +791,7 @@ class Board extends Component{
             
         }else if(undo_obj.type=='layer_reorder'){
             set['updated'] = 'sketchpad_undo_reorder_a_layer..'+undo_obj.undo_id
-            var layers = this.refs.sketchpad.state.layers.slice()
+            var layers = _this.refs.sketchpad.state.layers.slice()
             var undo_layer = undo_obj.layers.slice()
             // for(var i in layers){
             //     for(var j in undo_layer){
