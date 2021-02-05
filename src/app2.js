@@ -58,7 +58,7 @@ app.use('/img', express.static(path.join(__dirname, '../client/img')));
 
 // Set up Plugins and providers
 app.configure(express.rest());
-app.configure(socketio({timeout: 10000}))
+app.configure(socketio())
 
 app.configure(mongodb);
 
@@ -75,6 +75,8 @@ app.use(express.notFound());
 app.use(express.errorHandler({ logger }));
 
 app.hooks(appHooks);
+
+app.service('boards').timeout=30000
 
 
 
