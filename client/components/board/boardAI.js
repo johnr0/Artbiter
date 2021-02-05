@@ -7,8 +7,7 @@ import SketchPadAI from '../sketchpad/sketchpadAI'
 class BoardAI extends Board{
 
     componentDidMount(){
-        this.runAuth()
-        this.prepareUpdates()
+        
         // when groups are created
         Api.app.service('groups').on('created', (data)=>{
             if(data.board_id==this.state.board_id){
@@ -79,6 +78,9 @@ class BoardAI extends Board{
             this.moodboard.setState({disagreed_arts})
         
         })
+
+        this.runAuth()
+        this.prepareUpdates()
         
 
 
