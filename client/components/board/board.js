@@ -582,7 +582,7 @@ class Board extends Component{
             }else if(updated.indexOf('moodboard_generate_slider_change')!=-1){
                 _this.moodboard.setState({generate_slider_values: data.generate_slider_values})
             }else if(updated.indexOf('moodboard_search_slider_distances')!=-1){
-                _this.moodboard.setState({search_slider_distances: data.search_slider_distances, search_slider_values: data.search_slider_values,
+                _this.moodboard.setState({search_slider_distances: data.search_slider_distances,
                 generate_slider_values: data.generate_slider_values})
             }else if(updated.indexOf('moodboard_search_mode_toggle')!=-1){
                 _this.moodboard.setState({searchMode: data.searchMode})
