@@ -58,7 +58,7 @@ app.use('/img', express.static(path.join(__dirname, '../client/img')));
 
 // Set up Plugins and providers
 app.configure(express.rest());
-app.configure(socketio())
+app.configure(socketio({timeout: 10000}))
 
 app.configure(mongodb);
 
