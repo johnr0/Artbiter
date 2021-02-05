@@ -19,6 +19,7 @@ class BoardListPage extends Component{
             console.log(res, 'reauth success...')
             var boards = this.state.boards
             // find for initial
+            Api.app.service('boards').timeout = 30000
             Api.app.service('boards').find({query: {owner: res.user._id}})
             .then((res)=>{
                 console.log(res)

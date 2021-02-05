@@ -96,8 +96,9 @@ class BoardAI extends Board{
                 Api.app.service('users').update(user_id, {$set:{board_id: board_id}})
                 location.reload();
             }
-            
-            
+            console.log('timeout before...', Api.app.service('boards').timeout)
+            Api.app.service('boards').timeout = 30000
+            console.log('timeout after...', Api.app.service('boards').timeout)
             Api.app.service('boards').find({query: {_id: board_id}})
             .then((res)=>{
                 if(res.length==0){
