@@ -58,7 +58,9 @@ app.use('/img', express.static(path.join(__dirname, '../client/img')));
 
 // Set up Plugins and providers
 app.configure(express.rest());
-app.configure(socketio())
+app.configure(socketio({
+  transports: ['websocket']
+}))
 
 app.configure(mongodb);
 
