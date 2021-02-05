@@ -4,7 +4,7 @@ var webpack = require('webpack');
 var HTMLWebpackPlugin = require('html-webpack-plugin');
 
 var HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
-  template: path.join(__dirname, 'client', 'index.html'),
+  template: path.join(__dirname, 'client', 'index_prod.html'),
   filename: 'index.html',
   inject: 'body' 
 });
