@@ -181,7 +181,7 @@ class Board extends Component{
         })
 
         Api.app.service('arts').on('patched', (data)=>{
-            console.log('patched!', data.updated)
+            console.log('patched!', data.updated, _this.moodboard)
             var arts = _this.moodboard.state.arts
             if(data.updated=='arts_label'){
                 console.log('aaarrrrttttssss', data.labels)
