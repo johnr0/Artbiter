@@ -176,6 +176,9 @@ class MoodboardImage extends Component{
             if(this.props.mother_state.control_state=='control_object'){
                 if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
                     this.select_new_image(true, ecopied)
+                    if(this.props.art.choosen_by==this.props.mother_this.props.board_this.state.user_id){
+                        this.deselect_image(ecopied)
+                    }
                 }else if(this.props.mother_state.current_image.indexOf(this.props.art._id)!=-1){
                     console.log('deselect')
                     this.deselect_image(ecopied)

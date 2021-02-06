@@ -537,7 +537,10 @@ class MoodBoard extends ProtoBoard{
             init_text_pos[this.state.current_text[i]] = this.state.texts[this.state.current_text[i]].position
         }
         console.log(init_image_pos, init_mouse_pos, this.state.current_selected_pos)
-        this.setState({action:'object_moving', init_mouse_pos: init_mouse_pos, init_text_pos: init_text_pos,init_image_pos:init_image_pos,  init_group_pos:this.state.current_selected_pos.slice()})
+        if(this.state.current_selected_pos!=undefined){
+            this.setState({action:'object_moving', init_mouse_pos: init_mouse_pos, init_text_pos: init_text_pos,init_image_pos:init_image_pos,  init_group_pos:this.state.current_selected_pos.slice()})
+        }
+        
     }
 
     object_moving(e){
