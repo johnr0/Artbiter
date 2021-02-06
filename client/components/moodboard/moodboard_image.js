@@ -218,6 +218,16 @@ class MoodboardImage extends Component{
         
     }
 
+    object_moving_end(e){
+        
+        if(this.props.mother_state.action=='object_moving'){
+            if(e!=undefined){
+                e.stopPropagation()
+            }
+            this.props.mother_this.object_moving_end(e)
+        }
+    }
+
     render(){
         var smallx = (this.props.art.position[0]<this.props.art.position[2])?this.props.art.position[0]:this.props.art.position[2]
         var bigx = (this.props.art.position[0]>this.props.art.position[2])?this.props.art.position[0]:this.props.art.position[2]
@@ -240,7 +250,7 @@ class MoodboardImage extends Component{
         }
         // console.log(this.props.art)
         return (<g onPointerDown={this.test.bind(this)}>
-            <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)} opacity={(this.props.art.enabled)?'1':'0.3'}></image>
+            <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)} onPointerUp={this.object_moving_end.bind(this)} opacity={(this.props.art.enabled)?'1':'0.3'}></image>
             {color!='' && <g>
             <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2' onPointerDown={this.object_moving_init.bind(this)} onPointerUp={this.choose_image.bind(this)}></rect>
             </g>}

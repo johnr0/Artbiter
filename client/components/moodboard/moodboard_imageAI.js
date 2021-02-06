@@ -101,10 +101,12 @@ class MoodboardImageAI extends MoodboardImage{
     }
 
     style_choose_image(e){
-        e.stopPropagation()
+        
         var ecopied = {pageX: e.pageX, pageY: e.pageY}
         console.log(this.props.mother_state.control_state, this.props.art_enabled)
+        super.object_moving_end(e);
         if(this.props.art.enabled && this.props.mother_state.control_state=='style-stamp'){
+            e.stopPropagation()
             console.log('style choose image')
             if(this.props.mother_state.current_image.indexOf(this.props.art_key)==-1){
                 if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
