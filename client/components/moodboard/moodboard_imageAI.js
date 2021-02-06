@@ -30,6 +30,7 @@ class MoodboardImageAI extends MoodboardImage{
 
     // }
 
+
     deselectAnImage(){
         var arts = this.props.mother_state.arts
         if(arts[this.props.art_key].choosen_by==this.props.mother_this.props.board_this.state.user_id){
@@ -64,17 +65,20 @@ class MoodboardImageAI extends MoodboardImage{
         }
     }
 
-    choose_image(e){
-        console.log(this.props.art.enabled)
+    choose_image(down,e){
+        console.log(this.props.art.enabled, down)
         console.log('choooose imaaaage')
-        super.choose_image(e)
+        if(this.props.mother_state.control_state!='style-stamp'){
+            super.choose_image(e)
+        }
+        
         var ecopied = {pageX: e.pageX, pageY: e.pageY}
         if(this.props.mother_state.control_state=='search_image_select'){
             if(this.props.art.enabled){
                 Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {search_image_selected: this.props.art_key, updated:'moodboard_search_image_select'}})
                 this.props.mother_this.setState({control_state: 'control_object'})
             }
-        }else if(this.props.mother_state.control_state=='style-stamp'){
+        }else if(this.props.mother_state.control_state=='style-stamp' && down==false){
             if(this.props.art.enabled){
                 console.log(this.props.mother_state.current_image, this.props.art_key)
                 if(this.props.mother_state.current_image.indexOf(this.props.art_key)==-1){
@@ -94,6 +98,24 @@ class MoodboardImageAI extends MoodboardImage{
             
         }
         
+    }
+
+    style_choose_image(e){
+        e.stopPropagation()
+        var ecopied = {pageX: e.pageX, pageY: e.pageY}
+        console.log(this.props.mother_state.control_state, this.props.art_enabled)
+        if(this.props.art.enabled && this.props.mother_state.control_state=='style-stamp'){
+            console.log('style choose image')
+            if(this.props.mother_state.current_image.indexOf(this.props.art_key)==-1){
+                if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
+                    this.select_new_image(false, ecopied)
+                }else if(this.props.mother_state.shift_down==false){
+                    this.select_new_image(false, ecopied)
+                }else{
+                    this.add_an_image(false, ecopied)
+                }
+            }
+        }
     }
 
     renderUsers(group_key, x, y, width){
@@ -284,9 +306,9 @@ class MoodboardImageAI extends MoodboardImage{
         // console.log(this.props.art_key)
         // console.log(renderUser)
         return (<g onPointerDown={this.test.bind(this)}>
-            <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)} opacity={(this.props.art.enabled)?'1':'0.3'}></image>
+            <image href={this.props.art.file} x={x} y={y} width={width} height={height}  onPointerDown={this.choose_image.bind(this, true)} onPointerUp={this.style_choose_image.bind(this)} opacity={(this.props.art.enabled)?'1':'0.3'}></image>
             {color!='' && <g>
-            <rect onPointerDown={this.choose_image.bind(this)} x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>
+            <rect onPointerDown={this.object_moving_init.bind(this)} onPointerUp={this.choose_image.bind(this, false)} x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>
             {renderUser && this.renderUsers(userGroup,x,y, width)}
             </g>}
             {(selected_groups.length==1)&&this.renderLSigs((x+x2)/2, y2, width, selected_groups[0])}

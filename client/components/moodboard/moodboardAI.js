@@ -638,11 +638,12 @@ class MoodBoardAI extends MoodBoard{
                     
                     <svg width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength}>
                         {this.renderGroupBack()}
-                        {this.renderImages()}
-                        {this.renderTexts()}
                         {this.state.control_state=='control_object'&&(this.state.current_image.length>0||this.state.current_text.length>0)&&this.state.current_selected_pos!=undefined && 
                             this.renderImageHandle()
                         }
+                        {this.renderImages()}
+                        {this.renderTexts()}
+                        
                         {this.renderSelfs()}
                         {this.rendereditingTexts()}
                         {this.renderGroupFront()}

@@ -575,7 +575,7 @@ class MoodBoard extends ProtoBoard{
         
         e.stopPropagation()
         
-        if(this.state.init_mouse_pos[0] != cur_mouse_pos[0] && this.state.init_mouse_pos[1]!=cur_mouse_pos[1]){
+        if(this.state.init_mouse_pos[0] != cur_mouse_pos[0] || this.state.init_mouse_pos[1]!=cur_mouse_pos[1]){
             
             var arts_to_push=[]
             var art_ids_to_push = []
