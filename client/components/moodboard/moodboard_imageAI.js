@@ -189,7 +189,15 @@ class MoodboardImageAI extends MoodboardImage{
         </g>)
     }
 
+    labelOn(){
+        if(this.props.mother_state.current_image.length==1 && this.props.mother_state.current_text.length==0){
+            this.props.mother_this.setState({label_art: this.props.mother_state.current_image[0]})
+        }
+    }
 
+    labelOut(){
+        this.props.mother_this.setState({label_art:undefined})
+    }
     
     render(){
         var smallx = (this.props.art.position[0]<this.props.art.position[2])?this.props.art.position[0]:this.props.art.position[2]
@@ -310,7 +318,7 @@ class MoodboardImageAI extends MoodboardImage{
         return (<g onPointerDown={this.test.bind(this)}>
             <image href={this.props.art.file} x={x} y={y} width={width} height={height}  onPointerDown={this.choose_image.bind(this, true)} onPointerUp={this.style_choose_image.bind(this)} opacity={(this.props.art.enabled)?'1':'0.3'}></image>
             {color!='' && <g>
-            <rect onPointerDown={this.object_moving_init.bind(this)} onPointerUp={this.choose_image.bind(this, false)} x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>
+            <rect onPointerDown={this.object_moving_init.bind(this)} onPointerUp={this.choose_image.bind(this, false)} onPointerEnter={this.labelOn.bind(this)} onPointerOut={this.labelOut.bind(this)} x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>
             {renderUser && this.renderUsers(userGroup,x,y, width)}
             </g>}
             {(selected_groups.length==1)&&this.renderLSigs((x+x2)/2, y2, width, selected_groups[0])}

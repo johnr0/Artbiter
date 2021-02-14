@@ -71,6 +71,7 @@ function sliderImpact(board_id, context){
         }).then((response)=>{
           console.log(response.data['distances'])
           var distances = JSON.parse(response.data['distances'])
+          console.log(distances, 'dicstance')
           context.app.service('boards').patch(board_id, {$set: {search_slider_distances:distances, search_slider_values: search_slider_values, updated:'moodboard_search_slider_distances'}})
         }, (error)=>{
           console.log('error')

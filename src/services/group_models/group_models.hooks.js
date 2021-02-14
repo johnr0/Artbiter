@@ -3,11 +3,12 @@ var ml_server = require('../../config')
 
 const labelAllImages = async context => {
     console.log(':P')
-    var group_model = context.arguments[0].group_model 
-    var l2t = context.arguments[0].l2t
-    var dec = context.arguments[0].dec
+    var group_model = [context.arguments[0].group_model]
+    var l2t = [context.arguments[0].l2t]
+    var dec = [context.arguments[0].dec]
 
     var images = {}
+    var searched_images = {}
     console.log(':P', context.arguments[0].board_id)
     context.app.service('arts').find({query: {board_id: context.arguments[0].board_id}})
     .then((res)=>{
@@ -17,6 +18,10 @@ const labelAllImages = async context => {
                 images[res[i]._id]=res[i].embedding
             }
         }
+        // context.app.service("searched_arts").find({query:{board_id: context.arguments[0].board_id}})
+        // .then((res)=>{
+
+        // })
         console.log(':Pdouble')
         axios.post(context.app.get('ml_server')+'labelImages', {
             images: JSON.stringify(images),
@@ -26,10 +31,10 @@ const labelAllImages = async context => {
         }).then((response)=>{
             var label_result = JSON.parse(response.data['result'])
             for(var key in label_result){
-                for(var j in l2t){
-                    if(l2t[j]!='_random'){
-                        if(label_result[key][l2t[j]]==undefined){
-                            label_result[key][l2t[j]] = 0
+                for(var j in l2t[0]){
+                    if(l2t[0][j]!='_random'){
+                        if(label_result[key][l2t[0][j]]==undefined){
+                            label_result[key][l2t[0][j]] = 0
                         }
                         
                     }

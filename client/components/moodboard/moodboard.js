@@ -861,8 +861,7 @@ class MoodBoard extends ProtoBoard{
         }
         console.log(color)
         return (<g>
-            <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#333333' fill='transparent' strokeWidth='2' style={{cursor:'move'}} onPointerOver={this.labelOn.bind(this)} 
-            onPointerOut={this.labelOut.bind(this)} onPointerDown={this.object_moving_init.bind(this)}></rect>
+            <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#333333' fill='transparent' strokeWidth='2' style={{cursor:'move'}}  onPointerDown={this.object_moving_init.bind(this)}></rect>
             
             <rect x={x-8} y={y+4} width={12} height={height-8} fill='transparent' strokeWidth='0' style={{cursor:'ew-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-right')}></rect>
             <rect x={x+width-4} y={y+4} width={12} height={height-8} fill='transparent' strokeWidth='0' style={{cursor:'ew-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></rect>

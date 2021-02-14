@@ -172,8 +172,9 @@ class MoodBoardSearchPaneAI extends Component{
 
     renderGradientFromDistance(distance){
         var colormap = interpolate(['#ffbb00', '#0069c4'])
-
+        console.log(distance)
         return distance.map((val, idx)=>{
+            console.log(val)
             var color = colormap(val)
             return (<stop offset={(10*idx)+'%'} style={{stopColor: color, stopOpacity: 1}}></stop>)
         })
@@ -211,6 +212,7 @@ class MoodBoardSearchPaneAI extends Component{
                     if(distance == undefined){
                         distance = [0,0,0,0,0,0,0,0,0,0,0]
                     }
+                    console.log(distance, kidx)
 
                     
                     return (<div key={'slider_'+group._id}>
@@ -231,11 +233,11 @@ class MoodBoardSearchPaneAI extends Component{
                         <div style={{width: '100%', position:'relative'}}>
                             <svg width='100%' height='15.2px' preserveAspectRatio="none" viewBox="0 0 300 15.2" style={{display:'inline-block',position:'absolute'}}>
                                 <defs>
-                                    <linearGradient id={'grad'+idx} x1="0%" y1="0%" x2="100%" y2="0%">
-                                    {this.renderGradientFromDistance(distance)}
+                                    <linearGradient id={'grad'+kidx} x1="0%" y1="0%" x2="100%" y2="0%">
+                                    {this.renderGradientFromDistance(distance.slice())}
                                     </linearGradient>
                                 </defs>
-                            <rect fill={'url(#grad'+idx+')'} style={{width:'100%', height:'100%'}}></rect>
+                            <rect fill={'url(#grad'+kidx+')'} style={{width:'100%', height:'100%'}}></rect>
                             </svg>
                             <input type='range' style={{margin: '5px 0'}} min={-100} max={100} value={val} onChange={this.changeSliders.bind(this, group._id)} onPointerUp={this.doneChangeSliders.bind(this, group._id)}></input>
                         </div>
