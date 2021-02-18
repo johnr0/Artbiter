@@ -42,6 +42,8 @@ class MoodBoard extends ProtoBoard{
         shift_down: false,
         control_down: false,
 
+        crop: undefined, 
+
     }
 
     // TODO: Getting images from clip board...
@@ -397,18 +399,58 @@ class MoodBoard extends ProtoBoard{
         }else if(this.state.control_state=='control_object' && this.state.action=='object_moving'){
             this.object_moving(e)
         }
+        else if(this.state.control_state=='crop' && this.state.action=='crop'){
+            this.crop_move(e)
+        }
     }
 
 
 
     moodBoardMouseEnd(e){
+        console.log('e')
         if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp'||this.state.control_state=='crop') && this.state.action=='move_board'){
             this.moveBoardEnd(e)
         }else if(this.state.control_state=='control_object' && this.state.action=='object_resizing'){
             this.end_object_resizing(e)
         }else if(this.state.control_state=='control_object' && this.state.action=='object_moving'){
             this.object_moving_end(e)
+        }else if(this.state.control_state=='crop' && this.state.action=='crop'){
+            this.crop_move_end(e)
         }
+    }
+
+    crop_move(e){
+        if(this.state.control_state=='crop' && this.state.action=='crop'){
+            var p = this.getCurrentMouseOnBoard(e)
+            var art = this.state.arts[this.state.current_image[0]]
+            var x = (p[0]-art.position[0])/(art.position[2]-art.position[0])
+            var y = (p[1]-art.position[1])/(art.position[3]-art.position[1])
+            if(x>1){x=1}
+            if(y>1){y=1}
+            if(x<0){x=0}
+            if(y<0){y=0}
+            var crop = this.state.crop
+            crop[2] = x
+            crop[3] = y
+            console.log('cropmove..')
+            this.setState({crop: crop})
+        }
+    }
+
+    crop_move_end(e){
+        var crop = this.state.crop
+        if(crop[0]>crop[2]){
+            var tmp = crop[2]
+            crop[2]=crop[0]
+            crop[0]=tmp
+        }
+        if(crop[1]>crop[3]){
+            var tmp = crop[3]
+            crop[3]=crop[1]
+            crop[1]=tmp
+        }
+        console.log('crop move end!')
+        this.setState({action:'idle', crop:crop})
     }
 
     moveBoardEnd(e){
