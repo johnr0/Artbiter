@@ -317,10 +317,10 @@ class MoodboardImageAI extends MoodboardImage{
         // console.log(renderUser)
         return (<g onPointerDown={this.test.bind(this)}>
             <image href={this.props.art.file} x={x} y={y} width={width} height={height}  onPointerDown={this.choose_image.bind(this, true)} onPointerUp={this.style_choose_image.bind(this)} opacity={(this.props.art.enabled)?'1':'0.3'}></image>
-            {this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && this.props.mother_state.control_state!='crop' && 
+            {this.props.art.enabled && this.props.mother_state.control_state=='control_object' && this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && this.props.mother_state.control_state!='crop' && 
                 this.renderCropButton(x, y)
             }
-            {this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && this.props.mother_state.control_state=='crop' && 
+            {this.props.art.enabled && this.props.mother_state.control_state=='control_object' && this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && this.props.mother_state.control_state=='crop' && 
             this.renderCropDoneButton(x, y)
             }
             {color!='' && <g>

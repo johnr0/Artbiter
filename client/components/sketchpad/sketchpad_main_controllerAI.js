@@ -7,33 +7,44 @@ import SketchpadStyleStampControllerAI from './sketchpad_style_stamp_controllerA
 class SketchpadMainControllerAI extends SketchpadMainController{
     changeControlState(control_state){
         if(this.props.mother_state.current_layer!=-1){
-            if(control_state=='style-stamp'){
-                // var el = document.getElementById('style-stamp-canvas')
-                // var canvas = el.getContext('2d')
-                // canvas.fill='black'
-                // canvas.fillRect(0,0,1000,1000)
-                this.props.mother_this.props.board_this.moodboard.setState({control_state:'style-stamp'})
-                var moodboard_state = this.props.mother_this.props.board_this.moodboard.state
-                if(moodboard_state.current_text.length>0){
-                    this.props.mother_this.props.board_this.moodboard.deSelect();
-                }
+            var layer_id = this.props.mother_state.layers[this.props.mother_state.current_layer]
+            var layer = this.props.mother_state.layer_dict[layer_id]
 
-                if(moodboard_state.current_image.length>0){
-                    for(var i in moodboard_state.current_image){
-                        if(moodboard_state.arts[moodboard_state.current_image[i]].enabled!=true){
-                            // this.props.mother_this.props.board_this.ChooseArtsTexts([],[],[moodboard_state.current_image[i]], [])
+            if(layer!=undefined){
+                if(layer.hide!=true){
+                    if(control_state=='style-stamp'){
+                        // var el = document.getElementById('style-stamp-canvas')
+                        // var canvas = el.getContext('2d')
+                        // canvas.fill='black'
+                        // canvas.fillRect(0,0,1000,1000)
+                        this.props.mother_this.props.board_this.moodboard.setState({control_state:'style-stamp'})
+                        var moodboard_state = this.props.mother_this.props.board_this.moodboard.state
+                        if(moodboard_state.current_text.length>0){
                             this.props.mother_this.props.board_this.moodboard.deSelect();
-                            break
                         }
+        
+                        if(moodboard_state.current_image.length>0){
+                            for(var i in moodboard_state.current_image){
+                                if(moodboard_state.arts[moodboard_state.current_image[i]].enabled!=true){
+                                    // this.props.mother_this.props.board_this.ChooseArtsTexts([],[],[moodboard_state.current_image[i]], [])
+                                    this.props.mother_this.props.board_this.moodboard.deSelect();
+                                    break
+                                }
+                            }
+                        }
+        
+                        this.props.mother_this.sketchPadStyleContentFinalize()
+                    }
+                    if(control_state!='style-stamp'&&control_state!='content-stamp'&&this.props.mother_state.control_state=='style-stamp'){
+        
+                        this.props.mother_this.props.board_this.moodboard.setState({control_state:'control_object', action: 'idle'})
                     }
                 }
-
-                this.props.mother_this.sketchPadStyleContentFinalize()
             }
-            if(control_state!='style-stamp'&&control_state!='content-stamp'&&this.props.mother_state.control_state=='style-stamp'){
 
-                this.props.mother_this.props.board_this.moodboard.setState({control_state:'control_object', action: 'idle'})
-            }
+
+
+            
         }
         super.changeControlState(control_state)
     }
@@ -42,6 +53,15 @@ class SketchpadMainControllerAI extends SketchpadMainController{
         var basecolor='#888888'
         if(this.props.mother_state.current_layer==-1){
             basecolor='#444444'
+        }else{
+            var layer_id = this.props.mother_state.layers[this.props.mother_state.current_layer]
+            var layer = this.props.mother_state.layer_dict[layer_id]
+            console.log('layer', layer, layer_id)
+            if(layer!=undefined){
+                if(layer.hide==true){
+                    basecolor='#444444'
+                }
+            }
         }
         return (<div className="controller sketchpad_main_controllerAI">
             <div  className='controller_button' style={{color: (this.props.mother_state.control_state=='move')?'white':basecolor}}

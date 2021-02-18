@@ -267,6 +267,9 @@ class MoodBoardAI extends MoodBoard{
     }
 
     selectGroup(group_id, e){
+        if(this.state.control_state=='content-stamp'){
+            return
+        }
         // TODO revise
         e.stopPropagation()
         e.preventDefault()
@@ -275,12 +278,16 @@ class MoodBoardAI extends MoodBoard{
         var filtered = this.state.current_image.filter(value => !art_ids.includes(value))
         var pos = [Number.MAX_VALUE, Number.MAX_VALUE, Number.MIN_VALUE, Number.MIN_VALUE]
 
-        for(var i in art_ids){
-            var art_id = art_ids[i]
-            if(this.state.arts[art_id].choosen_by!=''){
+        var flist = art_ids 
+        if(this.state.shift_down==true){
+            flist = art_ids.concat(filtered)
+        }
+        for(var i in flist){
+            var art_id = flist[i]
+            if(this.state.arts[art_id].choosen_by!='' && this.state.arts[art_id].choosen_by!=this.props.board_this.state.user_id){
                 return
             }
-            if(filtered.indexOf(art_id)==-1){
+            // if(filtered.indexOf(art_id)==-1){
                 var position = this.state.arts[art_id].position
                 if(position[0]<pos[0]){
                     pos[0] = position[0]
@@ -294,17 +301,27 @@ class MoodBoardAI extends MoodBoard{
                 if(position[3]>pos[3]){
                     pos[3] = position[3]
                 }
-            }   
+            // }   
         }
+        console.log('select group')
         var ratio = (pos[2]-pos[0])/(pos[3]-pos[1])
         analytics.logEvent("select_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
-
-        Promise.all([
-            this.props.board_this.ChooseArtsTexts(art_ids.slice(),[],filtered,this.state.current_text.slice(0)),
-            this.setState({action:'idle', current_image:art_ids.slice(), current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
+        if(this.state.shift_down==true){
+            Promise.all([
+                this.props.board_this.ChooseArtsTexts(art_ids.slice(),[],[],this.state.current_text.slice(0)),
+                this.setState({action:'idle', current_image:flist, current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
+                    _this.props.board_this.sketchpad.setState({})
+                })
+            ])
+        }else{
+            Promise.all([
+                this.props.board_this.ChooseArtsTexts(art_ids.slice(),[],filtered,this.state.current_text.slice(0)),
+                this.setState({action:'idle', current_image:art_ids.slice(), current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
+                    _this.props.board_this.sketchpad.setState({})
+                })
+            ])
+        }
         
-            })
-        ])
         // this.setState({action:'idle'})
     }
 

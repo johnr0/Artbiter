@@ -275,6 +275,9 @@ module.exports = function(app) {
         data_to_return.board_id = data.board_id
       }else if(data.updated=='sketchpad_add_a_layer'){
         data_to_return = data
+      }else if(data.updated=='sketchpad_layer_hide'){
+        data_to_return._id = data._id
+        data_to_return.hide = data.hide
       }else{
         data_to_return = data
       }

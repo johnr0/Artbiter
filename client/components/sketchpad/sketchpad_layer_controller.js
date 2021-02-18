@@ -47,7 +47,9 @@ class SketchpadLayerController extends Component{
             promises.push(_this.setState({layer_mouse_down: true, mouse_y_pos: ypos, y_init_pos: y_init_pos, prev_current_layer: prev_current_layer_idx}))
             Promise.all(promises)
 
-            
+            if(layer.hide){
+                _this.resetControllerToMove()
+            }
             if(_this.props.mother_state.control_state=='move-layer'){
                 _this.props.mother_this.initializeMoveLayer()
             }
@@ -65,6 +67,7 @@ class SketchpadLayerController extends Component{
         var layers = this.props.mother_state.layers
         var origin_layers = this.props.mother_state.layers.slice()
         console.log(origin_layers)
+        var _this = this
         if(layers.length>1 && this.props.mother_state.current_layer!=-1){
             var remove_idx = this.props.mother_state.current_layer
             var removed_layer_id = layers[remove_idx]
@@ -78,7 +81,9 @@ class SketchpadLayerController extends Component{
             // }
             Promise.all([
                 this.props.mother_this.props.board_this.RemoveALayer(remove_idx, removed_layer, origin_layers),
-                this.props.mother_this.setState({layers:layers, current_layer: current_layer})
+                this.props.mother_this.setState({layers:layers, current_layer: current_layer}, function(){
+                    _this.resetControllerToMove();
+                })
             ])
 
             if(this.props.mother_state.control_state=='move-layer'){
@@ -126,7 +131,11 @@ class SketchpadLayerController extends Component{
                     onPointerDown={this.selectLayer.bind(this, idx)} onPointerUp={this.layerDone.bind(this)} 
                     onDragOver={this.layerMove.bind(this)}
                     onDragEnd={this.layerDone.bind(this)}>
+                
                 <img src={this.props.mother_state.layer_dict[item].image} style={{width: '100%', height: '100%'}}></img>
+                {layer_obj.hide==true && <div style={{paddingTop: '8px', position:'absolute', width: '100%', height: '100%', top:0, left: 0, textAlign:'center', backgroundColor:'#00000050'}}>
+                    <i className='fa fa-eye-slash'></i>
+                </div>}
             </div>)
         })
     }
@@ -251,6 +260,44 @@ class SketchpadLayerController extends Component{
         
     }
 
+    toggleHideLayer(){
+        var current_layer = this.props.mother_state.current_layer
+        var layers = this.props.mother_state.layers
+        var layer_dict = this.props.mother_state.layer_dict
+        console.log(layers)
+        var layer = layer_dict[layers[current_layer]]
+        console.log(layer)
+        var _this= this
+        if(layer==undefined){
+            return
+        }
+        if(layer.hide==undefined || layer.hide==false){
+            layer.hide = true
+        }else{
+            layer.hide = false
+        }
+
+        Promise.all([this.props.mother_this.props.board_this.ToggleHideLayer(layers[current_layer], layer.hide),
+            _this.props.mother_this.setState({layer_dict: layer_dict}, function(){
+                if(layer.hide){
+                    _this.resetControllerToMove()
+                }
+            })
+        ])
+        
+    }
+
+    resetControllerToMove(){
+        if(this.props.mother_state.control_state=='move-layer'){
+            this.props.mother_this.initializeMoveLayer();
+        }
+        if(this.props.mother_state.control_state=='content-stamp'||this.props.mother_state.control_state=='style-stamp'){
+            this.props.mother_this.props.board_this.moodboard.setState({control_state:'control_object', action: 'idle'})
+        }
+        this.props.mother_this.setState({control_state:'move'})
+    }
+
+
     render(){
         return (<div  onWheel={this.controllerWheel.bind(this)} className='controller sketchpad_layer_controller'>
             <div id='sketchpad_layer_controller' className='layer_box' style={{position:'relative', overflowY:'auto', height: '250px'}} onPointerMove={this.layerMove.bind(this)} onPointerUp={this.layerDone.bind(this)}
@@ -258,6 +305,9 @@ class SketchpadLayerController extends Component{
 
             onDrop={this.layerDone.bind(this)}>
                 {this.renderLayerIcon()}
+            </div>
+            <div onPointerDown={this.toggleHideLayer.bind(this)} style={{textAlign: 'center', fontSize: 30, paddingTop:'10px', color: (this.props.mother_state.current_layer!=-1)?'white':'#888888'}}>
+                <i className='fa fa-eye'></i>
             </div>
             <div onPointerDown={this.addNewLayer.bind(this)} style={{textAlign: 'center', fontSize: 30}}>
                 +

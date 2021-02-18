@@ -5,22 +5,29 @@ import SketchpadEraserController from './sketchpad_eraser_controller'
 class SketchpadMainController extends Component{
     changeControlState(control_state){
         if(this.props.mother_state.current_layer!=-1){
-            console.log(control_state)
-            if(control_state=='move-layer'){
-                this.props.mother_this.initializeMoveLayer();
-            }
-            if(control_state=='content-stamp'){
+            var layer_id = this.props.mother_state.layers[this.props.mother_state.current_layer]
+            var layer = this.props.mother_state.layer_dict[layer_id]
+            if(layer!=undefined){
+                if(layer.hide!=true){
+                    console.log(control_state)
+                    if(control_state=='move-layer'){
+                        this.props.mother_this.initializeMoveLayer();
+                    }
+                    if(control_state=='content-stamp'){
 
-                this.props.mother_this.props.board_this.moodboard.setState({control_state:'content-stamp'})
-                var moodboard_state = this.props.mother_this.props.board_this.moodboard.state
-                if(moodboard_state.current_image.length>1 || moodboard_state.current_text.length>0){
-                    this.props.mother_this.props.board_this.moodboard.deSelect();
+                        this.props.mother_this.props.board_this.moodboard.setState({control_state:'content-stamp'})
+                        var moodboard_state = this.props.mother_this.props.board_this.moodboard.state
+                        if(moodboard_state.current_image.length>1 || moodboard_state.current_text.length>0){
+                            this.props.mother_this.props.board_this.moodboard.deSelect();
+                        }
+                    }
+                    if(control_state!='content-stamp'&&control_state!='style-stamp'&&(this.props.mother_state.control_state=='content-stamp'||this.props.mother_state.control_state=='style-stamp')){
+                        this.props.mother_this.props.board_this.moodboard.setState({control_state:'control_object', action: 'idle'})
+                    }
+                        this.props.mother_this.setState({control_state: control_state})
                 }
             }
-            if(control_state!='content-stamp'&&control_state!='style-stamp'&&this.props.mother_state.control_state=='content-stamp'){
-                this.props.mother_this.props.board_this.moodboard.setState({control_state:'control_object', action: 'idle'})
-            }
-            this.props.mother_this.setState({control_state: control_state})
+            
         } 
     }
 
@@ -28,7 +35,16 @@ class SketchpadMainController extends Component{
         var basecolor='#888888'
         if(this.props.mother_state.current_layer==-1){
             basecolor='#444444'
+        }else{
+            var layer_id = this.props.mother_state.layers[this.props.mother_state.current_layer]
+            var layer = this.props.mother_state.layer_dict[layer_id]
+            if(layer!=undefined){
+                if(layer.hide==true){
+                    basecolor='#444444'
+                }
+            }
         }
+        
         return (<div className="controller sketchpad_main_controller">
             <div  className='controller_button' style={{color: (this.props.mother_state.control_state=='move')?'white':basecolor}}
                 onClick={this.changeControlState.bind(this, 'move')}>

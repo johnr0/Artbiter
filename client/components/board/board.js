@@ -269,6 +269,9 @@ class Board extends Component{
                         temp_ctx.clearRect(0,0,1000,1000)
                     }   
                 })
+            }else if(updated.indexOf('sketchpad_layer_hide')!=-1){
+                layer_dict[data._id].hide = data.hide
+                this.sketchpad.setState({layer_dict})
             }
         })
 
@@ -730,6 +733,19 @@ class Board extends Component{
         })
     }
 
+    ToggleHideLayer(layer_id, hide){
+        var set={
+            updated: 'sketchpad_layer_hide',
+            hide: hide
+        }
+        Api.app.service('layers').patch(layer_id, {$set: set})
+        // .then(()=>{
+        //     Api.app.service('boards').patch(this.state.board_id, set2).then(()=>{
+        //         Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
+        //     })
+        // })
+    }
+
     SketchUndo(idx, undo_obj){
 
         var set = {
@@ -1012,7 +1028,9 @@ class Board extends Component{
             file: image,
             position: [pos0, pos[1]-0.05, pos0+0.1,pos[1]+0.05],
             ratio: 1,
-            choosen_by: this.state.user_id
+            choosen_by: this.state.user_id,
+            width: 1000,
+            height: 1000,
         }
 
         Promise.all([
