@@ -4,6 +4,7 @@ import Api from '../../middleware/api'
 import MoodBoardAI from '../moodboard/moodboardAI'
 import SketchPadAI from '../sketchpad/sketchpadAI'
 
+
 class BoardAI extends Board{
 
     componentDidMount(){
@@ -96,6 +97,9 @@ class BoardAI extends Board{
                 Api.app.service('users').update(user_id, {$set:{board_id: board_id}})
                 location.reload();
             }
+            console.log(analytics)
+            Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
+            // analytics.logEvent("enter_board", {board_id, user_email, user_id})
             console.log('timeout before...', Api.app.service('boards').timeout)
             Api.app.service('boards').timeout = 30000
             console.log('timeout after...', Api.app.service('boards').timeout)

@@ -60,6 +60,13 @@ class SketchPad extends ProtoBoard {
         resize_layer_init_pos: undefined, 
         resize_ret: undefined, 
 
+        prev_shift_key: undefined, 
+
+        content_stamp_img: undefined, 
+        content_stamp_ratio: undefined,
+        content_stamp_init_pos: undefined,
+        content_stamp_cur_pos: undefined,
+
     }
 
     // TODO lasso tool - nonlasso-based resize
@@ -71,6 +78,26 @@ class SketchPad extends ProtoBoard {
         brush_img.src = location.protocol+'//'+location.host+'/img/brush.png'//'http://www.tricedesigns.com/wp-content/uploads/2012/01/brush2.png';
         console.log(brush_img)
         this.setState({brush_img})
+
+        var _this = this
+        document.addEventListener('keydown', function(e){
+            e = e||window.event;
+            if(e.key=="Control"){
+                if(_this.state.action=='idle'){
+                    _this.setState({prev_shift_key: _this.state.control_state, control_state: 'move'})
+                }
+                
+            }
+        })
+
+        document.addEventListener('keyup', function(e){
+            e = e||window.event;
+            if(e.key=="Control"){
+                _this.setState({control_state: _this.state.prev_shift_key, action: 'idle'})
+                
+                
+            }
+        })
     }
 
     getPositionOnBoard(xpix, ypix){
@@ -200,9 +227,13 @@ class SketchPad extends ProtoBoard {
             this.rotateLayerMove(e)
         }else if(this.state.control_state=='move-layer' && this.state.action=='resize-layer'){
             this.resizeLayerMove(e)
+        }else if(this.state.control_state=='content-stamp' && this.state.action=='content-stamp'){
+            this.contentStampMove(e)
         }
 
     }
+
+
 
     sketchPadMouseMoveEnd(e){
         if((this.state.control_state=='move'||this.state.control_state=='move-layer') && this.state.action=='move_board'){
@@ -219,6 +250,8 @@ class SketchPad extends ProtoBoard {
             this.rotateLayerEnd(e)
         }else if(this.state.control_state=='move-layer' && this.state.action=='resize-layer'){
             this.resizeLayerEnd(e)
+        }else if(this.state.control_state=='content-stamp' && this.state.action=='content-stamp'){
+            this.contentStampEnd(e)
         }
     }
 
@@ -970,19 +1003,64 @@ class SketchPad extends ProtoBoard {
         var _this = this
         var p = _this.getCurrentMouseOnBoard(e)
         im.onload = function(){
-            var el = document.getElementById('sketchpad_canvas_'+_this.state.layers[_this.state.current_layer])
-            var cur_image = el.toDataURL()
+            // var el = document.getElementById('sketchpad_canvas_'+_this.state.layers[_this.state.current_layer])
+            // var cur_image = el.toDataURL()
+            _this.setState({content_stamp_img: im, content_stamp_ratio:im.height/im.width, content_stamp_init_pos: p, content_stamp_cur_pos: p, action: 'content-stamp'})
 
-            var w = 200
-            var h = im.height * w /im.width
-            el.getContext('2d').drawImage(im, p[0]-w/2, p[1]-h/2, w, h)
-            _this.props.board_this.updateALayerImage(_this.state.current_layer, _this.state.layers[_this.state.current_layer], el.toDataURL(), cur_image)
+            // var w = 200
+            // var h = im.height * w /im.width
+            // el.getContext('2d').drawImage(im, p[0]-w/2, p[1]-h/2, w, h)
+            // _this.props.board_this.updateALayerImage(_this.state.current_layer, _this.state.layers[_this.state.current_layer], el.toDataURL(), cur_image)
 
         }
         im.src = cur_art
-        
-
     }
+
+    contentStampMove(e){
+        var p = this.getCurrentMouseOnBoard(e)
+        this.setState({content_stamp_cur_pos: p})
+    }
+
+    contentStampEnd(e){
+        // var smallx = (this.state.content_stamp_init_pos[0]<this.state.content_stamp_cur_pos[0])?this.state.content_stamp_init_pos[0]:this.state.content_stamp_cur_pos[0]
+        // var bigx = (this.state.content_stamp_init_pos[0]>=this.state.content_stamp_cur_pos[0])?this.state.content_stamp_init_pos[0]:this.state.content_stamp_cur_pos[0]
+        // var smally = (this.state.content_stamp_init_pos[1]<this.state.content_stamp_cur_pos[1])?this.state.content_stamp_init_pos[1]:this.state.content_stamp_cur_pos[1]
+        // var bigy = (this.state.content_stamp_init_pos[1]>=this.state.content_stamp_cur_pos[1])?this.state.content_stamp_init_pos[1]:this.state.content_stamp_cur_pos[1]
+
+        var width = Math.abs(this.state.content_stamp_init_pos[0]-this.state.content_stamp_cur_pos[0])
+        var height = Math.abs(this.state.content_stamp_init_pos[1]-this.state.content_stamp_cur_pos[1])
+
+        var cur_ratio = height/width
+        if(cur_ratio > this.state.content_stamp_ratio){
+            // keep width
+            height = this.state.content_stamp_ratio * width
+        }else{
+            // keep height
+            width = height / this.state.content_stamp_ratio
+        }
+        
+        var startx, starty
+
+        if(this.state.content_stamp_init_pos[0]>this.state.content_stamp_cur_pos[0]){
+            startx = this.state.content_stamp_init_pos[0]-width
+        }else{
+            startx = this.state.content_stamp_init_pos[0]
+        }
+
+        if(this.state.content_stamp_init_pos[1]>this.state.content_stamp_cur_pos[1]){
+            starty = this.state.content_stamp_init_pos[1]-height
+        }else{
+            starty = this.state.content_stamp_init_pos[1]
+        }
+
+        var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer])
+        var cur_image = el.toDataURL()
+        el.getContext('2d').drawImage(this.state.content_stamp_img, startx, starty, width, height)
+        this.props.board_this.updateALayerImage(this.state.current_layer, this.state.layers[this.state.current_layer], el.toDataURL(), cur_image)
+        this.setState({action:'idle'})
+    }
+
+
 
     renderCanvas(){
         return this.state.layers.map((layer, idx)=>{

@@ -169,56 +169,112 @@ class MoodboardImage extends Component{
 
     choose_image(e){
         e.stopPropagation()
-        console.log('look',this.props.mother_state.control_state, this.props.mother_state.action)
-        var ecopied = {pageX: e.pageX, pageY: e.pageY}
-        if(this.props.mother_state.action!='object_moving'){
-            console.log(this.props.mother_state.current_image.indexOf(this.props.art._id))
-            if(this.props.mother_state.control_state=='control_object'){
-                if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
-                    this.select_new_image(true, ecopied)
-                    if(this.props.art.choosen_by==this.props.mother_this.props.board_this.state.user_id){
+        console.log('this???')
+        if(this.props.mother_state.control_state!='crop'){
+            console.log('look',this.props.mother_state.control_state, this.props.mother_state.action)
+            var ecopied = {pageX: e.pageX, pageY: e.pageY}
+            if(this.props.mother_state.action!='object_moving'){
+                console.log(this.props.mother_state.current_image.indexOf(this.props.art._id))
+                if(this.props.mother_state.control_state=='control_object'){
+                    if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
+                        this.select_new_image(true, ecopied)
+                        if(this.props.art.choosen_by==this.props.mother_this.props.board_this.state.user_id){
+                            this.deselect_image(ecopied)
+                        }
+                    }else if(this.props.mother_state.current_image.indexOf(this.props.art._id)!=-1){
+                        console.log('deselect')
                         this.deselect_image(ecopied)
+                    }else if(this.props.mother_state.shift_down==false){
+                        this.select_new_image(true, ecopied)
+                    }else{
+                        this.add_an_image(true, ecopied)
                     }
-                }else if(this.props.mother_state.current_image.indexOf(this.props.art._id)!=-1){
-                    console.log('deselect')
-                    this.deselect_image(ecopied)
-                }else if(this.props.mother_state.shift_down==false){
-                    this.select_new_image(true, ecopied)
-                }else{
-                    this.add_an_image(true, ecopied)
+                    
+                }else if(this.props.mother_state.control_state=='content-stamp'){
+                    console.log('yeah')
+                    this.select_new_image(false, ecopied)
                 }
+            }else{
                 
-            }else if(this.props.mother_state.control_state=='content-stamp'){
-                console.log('yeah')
-                this.select_new_image(false, ecopied)
-            }
-        }else{
-            
-            if(this.props.mother_state.current_image.indexOf(this.props.art._id)!=-1&&this.state.remove){
-                console.log('deselect')
-                var cur_mouse_pos = this.props.mother_this.getCurrentMouseOnBoard(e)
-                if(this.props.mother_state.init_mouse_pos[0]==cur_mouse_pos[0]&&this.props.mother_state.init_mouse_pos[1]==cur_mouse_pos[1]){
-                    if(this.props.mother_state.current_image.length==1){
-                        this.deselect_image(ecopied)
-                    }else if(this.props.mother_state.shift_down){
-                        this.deselect_image(ecopied)
+                if(this.props.mother_state.current_image.indexOf(this.props.art._id)!=-1&&this.state.remove){
+                    console.log('deselect')
+                    var cur_mouse_pos = this.props.mother_this.getCurrentMouseOnBoard(e)
+                    if(this.props.mother_state.init_mouse_pos[0]==cur_mouse_pos[0]&&this.props.mother_state.init_mouse_pos[1]==cur_mouse_pos[1]){
+                        if(this.props.mother_state.current_image.length==1){
+                            this.deselect_image(ecopied)
+                        }else if(this.props.mother_state.shift_down){
+                            this.deselect_image(ecopied)
+                        }
+                        
                     }
                     
                 }
-                
+                this.props.mother_this.object_moving_end(e)
             }
-            this.props.mother_this.object_moving_end(e)
+            this.setState({remove:false})
+        }else if(this.props.mother_state.action=='crop'){
+            this.endCropMove(e)
         }
-        this.setState({remove:false})
+        
         
     }
 
     object_moving_init(e){
-        if(this.props.mother_state.action!='object_moving'){
-            this.setState({remove:true})
-            this.props.mother_this.object_moving_init(e)
+        console.log('here????')
+        if(this.props.mother_state.control_state!='crop'){
+            if(this.props.mother_state.action!='object_moving'){
+                this.setState({remove:true})
+                this.props.mother_this.object_moving_init(e)
+            }
+        }else{
+            // when cropping...
+            var p = this.props.mother_this.getCurrentMouseOnBoard(e)
+            console.log(p)
+            console.log('heeey')
+            var x = (p[0]-this.props.art.position[0])/(this.props.art.position[2]-this.props.art.position[0])
+            var y = (p[1]-this.props.art.position[1])/(this.props.art.position[3]-this.props.art.position[1])
+            this.props.art.crop = [x, y, x, y]
+            this.props.mother_this.setState({action:'crop'})
+            
         }
         
+    }
+
+    cropMove(e){
+        console.log('move?')
+        if(this.props.mother_state.control_state=='crop' && this.props.mother_state.action=='crop'){
+            var p = this.props.mother_this.getCurrentMouseOnBoard(e)
+            
+            var x = (p[0]-this.props.art.position[0])/(this.props.art.position[2]-this.props.art.position[0])
+            var y = (p[1]-this.props.art.position[1])/(this.props.art.position[3]-this.props.art.position[1])
+            this.props.art.crop[2] = x
+            this.props.art.crop[3] = y
+            console.log('cropmove..')
+            this.props.mother_this.setState({arts:this.props.mother_stat.arts})
+        }
+    }
+    endCropMove(e){
+        console.log('end crop move')
+        var p = this.props.mother_this.getCurrentMouseOnBoard(e)
+            
+        var x = (p[0]-this.props.art.position[0])/(this.props.art.position[2]-this.props.art.position[0])
+        var y = (p[1]-this.props.art.position[1])/(this.props.art.position[3]-this.props.art.position[1])
+        if(this.props.art.crop[0]>x){
+            this.props.art.crop[2]=this.props.art.crop[0]
+            this.props.art.crop[0]=x
+        }else if(this.props.art.crop[0]<x){
+            this.props.art.crop[2]=x
+        }
+        if(this.props.art.crop[1]>y){
+            this.props.art.crop[3]=this.props.art.crop[1]
+            this.props.art.crop[1]=y
+        }else if(this.props.art.crop[1]<y){
+            this.props.art.crop[3]=y
+        }
+        // this.props.art.crop[2] = x
+        // this.props.art.crop[3] = y
+        console.log('cropmove..')
+        this.props.mother_this.setState({action:'idle'})
     }
 
     object_moving_end(e){
@@ -228,7 +284,56 @@ class MoodboardImage extends Component{
                 e.stopPropagation()
             }
             this.props.mother_this.object_moving_end(e)
+        }else if(this.props.mother_state.action=='crop'){
+            this.endCropMove(e)
         }
+    }
+
+    toCropMode(e){
+        e.stopPropagation()
+        this.props.mother_this.setState({control_state:'crop'})
+    }
+
+    endCropMode(e){
+        e.stopPropagation()
+        // update the style and embedding
+       
+
+
+        this.props.mother_this.setState({control_state:'control_object'})
+    }
+
+    renderCropButton(x, y){
+        return (<g>
+            <rect x={x-2} y={y-20} width={34} height={20} fill='white' stroke='black' onPointerDown={this.toCropMode.bind(this)}></rect>
+            <text x={x} y={y-5} onPointerDown={this.toCropMode.bind(this)}>Crop</text>    
+        </g>)
+    }
+
+    renderCropDoneButton(x, y){
+        return (<g>
+            <rect x={x-2} y={y-20} width={34} height={20} fill='white' stroke='black' onPointerDown={this.endCropMode.bind(this)}></rect>
+            <text x={x} y={y-5} onPointerDown={this.endCropMode.bind(this)}>Done</text>    
+        </g>)
+    }
+
+    renderCropBoundary(x, y, width, height){
+        var crop = this.props.art.crop 
+        if(crop==undefined){
+            crop = [0,0,1,1]
+        }
+        var smallx = (crop[0]>crop[2])?crop[2]:crop[0]
+        var bigx = (crop[0]>crop[2])?crop[0]:crop[2]
+        var smally = (crop[1]>crop[3])?crop[3]:crop[1]
+        var bigy = (crop[1]>crop[3])?crop[1]:crop[3]
+
+
+
+        return (
+        <g>
+            <rect style={{pointerEvents:'none'}} fill='transparent' stroke='white' strokeWidth='3' x={x+smallx*width} y={y+smally*height} width={width*(bigx-smallx)} height={height*(bigy-smally)}></rect>
+            <rect style={{pointerEvents:'none'}} fill='transparent' stroke='red' strokeWidth='1' x={x+smallx*width} y={y+smally*height} width={width*(bigx-smallx)} height={height*(bigy-smally)}></rect>
+        </g>)
     }
 
     render(){
@@ -253,7 +358,16 @@ class MoodboardImage extends Component{
         }
         // console.log(this.props.art)
         return (<g onPointerDown={this.test.bind(this)}>
-            <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)} onPointerUp={this.object_moving_end.bind(this)} opacity={(this.props.art.enabled)?'1':'0.3'}></image>
+            <image href={this.props.art.file} x={x} y={y} width={width} height={height} onPointerDown={this.choose_image.bind(this)} onPointerMove={this.cropMove.bind(this)} onPointerUp={this.object_moving_end.bind(this)} opacity={(this.props.art.enabled)?'1':'0.3'}></image>
+            {this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && this.props.mother_state.control_state!='crop' && 
+            this.renderCropButton(x, y)
+            }
+            {this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && this.props.mother_state.control_state=='crop' && 
+            this.renderCropDoneButton(x, y)
+            }
+            {this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && this.props.mother_state.control_state=='crop' && 
+            this.renderCropBoundary(x, y, width, height)
+            }
             {color!='' && <g>
             <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2' onPointerDown={this.object_moving_init.bind(this)} onPointerUp={this.choose_image.bind(this)}></rect>
             </g>}

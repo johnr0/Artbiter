@@ -125,6 +125,7 @@ class SketchpadStyleStampControllerAI extends Component{
         console.log('why?')
         canvas.fillStyle='black'
         canvas.fillRect(0,0,1000,1000)
+        this.props.mother_this.setState({style_content_image: undefined})
     }
 
     // applyStyleTransfer(){

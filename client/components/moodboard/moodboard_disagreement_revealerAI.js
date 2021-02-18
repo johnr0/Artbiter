@@ -391,7 +391,7 @@ class MoodboardDisagreementRevealerAI extends Component{
             
         }
 
-        console.log('selected groups', selectedGroups)
+        // console.log('selected groups', selectedGroups)
 
 
         return (<div></div>)

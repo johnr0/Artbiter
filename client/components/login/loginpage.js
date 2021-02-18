@@ -8,6 +8,7 @@ class LoginPage extends Component{
 
     componentDidMount(){
         console.log(Api.app)
+        
         Api.app.reAuthenticate().then(()=>{
             console.log('success..')
             window.location.href = '/boardlist'
@@ -80,9 +81,9 @@ class LoginPage extends Component{
                     <div className='btn' onClick={this.toggleSignUp.bind(this)}>Sign Up</div>
                 </div>
 
-                <div className='row'>
+                {/* <div className='row'>
                 <div className='btn red'>Log in with Google</div>
-                </div>
+                </div> */}
             </div>
             }
 

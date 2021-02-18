@@ -184,8 +184,33 @@ class SketchPadAI extends SketchPad{
                 var target_layer = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer])
                 content_canvas.drawImage(target_layer, content_bbox.left, content_bbox.top, content_bbox.width, content_bbox.height, 0, 0, content_bbox.width, content_bbox.height)
 
+                var mask_el = document.createElement('canvas')
+                var mask_canvas = mask_el.getContext('2d')
+                mask_el.width = content_bbox['width']
+                mask_el.height = content_bbox['height']
+                var mask_layer = document.getElementById('style-stamp-canvas')
+                var mask_layer_ctx = mask_layer.getContext('2d')
+                var imgData = mask_layer_ctx.getImageData(content_bbox.left, content_bbox.top, content_bbox.width, content_bbox.height)
+                var data = imgData.data
+                for(var i=0;i<data.length;i+=4){
+                    if(data[i]>0){
+                        var opa = data[i]
+                        data[i]=0;
+                        data[i+1]=0;
+                        data[i+2]=0;
+                        data[i+3]=255-opa;
+                    }
+                }
+                mask_canvas.putImageData(imgData, 0, 0)
+                // mask_canvas.drawImage(mask_layer, content_bbox.left, content_bbox.top, content_bbox.width, content_bbox.height, 0, 0, content_bbox.width, content_bbox.height)
+                
+                // mask_canvas.globalCompositeOperation='source-out'
+                // mask_canvas.drawImage(target_layer, content_bbox.left, content_bbox.top, content_bbox.width, content_bbox.height, 0, 0, content_bbox.width, content_bbox.height)
+                
+
                 var content_image = content_el.toDataURL();
-                this.setState({action:'idle', style_brush_cur: undefined, style_content_image: content_image})
+                var mask_image = mask_el.toDataURL()
+                this.setState({action:'idle', style_brush_cur: undefined, style_content_mask: mask_image, style_content_image: content_image, style_content_box: content_bbox})
             }
     }
 

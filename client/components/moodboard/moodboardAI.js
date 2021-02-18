@@ -148,7 +148,7 @@ class MoodBoardAI extends MoodBoard{
 
         // var search_slider_values = this.state.search_slider_values
         // search_slider_values[id]=0
-
+        analytics.logEvent("create_a_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: id, group_name: name})
         Api.app.service('groups').create(a_group)
         // Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
         this.setState({action:'idle'})
@@ -184,12 +184,14 @@ class MoodBoardAI extends MoodBoard{
             set['user_info.'+this.props.board_this.state.user_id] = {
                 arts: this.state.current_image.slice()
             }
+            analytics.logEvent("add_to_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
             Api.app.service('groups').patch(group_id, {$set: set, $push:{art_ids: {$each: this.state.current_image.slice()}}})
         }else{
             var push = {art_ids: {$each: this.state.current_image.slice()}}
             push['user_info.'+this.props.board_this.state.user_id+'.arts'] = {
                 $each: this.state.current_image.slice()
             }
+            analytics.logEvent("add_to_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
             Api.app.service('groups').patch(group_id, {$set:{updated:'groups_add', pos: pos}, $push:push})
         }
         // Api.app.service('groups').patch(group_id, {$set:{updated:'groups_add', pos: pos}, $push:{art_ids: {$each: this.state.current_image.slice()}}})
@@ -229,7 +231,7 @@ class MoodBoardAI extends MoodBoard{
                 }
             } 
         }
-
+        analytics.logEvent("remove_from_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, removed_arts: this.state.current_image.slice()})
         Api.app.service('groups').patch(group_id, {$set:{updated:'groups_remove', pos: pos}, $pull:pull})
 
     }
@@ -259,6 +261,7 @@ class MoodBoardAI extends MoodBoard{
         // search_slider_values={}
 
         // Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
+        analytics.logEvent("delete_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
         Api.app.service('groups').remove(group_id)
         // Api.app.service('groups').remove({query: {group_id:group_id}})
     }
@@ -294,6 +297,7 @@ class MoodBoardAI extends MoodBoard{
             }   
         }
         var ratio = (pos[2]-pos[0])/(pos[3]-pos[1])
+        analytics.logEvent("select_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
 
         Promise.all([
             this.props.board_this.ChooseArtsTexts(art_ids.slice(),[],filtered,this.state.current_text.slice(0)),
@@ -333,6 +337,7 @@ class MoodBoardAI extends MoodBoard{
         //     search_slider_values[key] = 0
         // }
         // Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
+        analytics.logEvent("relate_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
         Api.app.service('groups').patch(key, {$set: {updated:'groups_relate_r', higher_group: standard_group.higher_group}})
     }
 
@@ -355,6 +360,7 @@ class MoodBoardAI extends MoodBoard{
         // }else if(num==3){
 
         // }
+        analytics.logEvent("unrelate_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
         Api.app.service('groups').patch(key, {$set: {updated: 'groups_relate_u', higher_group: this.getRandomColor()}})
 
     }
@@ -368,6 +374,7 @@ class MoodBoardAI extends MoodBoard{
                 var art_ids= group.art_ids
                 var filtered = art_ids.filter(value => _this.state.current_image.includes(value))
                 if(filtered.length==art_ids.length || art_ids.length-filtered.length==1){
+                    analytics.logEvent("group_delete", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group._id})
                     Api.app.service('groups').remove(group._id)
                 }else if(filtered.length>0){
                     for(var i in filtered){

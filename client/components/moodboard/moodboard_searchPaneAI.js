@@ -96,18 +96,22 @@ class MoodBoardSearchPaneAI extends Component{
     }
 
     search(){
+        analytics.logEvent("search", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.search_slider_values})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_images', searching: true}})
     }
 
     search_similar(){
+        analytics.logEvent("search_similar", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_similar_images', searching: true}})
     }
 
     search_random(){
+        analytics.logEvent("search_random", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_random_images', searching: true}})
     }
 
     generate(){
+        analytics.logEvent("transfer_on_moodboard", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.generate_slider_values})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_generate_image', searching: true}})
     }
 
@@ -142,7 +146,7 @@ class MoodBoardSearchPaneAI extends Component{
                 position[1]=0
                 position[3]=0.05/ratio
             }else{
-                position[3] = position[1]+0.05
+                position[3] = position[1]+0.05/ratio
             }
 
 
@@ -150,7 +154,9 @@ class MoodBoardSearchPaneAI extends Component{
                 file: val[1],
                 position: position,
                 ratio: ratio,
-                choosen_by: _this.props.mother_this.props.board_this.state.user_id
+                choosen_by: _this.props.mother_this.props.board_this.state.user_id,
+                width: this.width,
+                height: this.height,
             }
             Promise.all([
                 _this.props.mother_this.props.board_this.ChooseArtsTexts([],[],_this.props.mother_state.current_image, _this.props.mother_state.current_text),
@@ -172,9 +178,9 @@ class MoodBoardSearchPaneAI extends Component{
 
     renderGradientFromDistance(distance){
         var colormap = interpolate(['#ffbb00', '#0069c4'])
-        console.log(distance)
+        // console.log(distance)
         return distance.map((val, idx)=>{
-            console.log(val)
+            // console.log(val)
             var color = colormap(val)
             return (<stop offset={(10*idx)+'%'} style={{stopColor: color, stopOpacity: 1}}></stop>)
         })
@@ -212,7 +218,7 @@ class MoodBoardSearchPaneAI extends Component{
                     if(distance == undefined){
                         distance = [0,0,0,0,0,0,0,0,0,0,0]
                     }
-                    console.log(distance, kidx)
+                    // console.log(distance, kidx)
 
                     
                     return (<div key={'slider_'+group._id}>

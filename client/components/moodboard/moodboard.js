@@ -41,6 +41,7 @@ class MoodBoard extends ProtoBoard{
 
         shift_down: false,
         control_down: false,
+
     }
 
     // TODO: Getting images from clip board...
@@ -368,8 +369,8 @@ class MoodBoard extends ProtoBoard{
     }
 
     moodBoardMouseInit(e){
-        
-        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp') && this.state.action=='idle'){
+        console.log(this.state.control_state, this.state.action)
+        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp'||this.state.control_state=='crop') && this.state.action=='idle'){
             console.log('init starts at here? or?')
             this.moveBoardInit(e)
         }else if((this.state.control_state=='control_object') && this.state.action=='change_color'){
@@ -389,7 +390,7 @@ class MoodBoard extends ProtoBoard{
         // var pos = this.getCurrentMouseOnBoard(e)
         // this.props.board_this.setMoodboardPosition(pos[0], pos[1]);
 
-        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp') && this.state.action=='move_board'){
+        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp'||this.state.control_state=='crop') && this.state.action=='move_board'){
             this.moveMouse(e)
         }else if(this.state.control_state=='control_object' && this.state.action=='object_resizing'){
             this.object_resizing(e)
@@ -401,7 +402,7 @@ class MoodBoard extends ProtoBoard{
 
 
     moodBoardMouseEnd(e){
-        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp') && this.state.action=='move_board'){
+        if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp'||this.state.control_state=='crop') && this.state.action=='move_board'){
             this.moveBoardEnd(e)
         }else if(this.state.control_state=='control_object' && this.state.action=='object_resizing'){
             this.end_object_resizing(e)
@@ -411,7 +412,7 @@ class MoodBoard extends ProtoBoard{
     }
 
     moveBoardEnd(e){
-        if(this.state.move_board_init[0]==this.state.boardcenter[0] && this.state.move_board_init[1]==this.state.boardcenter[1]){
+        if(this.state.control_state!='crop' && this.state.move_board_init[0]==this.state.boardcenter[0] && this.state.move_board_init[1]==this.state.boardcenter[1]){
             this.deSelect()
             
         }else{

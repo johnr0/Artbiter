@@ -219,8 +219,9 @@ class SketchpadStyleStampControllerAI2 extends Component{
                 var img = new Image();
                 img.src = cur_art_file
                 img.onload=function(){
+                    console.log('crop log', cur_art_area, cur_art_width, cur_art_height)
                     cur_ctx.drawImage(img, cur_art_width*cur_art_area[0], cur_art_height*cur_art_area[1], cur_art_width*(cur_art_area[2]-cur_art_area[0]), cur_art_height*(cur_art_area[3]-cur_art_area[1]), 0, 0, cur_art_width*(cur_art_area[2]-cur_art_area[0]), cur_art_height*(cur_art_area[3]-cur_art_area[1]))
-                // console.log(cur_ctx)
+                console.log(cur_el.toDataURL())
                     cur_style['file']=cur_el.toDataURL()
                     console.log(cur_el)
                     resolve(cur_style);
@@ -327,6 +328,8 @@ class SketchpadStyleStampControllerAI2 extends Component{
         var content_canvas = content_el.getContext('2d')
         content_el.width = content_bbox['width']
         content_el.height = content_bbox['height']
+        content_canvas.fillStyle='white'
+        content_canvas.fillRect(0,0,content_el.width, content_el.height)
 
         var target_layer = document.getElementById('sketchpad_canvas_'+this.props.mother_state.layers[this.props.mother_state.current_layer])
         content_canvas.drawImage(target_layer, content_bbox.left, content_bbox.top, content_bbox.width, content_bbox.height, 0, 0, content_bbox.width, content_bbox.height)
@@ -379,6 +382,8 @@ class SketchpadStyleStampControllerAI2 extends Component{
         }
         Promise.all(promises).then((value)=>{
             console.log(content, value)
+            Api.app.service('event_logs').create({event: 'transfer_on_sketch', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
+            // analytics.logEvent("transfer_on_sketch", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
             Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated:'sketchpad_style_apply', content: content, styles: value}})
             
         })
@@ -388,7 +393,7 @@ class SketchpadStyleStampControllerAI2 extends Component{
         if(document.getElementById('sketchpad')==undefined){
             return (<div></div>)
         }
-        var side_length_width = (document.getElementById('sketchpad').offsetWidth-130)/2-20
+        var side_length_width = (document.getElementById('sketchpad').offsetWidth-130)/2-55///20
         var side_length_height = (document.getElementById('sketchpad').offsetHeight* 0.45-50-40)-20
         var side_length = (side_length_height>side_length_width)?side_length_width:side_length_height
 
@@ -397,6 +402,8 @@ class SketchpadStyleStampControllerAI2 extends Component{
         if(document.getElementById('sketchpad')!=undefined){
             paddingTop = document.getElementById('sketchpad').offsetHeight * 0.45 * 0.5 -32
         }
+
+
 
         return (<div style={{display:(this.props.mother_state.control_state=='style-stamp')?'':'none'}}>
             <div className="controller sketchpad_style_controller2" style={{display:(this.state.open)?'':'none'}}>
@@ -454,10 +461,29 @@ class SketchpadStyleStampControllerAI2 extends Component{
                             }
                             
                             <div style={{display:(this.props.mother_state.style_content_image!=undefined)?'':'none'}}> 
-                                <div style={{display:'block', margin:'auto', width: side_length, height: side_length, backgroundColor:'#eeeeee'}}>
-                                    <img src={this.props.mother_state.style_content_image}
-                                        style={{display:'block', border: 'solid 1px #888888', maxHeight: (100*this.state.content_ratio)+'%', maxWidth: (100*this.state.content_ratio)+'%'}}
-                                    ></img>
+                                <div style={{display:'block', margin:'auto', width: side_length, height: side_length, backgroundColor:'#eeeeee', position: 'relative'}}>
+                                    {this.props.mother_state.style_content_box!=undefined && this.props.mother_state.style_content_box['width']>this.props.mother_state.style_content_box['height'] &&
+                                        <img src={this.props.mother_state.style_content_image}
+                                        style={{display:'block', border: 'solid 1px #888888', width: (100*this.state.content_ratio)+'%'}}
+                                        ></img>
+                                        
+                                    }
+                                    {this.props.mother_state.style_content_box!=undefined && this.props.mother_state.style_content_box['width']<=this.props.mother_state.style_content_box['height'] &&
+                                        <img src={this.props.mother_state.style_content_image}
+                                        style={{display:'block', border: 'solid 1px #888888', height: (100*this.state.content_ratio)+'%'}}
+                                        ></img>
+                                    }
+                                    {this.props.mother_state.style_content_box!=undefined && this.props.mother_state.style_content_box['width']>this.props.mother_state.style_content_box['height'] &&
+                                        <img src={this.props.mother_state.style_content_mask}
+                                            style={{display:'block', border: 'solid 1px #888888', width: (100*this.state.content_ratio)+'%', position: 'absolute', top: 0, opacity: 0.5}}
+                                        ></img>
+                                    }
+                                    {this.props.mother_state.style_content_box!=undefined && this.props.mother_state.style_content_box['width']<=this.props.mother_state.style_content_box['height'] &&
+                                        <img src={this.props.mother_state.style_content_mask}
+                                            style={{display:'block', border: 'solid 1px #888888', height: (100*this.state.content_ratio)+'%', position: 'absolute', top: 0, opacity: 0.5}}
+                                        ></img>
+                                    }
+                                    
                                 </div>
                                 <div>
                                     <input id={'sketchpad_content_scale'} type='range' style={{width: side_length, height: '20px', margin: '0', border:'solid 1px transparent'}} min={0} max={100} value={this.state.content_ratio*100} onChange={this.changeRatio.bind(this, 'content')}></input>
