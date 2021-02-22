@@ -1008,9 +1008,12 @@ class Board extends Component{
         console.log(this.sketchpad.state.layers)
         for(var i in this.sketchpad.state.layers){
             var key = this.sketchpad.state.layers[i]
-            var el = document.getElementById('sketchpad_canvas_'+key)
-            var cur_canvas = el.getContext('2d')
-            output_canvas.drawImage(el, 0, 0);
+            if(this.sketchpad.state.layer_dict[key].hide!=true){
+                var el = document.getElementById('sketchpad_canvas_'+key)
+                var cur_canvas = el.getContext('2d')
+                output_canvas.drawImage(el, 0, 0);
+            }
+            
         }
         output_canvas.fillStyle = 'white'
         output_canvas.fillRect(0, 0, 1000, 1000);

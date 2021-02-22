@@ -419,7 +419,7 @@ class MoodboardImage extends Component{
             {this.props.art.enabled && this.props.mother_state.control_state=='control_object' && this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && this.props.mother_state.control_state!='crop' && 
             this.renderCropButton(x, y)
             }
-            {this.props.art.enabled && this.props.mother_state.control_state=='control_object' && this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && this.props.mother_state.control_state=='crop' && 
+            {this.props.art.enabled && this.props.mother_state.control_state=='crop' && this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && 
             this.renderCropDoneButton(x, y)
             }
             

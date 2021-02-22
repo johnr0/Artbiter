@@ -449,6 +449,9 @@ class MoodBoard extends ProtoBoard{
             crop[3]=crop[1]
             crop[1]=tmp
         }
+        if(crop[0]==crop[2] && crop[1]==crop[3]){
+            crop = [0,0,1,1]
+        }
         console.log('crop move end!')
         this.setState({action:'idle', crop:crop})
     }

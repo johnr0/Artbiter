@@ -228,6 +228,7 @@ class SketchPadAI extends SketchPad{
             onPointerOut={this.moveBoardEnd.bind(this)}
             onPointerMove={this.sketchPadMouseMove.bind(this)}> 
             <div className={'boardrender'} onPointerDown={this.sketchPadMouseMoveInit.bind(this)} onPointerUp={this.sketchPadMouseMoveEnd.bind(this)} 
+                onPointerOut={this.sketchPadMouseMoveOut.bind(this)}
                 // onPointerOut={this.props.board_this.setSketchpadPosition.bind(this.props.board_this, -1, -1)}
 
             

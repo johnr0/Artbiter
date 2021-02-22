@@ -224,6 +224,7 @@ class SketchPad extends ProtoBoard {
         }else if(this.state.control_state=='move-layer' && this.state.action=='move-layer'){
             this.moveLayerMove(e)
         }else if(this.state.control_state=='move-layer' && this.state.action=='rotate-layer'){
+            console.log('rot')
             this.rotateLayerMove(e)
         }else if(this.state.control_state=='move-layer' && this.state.action=='resize-layer'){
             this.resizeLayerMove(e)
@@ -252,6 +253,16 @@ class SketchPad extends ProtoBoard {
             this.resizeLayerEnd(e)
         }else if(this.state.control_state=='content-stamp' && this.state.action=='content-stamp'){
             this.contentStampEnd(e)
+        }
+    }
+
+    sketchPadMouseMoveOut(e){
+        console.log('out to where?')
+        if(this.state.control_state=='move-layer' && this.state.action=='move-layer'){
+            console.log('out to here')
+            this.moveLayerEnd(e)
+        }else{
+            this.moveBoardEnd(e)
         }
     }
 
@@ -516,7 +527,7 @@ class SketchPad extends ProtoBoard {
             nonlasso_ret.top = this.state.init_nonlasso_ret.top+pos[1]-this.state.move_layer_init_pos[1]
             nonlasso_ret.width = this.state.init_nonlasso_ret.width
             nonlasso_ret.height = this.state.init_nonlasso_ret.height
-            console.log(nonlasso_ret)
+            // console.log(nonlasso_ret)
             this.setState({nonlasso_ret})
         }
         
@@ -596,10 +607,10 @@ class SketchPad extends ProtoBoard {
             rotateCenter.push(this.state.nonlasso_ret.left+this.state.nonlasso_ret.width/2)
             rotateCenter.push(this.state.nonlasso_ret.top+this.state.nonlasso_ret.height/2)
         }
-
+        e.stopPropagation()
         var el = document.getElementById('sketchpad_canvas_'+this.state.layers[this.state.current_layer])
         var cur_image = el.toDataURL()
-
+        console.log('rot init')
         this.setState({action: 'rotate-layer', rotateCenter: rotateCenter, adjust_pre_canvas: adjust_pre_canvas, origin_image: cur_image})
     }
 
@@ -1351,6 +1362,7 @@ class SketchPad extends ProtoBoard {
             onPointerOut={this.moveBoardEnd.bind(this)}
             onPointerMove={this.sketchPadMouseMove.bind(this)}> 
             <div className={'boardrender'} onPointerDown={this.sketchPadMouseMoveInit.bind(this)} onPointerUp={this.sketchPadMouseMoveEnd.bind(this)} 
+                onPointerOut={this.sketchPadMouseMoveOut.bind(this)}
                 // onPointerOut={this.props.board_this.setSketchpadPosition.bind(this.props.board_this, -1, -1)}
 
             

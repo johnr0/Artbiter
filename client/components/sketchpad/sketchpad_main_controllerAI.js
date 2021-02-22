@@ -56,7 +56,7 @@ class SketchpadMainControllerAI extends SketchpadMainController{
         }else{
             var layer_id = this.props.mother_state.layers[this.props.mother_state.current_layer]
             var layer = this.props.mother_state.layer_dict[layer_id]
-            console.log('layer', layer, layer_id)
+            // console.log('layer', layer, layer_id)
             if(layer!=undefined){
                 if(layer.hide==true){
                     basecolor='#444444'
