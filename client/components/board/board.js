@@ -924,11 +924,12 @@ class Board extends Component{
     ChooseArtsTexts(art_ids, text_ids, d_art_ids, d_text_ids){
         console.log('chooseartstexts')
         var patch={}
-
+        var arts = this.moodboard.state.arts
         patch['updated'] = 'moodboard_arts_texts_choosen'
         var unset={}
         for(var i in art_ids){
             var art_id = art_ids[i]
+            arts[art_id].choosen_by=this.state.user_id
             Api.app.service('arts').patch(art_id, {$set:{choosen_by: this.state.user_id, updated:'moodboard_arts_texts_choosen'}})
         }
         for (var i in text_ids){
@@ -938,6 +939,7 @@ class Board extends Component{
         }
         for(var i in d_art_ids){
             var art_id = d_art_ids[i]
+            arts[art_id].choosen_by=''
             Api.app.service('arts').patch(art_id, {$set:{choosen_by: '', updated: 'moodboard_arts_texts_choosen'}})
         }
         for (var i in d_text_ids){
@@ -949,6 +951,8 @@ class Board extends Component{
         if(Object.keys(patch).length>1){
             Api.app.service('boards').patch(this.state.board_id, {$set:patch})
         }   
+
+        this.moodboard.setState({arts:arts})
     }
 
     ChooseLayers(layer_idxs, d_layer_idxs){
