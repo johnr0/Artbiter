@@ -20,7 +20,8 @@ class BoardListPage extends Component{
             var boards = this.state.boards
             // find for initial
             Api.app.service('boards').timeout = 30000
-            Api.app.service('boards').find({query: {owner: res.user._id}})
+            Api.app.service('boards').find({query: {owner: res.user._id, 
+                $select: ['name', 'collaborators', 'owner', 'current_collaborators']}})
             .then((res)=>{
                 console.log(res)
                 for (var i in res){
