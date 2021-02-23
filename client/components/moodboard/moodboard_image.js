@@ -20,6 +20,9 @@ class MoodboardImage extends Component{
             var board_state = this.props.mother_this.props.board_this.state
             console.log(board_state.user_id)
             arts[this.props.art_key].choosen_by = board_state.user_id
+            for(var i in this.props.mother_state.current_image){
+                arts[this.props.mother_state.current_image[i]].choosen_by = ''
+            }
             Promise.all([
                 this.props.mother_this.props.board_this.ChooseArtsTexts([this.props.art_key],[],this.props.mother_state.current_image.slice(0),this.props.mother_state.current_text.slice(0)),
                 this.props.mother_this.setState({arts:arts, current_image:[this.props.art_key], current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
@@ -152,11 +155,12 @@ class MoodboardImage extends Component{
                 }
                 var ratio = (pos[2]-pos[0])/(pos[3]-pos[1])
             }
+            arts[this.props.art_key].choosen_by= ''
 
             if(current_image.length==0){
                 Promise.all([
                     this.props.mother_this.props.board_this.ChooseArtsTexts([],[],[this.props.art_key],[]),
-                    this.props.mother_this.setState({current_image:current_image, current_selected_pos: pos, current_selected_ratio: ratio}, function(){
+                    this.props.mother_this.setState({arts:arts, current_image:current_image, current_selected_pos: pos, current_selected_ratio: ratio}, function(){
                         _this.props.mother_this.props.board_this.sketchpad.setState({})
                     })
                 ])

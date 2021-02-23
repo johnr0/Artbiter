@@ -471,6 +471,7 @@ class MoodBoard extends ProtoBoard{
         var del_texts = []
         var replace_texts = []
         var replace_text_ids = []
+        var arts = this.state.arts
         for(var i in this.state.current_text){
             var key = this.state.current_text[i]
             if(this.state.texts[key].text==''){
@@ -481,6 +482,11 @@ class MoodBoard extends ProtoBoard{
                 replace_texts.push(this.state.texts[key])
             }
         }
+        ///
+        for(var i in this.state.current_image){
+            arts[this.state.current_image[i]].choosen_by=''
+        }
+        ///
         var promises = [ 
             this.props.board_this.ChooseArtsTexts([],[],this.state.current_image.slice(0), this.state.current_text.slice(0)),
             this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids)
@@ -489,7 +495,7 @@ class MoodBoard extends ProtoBoard{
         if(del_texts.length>0){
             promises.push(this.props.board_this.RemoveArtsTexts([], del_texts))
         }
-        promises.push(this.setState({action:'idle', current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined, 
+        promises.push(this.setState({arts:arts, action:'idle', current_image:[], current_text:[], current_selected_pos: undefined, current_selected_ratio: undefined, 
         move_board_init: undefined, move_board_mouse_init: undefined}, function(){
             _this.props.board_this.sketchpad.setState({})
         })) 
