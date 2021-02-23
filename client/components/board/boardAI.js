@@ -65,20 +65,20 @@ class BoardAI extends Board{
         
         })
 
-        Api.app.service('disagreed_arts').on('created', (data)=>{
-            if(data.board_id==this.state.board_id){
-                var disagreed_arts = this.moodboard.state.disagreed_arts
-                disagreed_arts[data._id] = data
-                this.moodboard.setState({disagreed_arts})
-            }
-        })
+        // Api.app.service('disagreed_arts').on('created', (data)=>{
+        //     if(data.board_id==this.state.board_id){
+        //         var disagreed_arts = this.moodboard.state.disagreed_arts
+        //         disagreed_arts[data._id] = data
+        //         this.moodboard.setState({disagreed_arts})
+        //     }
+        // })
 
-        Api.app.service('disagreed_arts').on('removed', (data)=>{
-            var disagreed_arts = this.moodboard.state.disagreed_arts
-            delete disagreed_arts[data._id]
-            this.moodboard.setState({disagreed_arts})
+        // Api.app.service('disagreed_arts').on('removed', (data)=>{
+        //     var disagreed_arts = this.moodboard.state.disagreed_arts
+        //     delete disagreed_arts[data._id]
+        //     this.moodboard.setState({disagreed_arts})
         
-        })
+        // })
 
         this.runAuth()
         this.prepareUpdates()
@@ -214,15 +214,15 @@ class BoardAI extends Board{
                         _this.moodboard.setState({searched_arts:searched_arts})
                     })
 
-                    var disagreed_arts = _this.moodboard.state.disagreed_arts
-                    Api.app.service('disagreed_arts').find({query: {board_id: board_id}})
-                    .then((res)=>{
-                        for(var i in res){
-                            disagreed_arts[res[i]._id] = res[i]
-                        }
-                        console.log('disagreed arts', disagreed_arts)
-                        _this.moodboard.setState({disagreed_arts:disagreed_arts})
-                    })
+                    // var disagreed_arts = _this.moodboard.state.disagreed_arts
+                    // Api.app.service('disagreed_arts').find({query: {board_id: board_id}})
+                    // .then((res)=>{
+                    //     for(var i in res){
+                    //         disagreed_arts[res[i]._id] = res[i]
+                    //     }
+                    //     console.log('disagreed arts', disagreed_arts)
+                    //     _this.moodboard.setState({disagreed_arts:disagreed_arts})
+                    // })
 
 
                     // var arts = res[0]['arts']
