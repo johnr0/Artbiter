@@ -157,6 +157,9 @@ function generateImage(content, content_weight, styles, style_weights, context){
 
 function generateImageWithScaling(content, styles, context){
   console.log('start and error?')
+  console.log(typeof JSON.stringify(content))
+  console.log(typeof JSON.stringify(styles))
+
   axios.post(context.app.get('ml_server')+'generateImageWithScaling', {
     content: JSON.stringify(content),
     styles: JSON.stringify(styles)
