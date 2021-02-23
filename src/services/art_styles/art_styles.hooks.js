@@ -3,13 +3,13 @@ const axios = require("axios")
 const labelAddedImage = async context =>{
   var group_modeld = undefined
   console.log('output should be output')
-  console.log(context.arguments[0])
+  // console.log(context.arguments[0])
   context.app.service('arts').find({query: {_id: context.arguments[0].art_id}})
   .then((res)=>{
-    console.log(res[0])
+    // console.log(res[0])
     context.app.service('group_models').find({query: {board_id: res[0].board_id}})
     .then((res2)=>{
-      console.log(res2, 'pit[it os res')
+      // console.log(res2, 'pit[it os res')
       var group_models = []
       var l2ts = []
       var decs = []

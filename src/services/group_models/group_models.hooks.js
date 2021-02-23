@@ -2,18 +2,18 @@ var axios =require('axios')
 var ml_server = require('../../config')
 
 const labelAllImages = async context => {
-    console.log(':P')
+    // console.log(':P')
     var group_model = [context.arguments[0].group_model]
     var l2t = [context.arguments[0].l2t]
     var dec = [context.arguments[0].dec]
 
     var images = {}
     var searched_images = {}
-    console.log(':P', context.arguments[0].board_id)
+    // console.log(':P', context.arguments[0].board_id)
     context.app.service('arts').find({query: {board_id: context.arguments[0].board_id}})
     .then((res)=>{
         for(var i in res){
-            console.log(res[i].embedding)
+            // console.log(res[i].embedding)
             if(res[i].embedding!=undefined){
                 images[res[i]._id]=res[i].embedding
             }
@@ -22,7 +22,7 @@ const labelAllImages = async context => {
         // .then((res)=>{
 
         // })
-        console.log(':Pdouble')
+        // console.log(':Pdouble')
         axios.post(context.app.get('ml_server')+'labelImages', {
             images: JSON.stringify(images),
             group_model: JSON.stringify(group_model),

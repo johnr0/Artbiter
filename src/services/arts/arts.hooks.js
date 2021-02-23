@@ -6,8 +6,8 @@ const turnImageToEmbedding = async context => {
   // console.log(context.argument)
   // console.log(context)
   var image = context.arguments[0].file
-  console.log('ml_server', ml_server)
-  console.log(context.app.get('ml_server'))
+  // console.log('ml_server', ml_server)
+  // console.log(context.app.get('ml_server'))
 
   // console.log(image)
 
@@ -18,7 +18,7 @@ const turnImageToEmbedding = async context => {
     // console.log('e1?')
     var embedding = JSON.parse(response.data.embedding)
     var style = JSON.parse(response.data.style)
-    console.log(Object.keys(style))
+    // console.log(Object.keys(style))
     // console.log(context.arguments[0]._id)
     context.app.service('arts').patch(context.arguments[0]._id, {$set:{updated:'moodboard_update_arts_embedding', embedding: embedding, enabled:true}})
     
@@ -27,7 +27,7 @@ const turnImageToEmbedding = async context => {
       style: style
     })
   }, (error)=>{
-    console.log(error)
+    // console.log(error)
     console.log('error')
   })
   return context
@@ -35,9 +35,9 @@ const turnImageToEmbedding = async context => {
 
 const turnColorChangeToEmbedding = async context =>{
   if(context.result.updated=='moodboard_color_swatch_change'){
-    console.log(context.arguments)
+    // console.log(context.arguments)
     var image = context.result.file
-    console.log('ml_server', ml_server)
+    // console.log('ml_server', ml_server)
 
     axios.post(context.app.get('ml_server')+'image_to_embedding', {
       image: image,
@@ -46,14 +46,14 @@ const turnColorChangeToEmbedding = async context =>{
       // console.log('e1?')
       var embedding = JSON.parse(response.data.embedding)
       var style = JSON.parse(response.data.style)
-      console.log(Object.keys(style))
+      // console.log(Object.keys(style))
       // console.log(context.arguments[0]._id)
       console.log('color embedding patching')
       context.app.service('arts').patch(context.result._id, {$set:{updated:'moodboard_update_arts_embedding', embedding: embedding}})
       
       context.app.service('art_styles').find({query: {art_id:context.result._id}})
       .then((res)=>{
-        console.log('color style patching')
+        // console.log('color style patching')
         context.app.service('art_styles').patch(res[0]._id, {$set:{style:style}})
       })
     }, (error)=>{
