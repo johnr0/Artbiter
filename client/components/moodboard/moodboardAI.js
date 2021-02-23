@@ -293,6 +293,7 @@ class MoodBoardAI extends MoodBoard{
         var _this = this
         var filtered = this.state.current_image.filter(value => !art_ids.includes(value))
         var pos = [Number.MAX_VALUE, Number.MAX_VALUE, Number.MIN_VALUE, Number.MIN_VALUE]
+        var arts = this.state.arts
 
         var flist = art_ids 
         if(this.state.shift_down==true){
@@ -323,6 +324,10 @@ class MoodBoardAI extends MoodBoard{
         var ratio = (pos[2]-pos[0])/(pos[3]-pos[1])
         // analytics.logEvent("select_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
         if(this.state.shift_down==true){
+            for(var i in art_ids){
+                var art_id = art_ids[i]
+                arts[art_id].choosen_by = this.props.board_this.state.user_id
+            }
             Promise.all([
                 this.props.board_this.ChooseArtsTexts(art_ids.slice(),[],[],this.state.current_text.slice(0)),
                 this.setState({action:'idle', current_image:flist, current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
@@ -331,6 +336,14 @@ class MoodBoardAI extends MoodBoard{
                 Api.app.service('event_logs').create({event:'select_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
             ])
         }else{
+            for(var i in art_ids){
+                var art_id = art_ids[i]
+                arts[art_id].choosen_by = this.props.board_this.state.user_id
+            }
+            for(var i in filtered){
+                var art_id = filtered[i]
+                arts[art_id].choosen_by = ''
+            }
             Promise.all([
                 this.props.board_this.ChooseArtsTexts(art_ids.slice(),[],filtered,this.state.current_text.slice(0)),
                 this.setState({action:'idle', current_image:art_ids.slice(), current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
