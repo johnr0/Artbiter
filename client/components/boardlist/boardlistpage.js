@@ -244,10 +244,11 @@ class BoardListPage extends Component{
                         {board.name}
                         {(board.owner==this.state.user_id) && ' (belongs to you)'}
                         {(board.owner!=this.state.user_id) && ' (belongs to '+this.state.collaborator_dict[board.owner]+')'}
-                    </a>/
+                    </a>
+                    {/* /
                     <a href={'/boards_baseline?_id='+board._id}>
                         baseline
-                    </a>
+                    </a> */}
                 </div>
                 {this.state.user_id==board.owner && 
                     <div style={{display: 'inline-block', position:'absolute', right: '0'}}>

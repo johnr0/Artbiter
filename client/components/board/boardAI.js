@@ -108,6 +108,7 @@ class BoardAI extends Board{
                 if(res.length==0){
                     window.location.href='/boardlist'
                 }else{
+                    Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
                     console.log(res[0])
                     for(var j in res[0].collaborators){
                         if(res[0].collaborators[j]!=user_id){

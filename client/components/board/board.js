@@ -58,16 +58,18 @@ class Board extends Component{
                 location.reload();
             }
             console.log(analytics)
-            Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
+            
             // analytics.logEvent("enter_board", {board_id, user_email, user_id})
             
             console.log('timeout before...', Api.app.service('boards').timeout)
             Api.app.service('boards').timeout = 30000
             Api.app.service('boards').find({query: {_id: board_id}})
             .then((res)=>{
+                
                 if(res.length==0){
                     window.location.href='/boardlist'
                 }else{
+                    Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
                     console.log(res[0])
                     var owner = res[0].owner
                     for(var j in res[0].collaborators){
@@ -843,9 +845,12 @@ class Board extends Component{
             create['updated'] = 'moodboard_add_arts'
             create['board_id'] = this.state.board_id
             // patch['updated'] = patch['updated']+'.'+art_ids[i]
-            Api.app.service('event_logs').create({event: 'add_an_art', board_id: this.state.board_id, user_id:this.state.user_id, art_id:art_ids[i]})
+            
             // analytics.logEvent("add_an_art", {board_id: this.state.board_id, user_id:this.state.user_id, art_id:art_ids[i]})
             Api.app.service('arts').create(create)
+            .then(()=>{
+                Api.app.service('event_logs').create({event: 'add_an_art', board_id: this.state.board_id, user_id:this.state.user_id, art_id:art_ids[i]})
+            })
         }
         
         // Api.app.service('boards').patch(this.state.board_id, {$set:patch})
@@ -883,9 +888,12 @@ class Board extends Component{
         console.log(arts, texts)
         var unset = {}
         for(var i in arts){
-            Api.app.service('event_logs').create({event:'remove_an_art', board_id: this.state.board_id, user_id:this.state.user_id, art_id:arts[i]})
+            
             // analytics.logEvent("remove_an_art", {board_id: this.state.board_id, user_id:this.state.user_id, art_id:arts[i]})
             Api.app.service('arts').remove(arts[i])
+            .then(()=>{
+                Api.app.service('event_logs').create({event:'remove_an_art', board_id: this.state.board_id, user_id:this.state.user_id, art_id:arts[i]})
+            })
         }
         for(var i in texts){
             unset['texts.'+texts[i]]=1

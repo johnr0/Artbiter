@@ -223,7 +223,7 @@ class SketchPadAI extends SketchPad{
 
     render(){
         return (<div className='col s6 oneboard'>
-        <h2>SketchPad</h2>
+        <h2>Sketch Pad</h2>
         <div id='sketchpad' className='sketchpad select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
             onPointerOut={this.moveBoardEnd.bind(this)}
             onPointerMove={this.sketchPadMouseMove.bind(this)}> 

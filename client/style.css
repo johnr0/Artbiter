@@ -245,7 +245,7 @@ input[type=range][orient=vertical]
 
 .sketchpad_style_controller{
     position: absolute;
-    width: 220px; 
+    width: 260px; 
     height: 46px;
     
     left: 60px;
@@ -277,12 +277,12 @@ input[type=range][orient=vertical]
 .login{
     text-align: center;
     width: 300px;
-    height: 400px;
+    height: 330px;
     border: solid 4px #333333;
     display: block;
     margin: auto;
     position: relative;
-    top: calc(50% - 200px);
+    top: calc(50% - 165px);
     padding: 20px;
     
 }

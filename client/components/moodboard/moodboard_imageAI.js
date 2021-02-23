@@ -242,47 +242,47 @@ class MoodboardImageAI extends MoodboardImage{
         
 
 
-        // I selected
-        for(var k in groups){
-            if(groups[k].art_ids.indexOf(this.props.art_key)!=-1){
-                included_groups.push(k)
-                var filtered=current_image.filter(value => groups[k].art_ids.includes(value))
-                if(filtered.length == current_image.length && filtered.length==groups[k].art_ids.length){
-                    renderUser = true
-                    userGroup = k
-                }  
-            }
-        }
+        // // I selected
+        // for(var k in groups){
+        //     if(groups[k].art_ids.indexOf(this.props.art_key)!=-1){
+        //         included_groups.push(k)
+        //         var filtered=current_image.filter(value => groups[k].art_ids.includes(value))
+        //         if(filtered.length == current_image.length && filtered.length==groups[k].art_ids.length){
+        //             renderUser = true
+        //             userGroup = k
+        //         }  
+        //     }
+        // }
 
-        // others selected
-        if(renderUser==false){
-            for(var idx in included_groups){
-                var group = groups[included_groups[idx]]
-                var choosen_bys=[]
-                for(var jdx in group.art_ids){
-                    var art_id = group.art_ids[jdx]
-                    if(this.props.mother_state.arts[art_id]!=undefined){
-                        choosen_bys.push(this.props.mother_state.arts[art_id].choosen_by)
-                    }
-                }
-                choosen_bys.sort()
-                if(choosen_bys[0]==choosen_bys[choosen_bys.length-1]){
-                    var passed = true
-                    for(var k in this.props.mother_state.arts){
-                        if(group.art_ids.indexOf(k)==-1){
-                            if(this.props.mother_state.arts[k].choosen_by==choosen_bys[0]){
-                                passed=false
-                            }
-                        }
-                    }
-                    if(passed){
-                        renderUser=true
-                        userGroup=included_groups[idx]
-                    }
-                }
+        // // others selected
+        // if(renderUser==false){
+        //     for(var idx in included_groups){
+        //         var group = groups[included_groups[idx]]
+        //         var choosen_bys=[]
+        //         for(var jdx in group.art_ids){
+        //             var art_id = group.art_ids[jdx]
+        //             if(this.props.mother_state.arts[art_id]!=undefined){
+        //                 choosen_bys.push(this.props.mother_state.arts[art_id].choosen_by)
+        //             }
+        //         }
+        //         choosen_bys.sort()
+        //         if(choosen_bys[0]==choosen_bys[choosen_bys.length-1]){
+        //             var passed = true
+        //             for(var k in this.props.mother_state.arts){
+        //                 if(group.art_ids.indexOf(k)==-1){
+        //                     if(this.props.mother_state.arts[k].choosen_by==choosen_bys[0]){
+        //                         passed=false
+        //                     }
+        //                 }
+        //             }
+        //             if(passed){
+        //                 renderUser=true
+        //                 userGroup=included_groups[idx]
+        //             }
+        //         }
 
-            }
-        }
+        //     }
+        // }
 
         //////////////
         for(var idx in groups){
@@ -325,7 +325,7 @@ class MoodboardImageAI extends MoodboardImage{
             }
             {color!='' && <g>
             <rect onPointerDown={this.object_moving_init.bind(this)} onPointerUp={this.choose_image.bind(this, false)} onPointerEnter={this.labelOn.bind(this)} onPointerOut={this.labelOut.bind(this)} x={x-2} y={y-2} width={width+4} height={height+4} stroke={color} fill='transparent' strokeWidth='2'></rect>
-            {renderUser && this.renderUsers(userGroup,x,y, width)}
+            {/* {renderUser && this.renderUsers(userGroup,x,y, width)} */}
             {this.props.mother_state.current_image.length==1 && this.props.mother_state.current_image[0]==this.props.art_key && this.props.mother_state.current_text.length==0 && this.props.mother_state.control_state=='crop' && 
             this.renderCropBoundary(x, y, width, height)
             }

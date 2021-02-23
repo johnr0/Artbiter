@@ -96,23 +96,39 @@ class MoodBoardSearchPaneAI extends Component{
     }
 
     search(){
-        analytics.logEvent("search", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.search_slider_values})
+        
+        // analytics.logEvent("search", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.search_slider_values})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_images', searching: true}})
+        .then(()=>{
+            Api.app.service('event_logs').create({event: 'search', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.search_slider_values})
+        })
     }
 
     search_similar(){
-        analytics.logEvent("search_similar", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected})
+        
+        // analytics.logEvent("search_similar", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_similar_images', searching: true}})
+        .then(()=>{
+            Api.app.service('event_logs').create({event: 'search_similar', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected})
+        })
     }
 
     search_random(){
-        analytics.logEvent("search_random", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
+        
+        // analytics.logEvent("search_random", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_random_images', searching: true}})
+        .then(()=>{
+            Api.app.service('event_logs').create({event: 'search_random', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
+        })
     }
 
     generate(){
-        analytics.logEvent("transfer_on_moodboard", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.generate_slider_values})
+        
+        // analytics.logEvent("transfer_on_moodboard", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.generate_slider_values})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_generate_image', searching: true}})
+        .then(()=>{
+            Api.app.service('event_logs').create({event: 'transfer_on_moodboard', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.generate_slider_values})
+        })
     }
 
     addSearchedImageToMoodboard(val){

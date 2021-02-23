@@ -1357,7 +1357,7 @@ class SketchPad extends ProtoBoard {
 
     render(){
         return (<div className='col s6 oneboard'>
-        <h2 className='select_disabled'>SketchPad</h2>
+        <h2 className='select_disabled'>Sketch Pad</h2>
         <div id='sketchpad' className='sketchpad select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
             onPointerOut={this.moveBoardEnd.bind(this)}
             onPointerMove={this.sketchPadMouseMove.bind(this)}> 

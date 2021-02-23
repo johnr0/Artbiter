@@ -951,7 +951,7 @@ class MoodBoard extends ProtoBoard{
             boardrender_cursor='default'
         }
         return (<div className='col s6 oneboard'>
-            <h2>Moodboard</h2>
+            <h2>Mood board</h2>
             <div id='moodboard' className='moodboard select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
                 //onPointerOut={this.moveBoardEnd.bind(this)}
                 
