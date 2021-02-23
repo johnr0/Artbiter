@@ -36,7 +36,7 @@ module.exports = function(app) {
         // app.channel(`a`).join(connection);
         app.channel(`userIds/${user._id}`).join(connection);
         if(user.board_id!=undefined){
-          console.log('to boards...', user.board_id)
+          // console.log('to boards...', user.board_id)
           app.channel(`boards/${user.board_id}`).join(connection);
         } 
         
@@ -65,7 +65,7 @@ module.exports = function(app) {
     app.service('boards').publish((data) => {
         // console.log('owner', data.owner)
         var data_to_return = {}
-        console.log(data.updated)
+        // console.log(data.updated)
         if(data.updated.indexOf('sketchpad_update_a_layer')!=-1){
           data_to_return['updated']=data.updated
           data_to_return['layers']=[]
@@ -281,7 +281,7 @@ module.exports = function(app) {
       }else{
         data_to_return = data
       }
-      console.log(data.board_id)
+      // console.log(data.board_id)
 
 
       return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
@@ -321,7 +321,7 @@ module.exports = function(app) {
       }
         
       
-      console.log(data.board_id)
+      // console.log(data.board_id)
 
 
       return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
@@ -369,7 +369,7 @@ module.exports = function(app) {
         delete data_to_return['avg_style']
       }  
       
-      console.log(data.board_id)
+      // console.log(data.board_id)
 
 
       return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
