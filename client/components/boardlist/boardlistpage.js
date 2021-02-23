@@ -297,8 +297,10 @@ class BoardListPage extends Component{
     }
 
     signOut(){
-        Api.app.logout()
-        window.location.href='/'
+        Api.app.logout().then(()=>{
+            window.location.href='/'
+        })
+        
     }
 
     render(){
