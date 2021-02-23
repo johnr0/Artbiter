@@ -37,13 +37,13 @@ function sliderImpact(board_id, context){
 
       // console.log(res)
       for(var i in res1){
-        console.log('_id is', res1[i]._id, res1[i].higher_group)//, res[i]._id)
+        // console.log('_id is', res1[i]._id, res1[i].higher_group)//, res[i]._id)
         if(higher_groups[res1[i].higher_group]==undefined){
           higher_groups[res1[i].higher_group]=[]
         }
         higher_groups[res1[i].higher_group].push(res1[i]._id)
       }
-      console.log(higher_groups)
+      // console.log(higher_groups)
       for(var i in res1){
         if(search_slider_values[res1[i]._id]==undefined){
           if(higher_groups[res1[i].higher_group].length==2 ){
@@ -64,7 +64,7 @@ function sliderImpact(board_id, context){
         }
       }
 
-      console.log(search_slider_values)
+      // console.log(search_slider_values)
       cavs = {}
       for(var i in search_slider_values){
         cavs[i] = res1[ids.indexOf(i)].cav
@@ -72,14 +72,14 @@ function sliderImpact(board_id, context){
 
       context.app.service('arts').find({query: {_id: search_image_selected}})
       .then((res2)=>{
-        console.log(search_image_selected, res2[0]._id)
+        // console.log(search_image_selected, res2[0]._id)
         var embedding = res2[0].embedding
         axios.post(context.app.get('ml_server')+'sliderImpact', {
           search_slider_values: JSON.stringify(search_slider_values),
           cavs: JSON.stringify(cavs),
           cur_image: JSON.stringify(embedding),
         }).then((response)=>{
-          console.log(response.data['distances'])
+          // console.log(response.data['distances'])
           var distances = JSON.parse(response.data['distances'])
           context.app.service('boards').patch(board_id, {$set: {search_slider_distances:distances, search_slider_values: search_slider_values, generate_slider_values: generate_slider_values, updated:'moodboard_search_slider_distances'}})
         }, (error)=>{
@@ -115,7 +115,7 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
     .then((res)=>{
       to_remove=[]
       for(var i in res){
-        console.log('overlap is', res[i].groups.filter(value => Object.keys(cavs).includes(value)))
+        // console.log('overlap is', res[i].groups.filter(value => Object.keys(cavs).includes(value)))
         if(res[i].groups.filter(value => Object.keys(cavs).includes(value)).length>0){
           to_remove.push(context.app.service('group_models').remove(res[i]._id))
         }
@@ -124,7 +124,7 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
       .then((res2)=>{
         Promise.all(to_remove).then(data=>{
           var _id = res2[0].higher_group
-          console.log('id of high', _id)
+          // console.log('id of high', _id)
           context.app.service('group_models').find({query:{_id:_id}})
           .then((res_fin)=>{
             if(res_fin.length==0){
@@ -210,7 +210,7 @@ function averageStyles(styles, context){
       context.app.service('group_styles').find({query: {group_id: i}})
       .then((res)=>{
         if(res.length>0){
-          console.log('printed are', i, res[0]._id, res[0].group_id)
+          // console.log('printed are', i, res[0]._id, res[0].group_id)
           if(res[0].group_id==i){
             context.app.service('group_styles').patch(res[0]._id, {$set: {style: avg_styles[i]}})
           }
@@ -228,14 +228,14 @@ const createTrainCAV = async context => {
   // console.log(context.result)
   context.app.service('arts').find({query: {_id: {$in:context.arguments[0].art_ids}}})
   .then((res)=>{
-    console.log('length is ', res.length,',', context.result._id)
+    // console.log('length is ', res.length,',', context.result._id)
     var embeddings = {}
     // var styles = {}
 
     embeddings[context.result._id] = []
     // styles[context.result._id] = []
     for(var i in res){
-      console.log(res[i]._id)
+      // console.log(res[i]._id)
       if(res[i].embedding!=undefined){
         embeddings[context.result._id].push(res[i].embedding)
       }
@@ -297,7 +297,7 @@ const RelateCAV = async context => {
             embeddings[group._id].push(art_embeddings[art_id])
           }
         }
-        console.log(embeddings, 'embeddings')
+        // console.log(embeddings, 'embeddings')
         trainCAV(embeddings, context)
       })
 
@@ -330,10 +330,10 @@ const UnrelateCAV = async context => {
   if(context.arguments[1]['$set'].updated=='groups_relate_u'){
       context.app.service('groups').find({query:{_id: context.arguments[0]}})
       .then((res)=>{
-        console.log(res[0].higher_group)
+        // console.log(res[0].higher_group)
         context.app.service('groups').find({query: {higher_group: res[0].higher_group}})
         .then((res2)=>{
-          console.log(res2.length)
+          // console.log(res2.length)
           var art_ids = []
           
           for(var i in res2){
@@ -405,7 +405,7 @@ const AddRemoveArtCAV = async context => {
         for(var j in res2){
           art_embeddings[res2[j]._id] = res2[j].embedding
         }
-        console.log('arts',Object.keys(art_embeddings))
+        // console.log('arts',Object.keys(art_embeddings))
         for(var i in res){
           var group = res[i]
           embeddings[group._id] = []
@@ -442,10 +442,10 @@ const RemoveGroupCAV = async context => {
   console.log('remove group')
   context.app.service('groups').find({query:{_id: context.arguments[0]}})
   .then((res)=>{
-    console.log(res[0].higher_group)
+    // console.log(res[0].higher_group)
     context.app.service('groups').find({query: {higher_group: res[0].higher_group}})
     .then((res2)=>{
-      console.log(res2.length)
+      // console.log(res2.length)
       var art_ids = []
 
       if(res2.length==1){
@@ -471,7 +471,7 @@ const RemoveGroupCAV = async context => {
         for(var k in res_arts){
           if(res_arts[k].labels!=undefined){
             var labels = JSON.parse(JSON.stringify(res_arts[k].labels))
-            console.log(labels, context.arguments[0])
+            // console.log(labels, context.arguments[0])
             if(labels[context.arguments[0]]!=undefined){
               var unset = {}
               var set = {}
@@ -497,16 +497,16 @@ const RemoveGroupCAV = async context => {
         for(var i in res2){
           var embeddings = {}
           var group = res2[i]
-          console.log(group._id, context.arguments[0])
+          // console.log(group._id, context.arguments[0])
           if(group._id!=context.arguments[0]){
-            console.log('proce...')
+            // console.log('proce...')
             embeddings[group._id] = []
             for(var j in group.art_ids){
               var art_id = group.art_ids[j]
               // console.log(art_id, 'fourth')
               embeddings[group._id].push(art_embeddings[art_id])
             }
-            console.log('resres000', res[0].board_id)
+            // console.log('resres000', res[0].board_id)
             trainCAV(embeddings, context, res[0].board_id)
           }
           
@@ -548,8 +548,8 @@ const groupStyleRemove = async context =>{
 
 const revealDisagreement = async context => {
   if(context.result.updated == 'groups_reveal_disagreement'){
-    console.log(context.result.user_info)
-    console.log(context.result)
+    // console.log(context.result.user_info)
+    // console.log(context.result)
     var users = {}
     // context.app.service('arts').find({query: {_}})
     context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
@@ -591,15 +591,15 @@ const revealDisagreement = async context => {
           }
         }
 
-        console.log('users', users)
+        // console.log('users', users)
         axios.post(context.app.get('ml_server')+'revealDisagreement', {
           users: JSON.stringify(users),
           group_id: context.result._id,
           group_arts: JSON.stringify(group_art_cavs),
         }).then((response)=>{
-          console.log('error-1?')
+          // console.log('error-1?')
           var returned_images = JSON.parse(response.data['returned_images'])
-          console.log('error0?')
+          // console.log('error0?')
           context.app.service('disagreed_arts').find({query: {board_id: context.result.board_id}})
           .then((res0)=>{
             for(var i in res0){
@@ -615,16 +615,16 @@ const revealDisagreement = async context => {
               context.app.service('disagreed_arts').create(disagreed_art)
             }
           })
-          console.log('error1?')
+          // console.log('error1?')
           context.app.service('boards').patch(context.result.board_id, {$set: {
             agreementPane: true, 
             updated: 'moodboard_disagreement_search'
           }})
-          console.log('error2?')
+          // console.log('error2?')
 
 
         }, (error)=>{
-          console.log('error')
+          // console.log('error')
         })
       })
     })

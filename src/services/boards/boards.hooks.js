@@ -27,13 +27,13 @@ function sliderImpact(board_id, context){
 
       // console.log(res)
       for(var i in res1){
-        console.log('_id is', res1[i]._id, res1[i].higher_group)//, res[i]._id)
+        // console.log('_id is', res1[i]._id, res1[i].higher_group)//, res[i]._id)
         if(higher_groups[res1[i].higher_group]==undefined){
           higher_groups[res1[i].higher_group]=[]
         }
         higher_groups[res1[i].higher_group].push(res1[i]._id)
       }
-      console.log(higher_groups)
+      // console.log(higher_groups)
       for(var i in res1){
         if(search_slider_values[res1[i]._id]==undefined){
           if(higher_groups[res1[i].higher_group].length==2 ){
@@ -62,16 +62,16 @@ function sliderImpact(board_id, context){
 
       context.app.service('arts').find({query: {_id: search_image_selected}})
       .then((res2)=>{
-        console.log(search_image_selected, res2[0]._id)
+        // console.log(search_image_selected, res2[0]._id)
         var embedding = res2[0].embedding
         axios.post(context.app.get('ml_server')+'sliderImpact', {
           search_slider_values: JSON.stringify(search_slider_values),
           cavs: JSON.stringify(cavs),
           cur_image: JSON.stringify(embedding),
         }).then((response)=>{
-          console.log(response.data['distances'])
+          // console.log(response.data['distances'])
           var distances = JSON.parse(response.data['distances'])
-          console.log(distances, 'dicstance')
+          // console.log(distances, 'dicstance')
           context.app.service('boards').patch(board_id, {$set: {search_slider_distances:distances, search_slider_values: search_slider_values, updated:'moodboard_search_slider_distances'}})
         }, (error)=>{
           console.log('error')
@@ -93,7 +93,7 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
     search_slider_values: JSON.stringify(search_slider_values)
   }).then((response)=>{
     var returned_images = JSON.parse(response.data['returned_images'])
-    console.log('returned images:', returned_images.length)
+    // console.log('returned images:', returned_images.length)
 
     // TODO show returned images... 
     context.app.service('searched_arts').find({query: {board_id: context.result._id}})
@@ -132,7 +132,7 @@ function generateImage(content, content_weight, styles, style_weights, context){
   }).then((response)=>{
     console.log('response')
     var returned_images = JSON.parse(response.data['returned_images'])
-    console.log('returned images:', returned_images.length)
+    // console.log('returned images:', returned_images.length)
 
     // TODO show returned images... 
     context.app.service('searched_arts').find({query: {board_id: context.result._id}})
@@ -161,11 +161,11 @@ function generateImageWithScaling(content, styles, context){
     styles: JSON.stringify(styles)
   }).then((response)=>{
     var returned_image = response.data['returned_image']
-    console.log('got response')
+    // console.log('got response')
     // add layer
     // console.log(returned_image)
     var layer_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-    console.log(content['current_layer'])
+    // console.log(content['current_layer'])
     var layer = {
       _id: layer_id, 
       board_id: context.arguments[0],
@@ -248,7 +248,7 @@ const boardGenerateImage = async context =>{
     if(search_start_image==undefined){
       return
     }
-    console.log('hm?')
+    // console.log('hm?')
     var generate_slider_values = JSON.parse(JSON.stringify(context.result.generate_slider_values))
   
     context.app.service('groups').find({query:{board_id: context.result._id}})
@@ -280,7 +280,7 @@ const boardGenerateImage = async context =>{
       for(var gk in generate_slider_values){
         weight_sum = weight_sum + generate_slider_values[gk]
       }
-      console.log(weight_sum, 'weight sum is...', generate_slider_values)
+      // console.log(weight_sum, 'weight sum is...', generate_slider_values)
       if(weight_sum==0){
         return
       }
@@ -291,7 +291,7 @@ const boardGenerateImage = async context =>{
         delete generate_slider_values['selected_image']
       }
       art_weight = art_weight/weight_sum
-      console.log(art_weight)
+      // console.log(art_weight)
       // var art_weight = 0
       for(var gk in generate_slider_values){
         // search_slider_values[gk]= search_slider_values[gk]/weight_sum
@@ -299,8 +299,8 @@ const boardGenerateImage = async context =>{
         group_ids.push(gk)
       }
 
-      console.log(generate_slider_values)
-      console.log(group_ids)
+      // console.log(generate_slider_values)
+      // console.log(group_ids)
       context.app.service('group_styles').find({query: {group_id: {$in: group_ids}}})
       .then((group_styles)=>{
         console.log('pass?')
@@ -341,7 +341,7 @@ const boardSearchRandomImage = async context =>{
     axios.post(context.app.get('ml_server')+'randomSearchImage', {})
     .then((response)=>{
       var returned_images = JSON.parse(response.data['returned_images'])
-      console.log('returned images:', returned_images.length)
+      // console.log('returned images:', returned_images.length)
 
       // TODO show returned images... 
       context.app.service('searched_arts').find({query: {board_id: context.result._id}})
@@ -387,10 +387,10 @@ const sketchpadStyleApply = async context => {
       var styles = context.arguments[1]['$set'].styles
       delete context.arguments[1]['$set'].styles
 
-      console.log(context.arguments[1])
+      // console.log(context.arguments[1])
       // do something fun
 
-      console.log(styles)
+      // console.log(styles)
 
       generateImageWithScaling(content, styles, context)
 
