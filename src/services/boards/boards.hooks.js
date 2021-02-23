@@ -156,12 +156,13 @@ function generateImage(content, content_weight, styles, style_weights, context){
 }
 
 function generateImageWithScaling(content, styles, context){
+  console.log('start and error?')
   axios.post(context.app.get('ml_server')+'generateImageWithScaling', {
     content: JSON.stringify(content),
     styles: JSON.stringify(styles)
   }).then((response)=>{
     var returned_image = response.data['returned_image']
-    // console.log('got response')
+    console.log('got response')
     // add layer
     // console.log(returned_image)
     var layer_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
