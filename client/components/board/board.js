@@ -63,6 +63,7 @@ class Board extends Component{
             
             console.log('timeout before...', Api.app.service('boards').timeout)
             Api.app.service('boards').timeout = 30000
+            Api.app.service('arts').timeout=30000
             Api.app.service('boards').find({query: {_id: board_id}})
             .then((res)=>{
                 

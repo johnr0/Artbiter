@@ -102,6 +102,7 @@ class BoardAI extends Board{
             // analytics.logEvent("enter_board", {board_id, user_email, user_id})
             console.log('timeout before...', Api.app.service('boards').timeout)
             Api.app.service('boards').timeout = 30000
+            Api.app.service('arts').timeout = 30000
             console.log('timeout after...', Api.app.service('boards').timeout)
             Api.app.service('boards').find({query: {_id: board_id}})
             .then((res)=>{
