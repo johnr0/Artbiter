@@ -82,8 +82,8 @@ class SketchPad extends ProtoBoard {
         var _this = this
         document.addEventListener('keydown', function(e){
             e = e||window.event;
-            if(e.key=="Control"){
-                if(_this.state.action=='idle'){
+            if(e.key=="z"){
+                if(_this.state.action=='idle'&&_this.state.control_state!='move'){
                     _this.setState({prev_shift_key: _this.state.control_state, control_state: 'move'})
                 }
                 
@@ -92,7 +92,7 @@ class SketchPad extends ProtoBoard {
 
         document.addEventListener('keyup', function(e){
             e = e||window.event;
-            if(e.key=="Control"){
+            if(e.key=="z"){
                 _this.setState({control_state: _this.state.prev_shift_key, action: 'idle'})
                 
                 
@@ -257,12 +257,15 @@ class SketchPad extends ProtoBoard {
     }
 
     sketchPadMouseMoveOut(e){
-        console.log('out to where?')
+        console.log('out to where?', this.state.action)
         if(this.state.control_state=='move-layer' && this.state.action=='move-layer'){
             console.log('out to here')
             this.moveLayerEnd(e)
         }else{
-            this.moveBoardEnd(e)
+            if(this.state.action!='idle'){
+                this.moveBoardEnd(e)
+            }
+            
         }
     }
 

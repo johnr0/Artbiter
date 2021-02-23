@@ -44,6 +44,8 @@ class MoodBoard extends ProtoBoard{
 
         crop: undefined, 
 
+        messageCount: 0,
+
     }
 
     // TODO: Getting images from clip board...
@@ -928,7 +930,31 @@ class MoodBoard extends ProtoBoard{
         </g>)
     }
 
+    toastMessage(){
+        // console.log(M)
+        var _this = this
+        var messages = [
+            'If you are an artist, and creating mood board with your own arts, please keep in mind followings! (keep clicking the button)',
+            'First, you need to create concepts that can define "your own artworks" compared to others!',
+            'Second, you would want to identify concepts that can split your own artworks into different types! (click the button again to close)'
+        ]
+        if(this.state.messageCount==messages.length){
+            M.Toast.dismissAll()
+        }else if(this.state.messageCount-1==messages.length){
+            M.toast({html: messages[this.state.messageCount], displayLength: 20000, completeCallback: function(){
+                _this.setState({messageCount:0})
+            }})
+        }else{
+            M.toast({html: messages[this.state.messageCount], displayLength: 20000})
+        }
+        
+        var messageCount = (this.state.messageCount+1) % (messages.length+1)
+        this.setState({messageCount})
+    }
 
+    renderInitMoodboardMessage(){
+       return (<span style={{fontSize:'30px', verticalAlign:'top'}}><i onClick={this.toastMessage.bind(this)} class='fas fa-info-circle'></i></span>) 
+    }
     
 
     // TODO add image through url
@@ -951,7 +977,7 @@ class MoodBoard extends ProtoBoard{
             boardrender_cursor='default'
         }
         return (<div className='col s6 oneboard'>
-            <h2>Mood board</h2>
+            <h2>Mood board {this.renderInitMoodboardMessage()}</h2>
             <div id='moodboard' className='moodboard select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
                 //onPointerOut={this.moveBoardEnd.bind(this)}
                 
