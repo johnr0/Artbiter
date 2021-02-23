@@ -17,10 +17,12 @@ class MoodboardImage extends Component{
             if(arts[this.props.art_key].color!=undefined){
                 this.props.mother_this.setState({color: arts[this.props.art_key].color})
             }
-
+            var board_state = this.props.mother_this.props.board_this.state
+            console.log(board_state.user_id)
+            arts[this.props.art_key].choosen_by = board_state.user_id
             Promise.all([
                 this.props.mother_this.props.board_this.ChooseArtsTexts([this.props.art_key],[],this.props.mother_state.current_image.slice(0),this.props.mother_state.current_text.slice(0)),
-                this.props.mother_this.setState({current_image:[this.props.art_key], current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
+                this.props.mother_this.setState({arts:arts, current_image:[this.props.art_key], current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
                     if(obj_moving){
                         _this.props.mother_this.object_moving_init(e)
                     }
@@ -74,10 +76,14 @@ class MoodboardImage extends Component{
                 }
             }
             var ratio = (pos[2]-pos[0])/(pos[3]-pos[1])
+
+            var board_state = this.props.mother_this.props.board_this.state
+            console.log(board_state.user_id)
+            arts[this.props.art_key].choosen_by = board_state.user_id
             
             Promise.all([
                 this.props.mother_this.props.board_this.ChooseArtsTexts([this.props.art_key],[], [],[]),
-                this.props.mother_this.setState({current_image:current_image, current_selected_pos: pos, current_selected_ratio: ratio}, function(){
+                this.props.mother_this.setState({arts: arts, current_image:current_image, current_selected_pos: pos, current_selected_ratio: ratio}, function(){
                     if(obj_moving){
                         _this.props.mother_this.object_moving_init(e)
                     }
@@ -178,9 +184,12 @@ class MoodboardImage extends Component{
                 console.log(this.props.mother_state.current_image.indexOf(this.props.art._id))
                 if(this.props.mother_state.control_state=='control_object'){
                     if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
-                        this.select_new_image(true, ecopied)
+                        // this.select_new_image(true, ecopied)
                         if(this.props.art.choosen_by==this.props.mother_this.props.board_this.state.user_id){
+                            console.log('ddd')
                             this.deselect_image(ecopied)
+                        }else{
+                            this.select_new_image(true, ecopied)
                         }
                     }else if(this.props.mother_state.current_image.indexOf(this.props.art._id)!=-1){
                         console.log('deselect')
