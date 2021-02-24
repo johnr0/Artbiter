@@ -130,7 +130,7 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
         context.app.service('group_models').remove(null, {query: {_id: {$in: to_remove_ids}}})
         .then(()=>{
           console.log('group model find', _id)
-          context.app.service('group_models').find({query:{_id:{$in: [_id]}}})
+          context.app.service('group_models').find({query:{_id:_id}})
           .then((res_fin)=>{
             console.log('group model create')
             if(res_fin.length==0){
