@@ -6,19 +6,21 @@ const { response } = require('@feathersjs/express');
 function sliderImpact(board_id, context){
   context.app.service('boards').find({query: {_id: board_id}})
   .then((res0)=>{
-
+    // console.log('b', res0.length)
     var generate_slider_values = res0[0].generate_slider_values
     if(generate_slider_values==undefined){
       generate_slider_values = {}
     }
-
+    // console.log('b')
     var search_slider_values = res0[0].search_slider_values
     if(search_slider_values==undefined){
       search_slider_values = {}
     }
     var search_image_selected = res0[0].search_image_selected
+    
     context.app.service('groups').find({query: {board_id:board_id}})
     .then((res1)=>{
+      
       var higher_groups = {}
       var ids = []
       for(var i in res1){
@@ -163,7 +165,8 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
     })
 
     Promise.all(promises).then(data=>{
-      console.log('all')
+      console.log('all', board_id)
+
       sliderImpact(board_id, context)
     }).catch(function(err){
       console.log('err')
@@ -318,7 +321,7 @@ const RelateCAV = async context => {
           }
         }
         // console.log(embeddings, 'embeddings')
-        trainCAV(embeddings, context)
+        trainCAV(embeddings, context, res[0].board_id)
       })
 
       // context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
