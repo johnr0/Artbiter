@@ -74,12 +74,12 @@ module.exports = function(app) {
               data_to_return['layers'].push(data.layers[i])
             }
           }
-          data_to_return['sketchundo'] = data.sketchundo[data.sketchundo.length-1]
+          // data_to_return['sketchundo'] = data.sketchundo[data.sketchundo.length-1]
            
         }else if(data.updated.indexOf('sketchpad_remove_a_layer')!=-1 || data.updated.indexOf('sketchpad_add_a_layer')!=-1 || data.updated.indexOf('sketchpad_reorder_layers')!=-1){
           data_to_return['updated']=data.updated
           data_to_return['layers']=data.layers
-          data_to_return['sketchundo'] = data.sketchundo[data.sketchundo.length-1]
+          // data_to_return['sketchundo'] = data.sketchundo[data.sketchundo.length-1]
           
         }else if(data.updated.indexOf('sketchpad_layers_choosen')!=-1){
           data_to_return['layers'] = []

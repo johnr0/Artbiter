@@ -5,7 +5,7 @@ module.exports = function (app) {
   console.log('connection', connection)
   const database = connection.substr(connection.lastIndexOf('/') + 1);
   console.log('database', database)
-  const mongoClient = MongoClient.connect(connection, {})
+  const mongoClient = MongoClient.connect(connection, {poolSize:100})
     .then(client => client.db(database));
 
   app.set('mongoClient', mongoClient);

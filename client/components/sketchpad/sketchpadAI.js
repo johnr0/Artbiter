@@ -241,7 +241,7 @@ class SketchPadAI extends SketchPad{
                 
                 {this.renderCanvas()}
                 <svg id='sketch_pad_svg' width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength} style={{position: 'absolute', top: '0', left: '0'}}>
-                    {/* {this.renderAdjuster()} */}
+
                     {(this.state.control_state!='content-stamp' && this.state.control_state!='style-stamp') && this.renderLasso()}
                 </svg>
                 <canvas id='temp_canvas' width={1000} height={1000} style={{width: '100%', position:'absolute', top:'0', left: '0'}}></canvas>
@@ -254,7 +254,7 @@ class SketchPadAI extends SketchPad{
             </div>
             <SketchpadMainControllerAI mother_state={this.state} mother_this={this}></SketchpadMainControllerAI>
             <SketchpadLayerController mother_state={this.state} mother_this={this}></SketchpadLayerController>
-            <SketchpadUndo mother_state={this.state} mother_this={this}></SketchpadUndo>
+            {/* <SketchpadUndo mother_state={this.state} mother_this={this}></SketchpadUndo> */}
             <SketchpadStyleStampControllerAI2 ref={c=>this.stylestampcontroller=c} mother_state={this.state} mother_this={this}></SketchpadStyleStampControllerAI2>
             
         </div>

@@ -129,6 +129,9 @@ class SketchPad extends ProtoBoard {
         if(this.state.control_state=='style-stamp' && (this.state.action=='size'||this.state.action=='blur')){
             return
         }
+        if(this.state.control_state=='move-layer' && this.state.action=='move-layer'){
+            return
+        }
         if(this.state.control_state=='move-layer' && this.state.action=='rotate-layer'){
             return
         }
@@ -158,6 +161,7 @@ class SketchPad extends ProtoBoard {
         }else if(this.state.control_state=='move-layer' && this.state.action=='idle'){
             console.log('consome')
             if(this.isOutSideMovableArea(e)){
+                console.log('masita')
                 this.moveBoardInit(e)
             }
             
@@ -212,7 +216,7 @@ class SketchPad extends ProtoBoard {
         // console.log(this.state.action)
         // var pos = this.getCurrentMouseOnBoard(e)
         // this.props.board_this.setSketchpadPosition(pos[0], pos[1]);
-
+        // console.log('sdkfjo', this.state.action)
         if((this.state.control_state=='move'||this.state.control_state=='move-layer') && this.state.action=='move_board'){
             this.moveMouse(e)
         }else if(this.state.control_state=='brush' && this.state.action=='brush'){
@@ -237,6 +241,7 @@ class SketchPad extends ProtoBoard {
 
 
     sketchPadMouseMoveEnd(e){
+        console.log('eeeeeennnnnnndddd')
         if((this.state.control_state=='move'||this.state.control_state=='move-layer') && this.state.action=='move_board'){
             this.moveBoardEnd(e)
         }else if (this.state.control_state=='brush'&&this.state.action=='brush'){
@@ -259,10 +264,14 @@ class SketchPad extends ProtoBoard {
     sketchPadMouseMoveOut(e){
         console.log('out to where?', this.state.action)
         if(this.state.control_state=='move-layer' && this.state.action=='move-layer'){
-            console.log('out to here')
-            this.moveLayerEnd(e)
+            console.log('out to here', e.relatedTarget)
+            if(e.relatedTarget.id=='sketchpad'){
+                this.moveLayerEnd(e)
+            }
+            
         }else{
             if(this.state.action!='idle'){
+                console.log('here?')
                 this.moveBoardEnd(e)
             }
             
@@ -475,6 +484,7 @@ class SketchPad extends ProtoBoard {
     }
 
     moveLayerInit(e){
+        e.stopPropagation()
         if(this.state.current_layer==-1){
             return
         }
@@ -498,6 +508,7 @@ class SketchPad extends ProtoBoard {
     }
 
     moveLayerMove(e){  
+        console.log('moving..')
         var adjust_pre_canvas = this.state.adjust_pre_canvas
         var adjust_pre_ctx = adjust_pre_canvas.getContext('2d')
         adjust_pre_ctx.clearRect(0,0,1000,1000)
@@ -1156,10 +1167,10 @@ class SketchPad extends ProtoBoard {
                      onPointerDown={this.moveLayerInit.bind(this)}>
                     </rect>
 
-                    <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
+                    {/* <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={(ymax-ymin)/1000*this.state.boardlength*this.state.boardzoom}
                      style={{fill:'transparent', stroke:'#333333', strokeDasharray:"5,5", cursor: 'move'}}
                      onPointerDown={this.moveLayerInit.bind(this)}>
-                    </rect>
+                    </rect> */}
                     <rect x={xmin/1000*this.state.boardlength*this.state.boardzoom} y={ymin/1000*this.state.boardlength*this.state.boardzoom} width={(xmax-xmin)/1000*this.state.boardlength*this.state.boardzoom} height={10}
                     style={{fill:'transparent', cursor:'n-resize'}} onPointerDown={this.resizeLayerInit.bind(this, 'n')}
                     ></rect> 
@@ -1365,7 +1376,7 @@ class SketchPad extends ProtoBoard {
             onPointerOut={this.moveBoardEnd.bind(this)}
             onPointerMove={this.sketchPadMouseMove.bind(this)}> 
             <div className={'boardrender'} onPointerDown={this.sketchPadMouseMoveInit.bind(this)} onPointerUp={this.sketchPadMouseMoveEnd.bind(this)} 
-                onPointerOut={this.sketchPadMouseMoveOut.bind(this)}
+                // onPointerOut={this.sketchPadMouseMoveOut.bind(this)}
                 // onPointerOut={this.props.board_this.setSketchpadPosition.bind(this.props.board_this, -1, -1)}
 
             
@@ -1378,7 +1389,7 @@ class SketchPad extends ProtoBoard {
                 
                 {this.renderCanvas()}
                 <svg id='sketch_pad_svg' width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength} style={{position: 'absolute', top: '0', left: '0'}}>
-                    {/* {this.renderAdjuster()} */}
+             
                     {(this.state.control_state!='content-stamp' && this.state.control_state!='style-stamp') && this.renderLasso()}
                 </svg>
                 <canvas id='temp_canvas' width={1000} height={1000} style={{width: '100%', position:'absolute', top:'0', left: '0'}}></canvas>
@@ -1390,7 +1401,7 @@ class SketchPad extends ProtoBoard {
             </div>
             <SketchpadMainController mother_state={this.state} mother_this={this}></SketchpadMainController>
             <SketchpadLayerController mother_state={this.state} mother_this={this}></SketchpadLayerController>
-            <SketchpadUndo mother_state={this.state} mother_this={this}></SketchpadUndo>
+            {/* <SketchpadUndo mother_state={this.state} mother_this={this}></SketchpadUndo> */}
         </div>
     </div>)
     }

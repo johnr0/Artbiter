@@ -64,7 +64,9 @@ class Board extends Component{
             console.log('timeout before...', Api.app.service('boards').timeout)
             Api.app.service('boards').timeout = 30000
             Api.app.service('arts').timeout=30000
-            Api.app.service('boards').find({query: {_id: board_id}})
+            Api.app.service('boards').find({query: {_id: board_id,
+                $select: ['name', 'owner', 'texts', 'collaborators', 'current_collaborators', 'layers']
+            }})
             .then((res)=>{
                 
                 if(res.length==0){
@@ -86,7 +88,8 @@ class Board extends Component{
                     // propage board contents to sketchpad and moodboard
                     var layers = res[0]['layers']
                     
-                    _this.sketchpad.setState({layers: layers, sketchundo: sketchundo}, function(){
+                    // _this.sketchpad.setState({layers: layers, sketchundo: sketchundo}, function(){
+                    _this.sketchpad.setState({layers: layers}, function(){
                         for(var layer_idx in layers){
                             var layer_id = layers[layer_idx]
                             console.log(layer_id)
@@ -118,7 +121,7 @@ class Board extends Component{
 
                     // var arts = res[0]['arts']
                     var texts = res[0]['texts']
-                    var sketchundo = res[0]['sketchundo']
+                    // var sketchundo = res[0]['sketchundo']
                     var moodboardundo = res[0]['moodboardundo']
                     var current_collaborators = res[0]['current_collaborators']
 
@@ -145,11 +148,11 @@ class Board extends Component{
                     set['current_collaborators.'+user_id] = current_collaborators[user_id]
                     set['updated']='current_collaborators.'+user_id
                     console.log(set)
-                    console.log(layers, arts, texts, sketchundo)
+                    // console.log(layers, arts, texts, sketchundo)
                     Api.app.service('boards').update(board_id, {$set: set})
                     .then((res)=>{
                         _this.setState({current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email, board_owner: owner}, function(){
-                            _this.sketchpad.setState({sketchundo: sketchundo})
+                            // _this.sketchpad.setState({sketchundo: sketchundo})
                                 // , function(){
                             //     var promises = []
                             //     for(var i in layers){
@@ -318,93 +321,93 @@ class Board extends Component{
             console.log(data, updated)
             if(updated.indexOf('sketchpad_update_a_layer')!=-1 || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
                 var layers = _this.sketchpad.state.layers
-                var sketchundo = _this.sketchpad.state.sketchundo
-                console.log(sketchundo)
+                // var sketchundo = _this.sketchpad.state.sketchundo
+                // console.log(sketchundo)
                 if(updated.indexOf('undo')==-1){
-                    sketchundo.shift();
-                    sketchundo.push(data.sketchundo)
+                    // sketchundo.shift();
+                    // sketchundo.push(data.sketchundo)
                     
                 }else{
-                    var undo_id = updated.split('.')[1] 
-                    var undo_idx =undefined
-                    var undo_obj
-                    for(var i in sketchundo){
-                        if(sketchundo[i]!=undefined){
-                            if(sketchundo[i].undo_id==undo_id){
-                                undo_obj = sketchundo.splice(i, 1)
-                                console.log('splicaE1')
-                                break
-                            }
-                        }
-                    }
-                    undo_obj = undo_obj[0]
-                    if (undo_obj!=undefined){
-                        console.log('here?', undo_obj, this.state.user_id)
-                        if(undo_obj.user_id==this.state.user_id){
-                            if(undo_obj.cond=='lasso'){
-                                console.log('this??', _this.sketchpad.state.lasso[0])
-                                _this.sketchpad.setState({lasso:undo_obj.selection, control_state:'area'}, function(){
-                                    console.log(_this.sketchpad.state.lasso[0])
-                                    Promise.all([
-                                        _this.sketchpad.lassoEnd(),
-                                        _this.sketchpad.setState({}, function(){
-                                            _this.sketchpad.initializeMoveLayer()
-                                        }),
-                                        _this.sketchpad.setState({control_state: 'move-layer'})
-                                    ])
-                                })
+                    // var undo_id = updated.split('.')[1] 
+                    // var undo_idx =undefined
+                    // var undo_obj
+                    // for(var i in sketchundo){
+                    //     if(sketchundo[i]!=undefined){
+                    //         if(sketchundo[i].undo_id==undo_id){
+                    //             undo_obj = sketchundo.splice(i, 1)
+                    //             console.log('splicaE1')
+                    //             break
+                    //         }
+                    //     }
+                    // }
+                    // undo_obj = undo_obj[0]
+                    // if (undo_obj!=undefined){
+                    //     console.log('here?', undo_obj, this.state.user_id)
+                    //     if(undo_obj.user_id==this.state.user_id){
+                    //         if(undo_obj.cond=='lasso'){
+                    //             console.log('this??', _this.sketchpad.state.lasso[0])
+                    //             _this.sketchpad.setState({lasso:undo_obj.selection, control_state:'area'}, function(){
+                    //                 console.log(_this.sketchpad.state.lasso[0])
+                    //                 Promise.all([
+                    //                     _this.sketchpad.lassoEnd(),
+                    //                     _this.sketchpad.setState({}, function(){
+                    //                         _this.sketchpad.initializeMoveLayer()
+                    //                     }),
+                    //                     _this.sketchpad.setState({control_state: 'move-layer'})
+                    //                 ])
+                    //             })
                                 
-                            }else if(undo_obj.cond=='nonlasso'){
-                                _this.sketchpad.setState({nonlasso_ret:undo_obj.selection}, function(){
-                                    _this.sketchpad.initializeMoveLayer();
-                                })
-                            }
-                        }
-                    }
-                    sketchundo.unshift(null)
+                    //         }else if(undo_obj.cond=='nonlasso'){
+                    //             _this.sketchpad.setState({nonlasso_ret:undo_obj.selection}, function(){
+                    //                 _this.sketchpad.initializeMoveLayer();
+                    //             })
+                    //         }
+                    //     }
+                    // }
+                    // sketchundo.unshift(null)
 
                     
                 }
 
-                console.log(sketchundo)
-                _this.sketchpad.setState({sketchundo:sketchundo}) 
+                // console.log(sketchundo)
+                // _this.sketchpad.setState({sketchundo:sketchundo}) 
 
             }else if(updated.indexOf('sketchpad_add_a_layer')!=-1 || updated.indexOf('sketchpad_remove_a_layer')!=-1 || 
             updated.indexOf('sketchpad_undo_remove_a_layer')!=-1 || updated.indexOf('sketchpad_undo_reorder_a_layer')!=-1){
                 var layers = data.layers
-                var sketchundo = _this.sketchpad.state.sketchundo
+                // var sketchundo = _this.sketchpad.state.sketchundo
                 var current_layer = _this.sketchpad.state.current_layer
                 if(updated.indexOf('undo')==-1){
-                    sketchundo.shift();
-                    sketchundo.push(data.sketchundo)
+                    // sketchundo.shift();
+                    // sketchundo.push(data.sketchundo)
 
                     var current_layer_id = _this.sketchpad.state.layers[current_layer]
                     current_layer = layers.indexOf(current_layer_id)
                     
                 }else{
-                    var undo_id = updated.split('.')[2] 
-                    for(var i in sketchundo){
-                        if(sketchundo[i]!=undefined){
-                            if(sketchundo[i].undo_id==undo_id){
-                                sketchundo.splice(i, 1)
-                                console.log('splicaE1')
-                                break
-                            }
-                        }
-                    }
-                    sketchundo.unshift(null)
-                    if(updated.indexOf('reorder')!=-1){
-                        for(var i in layers){
-                            if(_this.sketchpad.state.layer_dict[layers[i]].choosen_by == this.state.user_id){
-                                current_layer = i
-                            }
-                        }
-                    }
+                    // var undo_id = updated.split('.')[2] 
+                    // for(var i in sketchundo){
+                    //     if(sketchundo[i]!=undefined){
+                    //         if(sketchundo[i].undo_id==undo_id){
+                    //             sketchundo.splice(i, 1)
+                    //             console.log('splicaE1')
+                    //             break
+                    //         }
+                    //     }
+                    // }
+                    // sketchundo.unshift(null)
+                    // if(updated.indexOf('reorder')!=-1){
+                    //     for(var i in layers){
+                    //         if(_this.sketchpad.state.layer_dict[layers[i]].choosen_by == this.state.user_id){
+                    //             current_layer = i
+                    //         }
+                    //     }
+                    // }
                 }
-                console.log(sketchundo, layers)
+                // console.log(sketchundo, layers)
                 
-                _this.sketchpad.setState({layers, sketchundo, current_layer}, function(){
-
+                // _this.sketchpad.setState({layers, sketchundo, current_layer}, function(){
+                _this.sketchpad.setState({layers, current_layer}, function(){
                     if(updated.indexOf('sketchpad_undo_remove_a_layer')!=-1){
                         var layer_id = data.updated.split('.')[1]
                         console.log(layer_id)
@@ -459,11 +462,12 @@ class Board extends Component{
                     current_layer = -1
                 }
                 console.log(current_layer, layers)
-                var sketchundo = _this.sketchpad.state.sketchundo
-                sketchundo.shift();
-                sketchundo.push(data.sketchundo)
-                console.log(sketchundo)
-                _this.sketchpad.setState({layers, current_layer, sketchundo})
+                // var sketchundo = _this.sketchpad.state.sketchundo
+                // sketchundo.shift();
+                // sketchundo.push(data.sketchundo)
+                // console.log(sketchundo)
+                // _this.sketchpad.setState({layers, current_layer, sketchundo})
+                _this.sketchpad.setState({layers, current_layer})
             }else if(updated.indexOf('sketchpad_layers_choosen')!=-1){
                 var list = updated.split('.')
                 var layers = _this.sketchpad.state.layers
@@ -481,7 +485,7 @@ class Board extends Component{
             }else if(updated.indexOf('sketchpad_undo_add_a_layer')!=-1){
                 var layer_id = updated.split('.')[1]
                 var undo_id = updated.split('.')[2]
-                var sketchundo = _this.sketchpad.state.sketchundo
+                // var sketchundo = _this.sketchpad.state.sketchundo
                 var layers= _this.sketchpad.state.layers
                 var current_layer = _this.sketchpad.state.current_layer
                 var control_state = _this.sketchpad.state.control_state
@@ -497,18 +501,19 @@ class Board extends Component{
                         break
                     }
                 }
-                for(var i in sketchundo){
-                    if(sketchundo[i]!=undefined){
-                        if(sketchundo[i].undo_id==undo_id){
-                            sketchundo.splice(i, 1)
+                // for(var i in sketchundo){
+                //     if(sketchundo[i]!=undefined){
+                //         if(sketchundo[i].undo_id==undo_id){
+                //             sketchundo.splice(i, 1)
                             
-                            console.log('splicaE1')
-                            break
-                        }
-                    }
-                }
-                sketchundo.unshift(null)
-                _this.sketchpad.setState({layers, sketchundo, current_layer, control_state})
+                //             console.log('splicaE1')
+                //             break
+                //         }
+                //     }
+                // }
+                // sketchundo.unshift(null)
+                // _this.sketchpad.setState({layers, sketchundo, current_layer, control_state})
+                _this.sketchpad.setState({layers, current_layer, control_state})
             }
             // else if(updated.indexOf('moodboard_add_arts')!=-1){
             //     var arts = data.arts
@@ -636,20 +641,20 @@ class Board extends Component{
         set['updated'] = 'sketchpad_update_a_layer'
         var set2={}
         set2['updated'] = 'sketchpad_update_a_layer'
-        set2['$push']  = {
-            sketchundo: {
-                undo_id: Math.random().toString(36).substring(2, 15), 
-                user_id: this.state.user_id,
-                type:'layer_image', 
-                layer_id: layer_id,
-                layer_image: origin_image,
-                cond: cond,
-                selection: selection
-            }
-        }
+        // set2['$push']  = {
+        //     sketchundo: {
+        //         undo_id: Math.random().toString(36).substring(2, 15), 
+        //         user_id: this.state.user_id,
+        //         type:'layer_image', 
+        //         layer_id: layer_id,
+        //         layer_image: origin_image,
+        //         cond: cond,
+        //         selection: selection
+        //     }
+        // }
         Api.app.service('layers').patch(layer_id, {$set: set}).then(()=>{
             Api.app.service('boards').patch(this.state.board_id, set2).then(()=>{
-                Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
+                // Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
             })
         })
         
@@ -660,20 +665,20 @@ class Board extends Component{
         layer.updated = 'sketchpad_add_a_layer'
         set['layers.'+layer_idx] = layer_id
         set['updated'] = 'sketchpad_add_a_layer'
-        set['$push'] = {
-            sketchundo: {
-                undo_id: Math.random().toString(36).substring(2, 15), 
-                user_id: this.state.user_id,
-                type: 'layer_add',
-                layer_idx: layer_idx,
-                layer_id: layer_id,
-                layer: layer
-            }
-        }
+        // set['$push'] = {
+        //     sketchundo: {
+        //         undo_id: Math.random().toString(36).substring(2, 15), 
+        //         user_id: this.state.user_id,
+        //         type: 'layer_add',
+        //         layer_idx: layer_idx,
+        //         layer_id: layer_id,
+        //         layer: layer
+        //     }
+        // }
         // analytics.logEvent("add_a_layer", {board_id: this.state.board_id, user_id:this.state.user_id, layer_id})
         Api.app.service('layers').create(layer).then(()=>{
             Api.app.service('boards').patch(this.state.board_id, set).then(()=>{
-                Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}}) 
+                // Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}}) 
             })
         })
 
@@ -692,20 +697,20 @@ class Board extends Component{
         // layer = JSON.parse(JSON.stringify(layer))
         layer.choosen_by=''
         var push = {
-            sketchundo: {
-                undo_id: Math.random().toString(36).substring(2, 15), 
-                user_id: this.state.user_id,
-                type: 'layer_remove',
-                layer_idx: layer_idx,
-                layer_id: layer._id,
-                layer: layer,
-                layers: layers
-            }
+            // sketchundo: {
+            //     undo_id: Math.random().toString(36).substring(2, 15), 
+            //     user_id: this.state.user_id,
+            //     type: 'layer_remove',
+            //     layer_idx: layer_idx,
+            //     layer_id: layer._id,
+            //     layer: layer,
+            //     layers: layers
+            // }
         }
         // analytics.logEvent("remove_a_layer", {board_id: this.state.board_id, user_id:this.state.user_id, layer_id})
         Api.app.service('layers').remove(layer._id).then(()=>{
             Api.app.service('boards').patch(this.state.board_id, {$set: set, $push: push}).then(()=>{
-                Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
+                // Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
             })
         })
         
@@ -724,15 +729,15 @@ class Board extends Component{
         patch['layers']=new_layer
         patch['updated']='sketchpad_reorder_layers'
         patch['$push'] = {
-            sketchundo: {
-                undo_id: Math.random().toString(36).substring(2, 15), 
-                user_id: this.state.user_id,
-                type: 'layer_reorder',
-                layers: prev_layer
-            }
+            // sketchundo: {
+            //     undo_id: Math.random().toString(36).substring(2, 15), 
+            //     user_id: this.state.user_id,
+            //     type: 'layer_reorder',
+            //     layers: prev_layer
+            // }
         }
         Api.app.service('boards').patch(this.state.board_id, patch).then(()=>{
-            Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
+            // Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
         })
     }
 

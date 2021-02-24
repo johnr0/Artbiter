@@ -183,14 +183,14 @@ function generateImageWithScaling(content, styles, context){
         $each: [layer_id],
         $position: parseInt(content['current_layer']),
       },
-      sketchundo: {
-        undo_id: Math.random().toString(36).substring(2, 15), 
-        user_id: context.arguments[2]['user']['_id'],
-        type: 'layer_add',
-        layer_idx: content['current_layer'],
-        layer_id: layer_id,
-        layer: layer
-      }
+      // sketchundo: {
+      //   undo_id: Math.random().toString(36).substring(2, 15), 
+      //   user_id: context.arguments[2]['user']['_id'],
+      //   type: 'layer_add',
+      //   layer_idx: content['current_layer'],
+      //   layer_id: layer_id,
+      //   layer: layer
+      // }
     }
     var set ={
       updated: 'sketchpad_add_a_layer_style_stamp_'+context.arguments[2]['user']['_id']
@@ -198,7 +198,7 @@ function generateImageWithScaling(content, styles, context){
 
     context.app.service('layers').create(layer).then(()=>{
       context.app.service('boards').patch(context.arguments[0], {$set:set, $push:push}).then(()=>{
-        context.app.service('boards').patch(context.arguments[0], {$set:{updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
+        // context.app.service('boards').patch(context.arguments[0], {$set:{updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
       })
     })
   

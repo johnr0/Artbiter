@@ -1,7 +1,7 @@
 {
   "host": "0.0.0.0",
   "port": 5050,
-  "mongodb": "mongodb+srv://jjyc:CymPV598Urlgdqh4@artbiter.zklbs.mongodb.net/artbiter?retryWrites=true&w=majority",
+  "mongodb": "mongodb://localhost:27017/MemoryGame05",
   "public": "../dist/",
   "ml_server": "http://194.61.20.92/", 
   "auth": {
