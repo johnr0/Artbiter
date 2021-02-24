@@ -700,7 +700,7 @@ class Board extends Component{
         console.log(layers)
         set['updated'] = 'sketchpad_remove_a_layer'
         
-        set['layers'] = layers.slice()
+        set['layers'] =  _this.sketchpad.state.layers.slice()
         console.log(layers)
         // layer = JSON.parse(JSON.stringify(layer))
         layer.choosen_by=''
