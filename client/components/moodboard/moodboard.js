@@ -311,7 +311,7 @@ class MoodBoard extends ProtoBoard{
         // console.log(e.clipboardData.items)
         var _this = this
         this.setState({current_image:[], current_text: [],current_selected_pos: undefined, current_selected_ratio: undefined},function(){
-            navigator.clipboard.read().then((items)=>{
+            window.navigator.clipboard.read().then((items)=>{
                 console.log(items)
                 var promises = []
                 var counter = 0
