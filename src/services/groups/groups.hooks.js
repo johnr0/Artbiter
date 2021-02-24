@@ -130,24 +130,15 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
         context.app.service('group_models').remove(null, {query: {_id: {$in: to_remove_ids}}})
         .then(()=>{
           console.log('group model find', _id)
-          if(to_remove_ids.length==1){
-            if(to_remove_ids[0]==_id){
+          context.app.service('group_models').find({query:{_id:_id}})
+          .then((res_fin)=>{
+            console.log('group model create')
+            if(res_fin.length==0){
               context.app.service('group_models').create({ '_id': _id, board_id: context.result.board_id, 
                 'group_model': response.data['group_model'], 'l2t': response.data['l2t'], 'dec': response.data['dec'], groups: Object.keys(cavs)
               })
             }
-          }else{
-            context.app.service('group_models').find({query:{_id:_id}})
-            .then((res_fin)=>{
-              console.log('group model create')
-              if(res_fin.length==0){
-                context.app.service('group_models').create({ '_id': _id, board_id: context.result.board_id, 
-                  'group_model': response.data['group_model'], 'l2t': response.data['l2t'], 'dec': response.data['dec'], groups: Object.keys(cavs)
-                })
-              }
-            })
-          }
-          
+          })
         })
 
 
