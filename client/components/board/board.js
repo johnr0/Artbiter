@@ -717,7 +717,7 @@ class Board extends Component{
         }
         // analytics.logEvent("remove_a_layer", {board_id: this.state.board_id, user_id:this.state.user_id, layer_id})
         Api.app.service('layers').remove(layer._id).then(()=>{
-            Api.app.service('boards').patch(this.state.board_id, {$set: set, $push: push}).then(()=>{
+            Api.app.service('boards').patch(this.state.board_id, {$set: set}).then(()=>{
                 // Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
             })
         })
