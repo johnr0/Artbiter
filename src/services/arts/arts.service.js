@@ -3,7 +3,7 @@ const hooks = require('./arts.hooks');
 
 module.exports = function (app) {
   const options = {
-    
+    multi: true,
   };
 
   // Initialize our service with any options it requires

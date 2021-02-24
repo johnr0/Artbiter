@@ -6,6 +6,7 @@ module.exports = function (app) {
     events: ['changed'],
     paginate: app.get('paginate'),
     
+    
   };
 
   // Initialize our service with any options it requires

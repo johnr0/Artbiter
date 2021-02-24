@@ -285,6 +285,7 @@ class MoodboardImageAI extends MoodboardImage{
         // }
 
         //////////////
+        var cur_arts = []
         for(var idx in groups){
             var group = groups[idx]
             var choosen_bys=[]
@@ -295,6 +296,8 @@ class MoodboardImageAI extends MoodboardImage{
                 }
             }
             choosen_bys.sort()
+            var fil = cur_arts.filter(value => groups[idx].art_ids.includes(value))
+            // console.log(fil.length, cur_arts.length)
             if(choosen_bys[0]==choosen_bys[choosen_bys.length-1] && choosen_bys[0]!=''){
                 // var passed = true
                 // for(var k in this.props.mother_state.arts){
@@ -306,7 +309,17 @@ class MoodboardImageAI extends MoodboardImage{
                 // }
                 // if(passed){
                     // renderUser=true
-                    selected_groups.push(group)
+                    
+                    if(fil.length==cur_arts.length && cur_arts.length>0){
+                        selected_groups[selected_groups.length-1] = group
+                        cur_arts = groups[idx].art_ids
+                    }else if(fil.length==groups[idx].art_ids.length){}else{
+                        selected_groups.push(group)
+                        if(cur_arts.length==0){
+                            cur_arts = groups[idx].art_ids
+                        }
+                    }
+                    
                 // }
             }
 

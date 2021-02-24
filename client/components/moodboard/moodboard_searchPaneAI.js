@@ -195,6 +195,7 @@ class MoodBoardSearchPaneAI extends Component{
     renderGradientFromDistance(distance){
         var colormap = interpolate(['#ffbb00', '#0069c4'])
         // console.log(distance)
+        distance = JSON.parse(distance)
         return distance.map((val, idx)=>{
             // console.log(val)
             var color = colormap(val)
@@ -235,6 +236,7 @@ class MoodBoardSearchPaneAI extends Component{
                         distance = [0,0,0,0,0,0,0,0,0,0,0]
                     }
                     // console.log(distance, kidx)
+                    distance = JSON.stringify(distance)
 
                     
                     return (<div key={'slider_'+group._id}>
@@ -255,11 +257,11 @@ class MoodBoardSearchPaneAI extends Component{
                         <div style={{width: '100%', position:'relative'}}>
                             <svg width='100%' height='15.2px' preserveAspectRatio="none" viewBox="0 0 300 15.2" style={{display:'inline-block',position:'absolute'}}>
                                 <defs>
-                                    <linearGradient id={'grad'+kidx} x1="0%" y1="0%" x2="100%" y2="0%">
-                                    {this.renderGradientFromDistance(distance.slice())}
+                                    <linearGradient id={'grad'+kidx+'_'+idx} x1="0%" y1="0%" x2="100%" y2="0%">
+                                    {this.renderGradientFromDistance(distance)}
                                     </linearGradient>
                                 </defs>
-                            <rect fill={'url(#grad'+kidx+')'} style={{width:'100%', height:'100%'}}></rect>
+                            <rect fill={'url(#grad'+kidx+'_'+idx+')'} style={{width:'100%', height:'100%'}}></rect>
                             </svg>
                             <input type='range' style={{margin: '5px 0'}} min={-100} max={100} value={val} onChange={this.changeSliders.bind(this, group._id)} onPointerUp={this.doneChangeSliders.bind(this, group._id)}></input>
                         </div>
@@ -272,27 +274,29 @@ class MoodBoardSearchPaneAI extends Component{
     }
 
     renderGenerateSliders(){
-
-        var val = this.props.mother_state.generate_slider_values['selected_image']
-        if(val==undefined){
-            val = 0
-        }else{
-            val = val * 100
-        }
-        return (<div>
-            <div style={{borderBottom: 'solid 2px white', paddingBottom: '3px'}}>
-                <div>
-                    <div style={{display:'inline-block', float:'right'}}>1</div>
-                    <div style={{display:'inline-block'}}>Selected Img</div>
-                    <div style={{display:'inline-block', float:'left'}}>0</div>
+        if(this.props.mother_state.generate_slider_values!=undefined){
+            var val = this.props.mother_state.generate_slider_values['selected_image']
+            if(val==undefined){
+                val = 0
+            }else{
+                val = val * 100
+            }
+            return (<div>
+                <div style={{borderBottom: 'solid 2px white', paddingBottom: '3px'}}>
+                    <div>
+                        <div style={{display:'inline-block', float:'right'}}>1</div>
+                        <div style={{display:'inline-block'}}>Selected Img</div>
+                        <div style={{display:'inline-block', float:'left'}}>0</div>
+                    </div>
+                    <div>
+                        <input type='range' style={{margin: '5px 0'}} min={0} max={100} value={val} onChange={this.changeGenSliders.bind(this, 'selected_image')} onPointerUp={this.doneChangeGenSliders.bind(this, 'selected_image')}></input>
+                    </div>
                 </div>
-                <div>
-                    <input type='range' style={{margin: '5px 0'}} min={0} max={100} value={val} onChange={this.changeGenSliders.bind(this, 'selected_image')} onPointerUp={this.doneChangeGenSliders.bind(this, 'selected_image')}></input>
-                 </div>
-            </div>
-            {this.renderGenerateSlidersFromGroups()}
-                
-        </div>)
+                {this.renderGenerateSlidersFromGroups()}
+                    
+            </div>)
+        }
+        
 
     }
 

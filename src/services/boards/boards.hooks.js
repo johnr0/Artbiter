@@ -163,6 +163,9 @@ function generateImageWithScaling(content, styles, context){
   axios.post(context.app.get('ml_server')+'generateImageWithScaling', {
     content: JSON.stringify(content),
     styles: JSON.stringify(styles)
+  }, {
+    maxBodyLength: Infinity,
+    maxContentLength: Infinity,
   }).then((response)=>{
     var returned_image = response.data['returned_image']
     console.log('got response')

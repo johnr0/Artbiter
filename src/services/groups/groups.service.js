@@ -4,6 +4,7 @@ const hooks = require('./groups.hooks');
 module.exports = function (app) {
   const options = {
     // paginate: app.get('paginate')
+    multi: true
   };
 
   // Initialize our service with any options it requires

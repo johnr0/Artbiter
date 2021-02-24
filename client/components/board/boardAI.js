@@ -106,7 +106,7 @@ class BoardAI extends Board{
             Api.app.service('layers').timeout = 60000
             console.log('timeout after...', Api.app.service('boards').timeout)
             Api.app.service('boards').find({query: {_id: board_id,
-                $select: ['name', 'owner', 'texts', 'collaborators', 'current_collaborators', 'layers']
+                $select: ['name', 'owner', 'texts', 'collaborators', 'current_collaborators', 'layers', 'searchMode', 'searchPane', 'search_image_selected', 'search_slider_values', 'search_slider_distances', 'generate_slider_values', 'agreementPane', 'agreement_userSelection']
             }})
             .then((res0)=>{
                 var res = res0
@@ -167,30 +167,30 @@ class BoardAI extends Board{
                         var agreementPane=false
                         var agreement_userSelection = {}
                         
-                        if(res[0].searchMode!=undefined){
-                            searchMode = res[0].searchMode
+                        if(res0[0].searchMode!=undefined){
+                            searchMode = res0[0].searchMode
                         }
-                        if(res[0].searchPane!=undefined){
-                            searchPane = res[0].searchPane
+                        if(res0[0].searchPane!=undefined){
+                            searchPane = res0[0].searchPane
                         }
-                        if(res[0].search_image_selected!=undefined){
-                            search_image_selected = res[0].search_image_selected
+                        if(res0[0].search_image_selected!=undefined){
+                            search_image_selected = res0[0].search_image_selected
                         }
-                        if(res[0].search_slider_values!=undefined){
-                            search_slider_values = res[0].search_slider_values
+                        if(res0[0].search_slider_values!=undefined){
+                            search_slider_values = res0[0].search_slider_values
                         }
-                        if(res[0].search_slider_distances!=undefined){
-                            search_slider_distances = res[0].search_slider_distances
+                        if(res0[0].search_slider_distances!=undefined){
+                            search_slider_distances = res0[0].search_slider_distances
                         }
-                        if(res[0].generate_slider_values!=undefined){
-                            generate_slider_values = res[0].generate_slider_values
+                        if(res0[0].generate_slider_values!=undefined){
+                            generate_slider_values = res0[0].generate_slider_values
                         }
 
-                        if(res[0].agreementPane!=undefined){
-                            agreementPane = res[0].agreementPane
+                        if(res0[0].agreementPane!=undefined){
+                            agreementPane = res0[0].agreementPane
                         }
-                        if(res[0].agreement_userSelection!=undefined){
-                            agreement_userSelection = res[0]['agreement_userSelection']
+                        if(res0[0].agreement_userSelection!=undefined){
+                            agreement_userSelection = res0[0]['agreement_userSelection']
                         }
                         
                         Api.app.service('arts').find({query: {board_id: board_id, 

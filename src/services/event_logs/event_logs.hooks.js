@@ -1,5 +1,5 @@
 const recordTime = async context =>{
-
+  context.data.timestamp = new Date();
 }
 
 module.exports = {

@@ -628,30 +628,33 @@ class MoodBoardAI extends MoodBoard{
                 var art = this.state.arts[this.state.current_image[0]]
                 if(art!=undefined){
                     if(art.labels!=undefined){
-                        var smallx = (art.position[0]<art.position[2])?art.position[0]:art.position[2]
-                        var bigx = (art.position[0]<art.position[2])?art.position[2]:art.position[0]
-                        var smally = (art.position[1]<art.position[3])?art.position[1]:art.position[3]
-                        var bigy = (art.position[1]<art.position[3])?art.position[3]:art.position[1]
-                        var x = bigx* this.state.boardlength*this.state.boardzoom+5
-                        var y = smally* this.state.boardlength*this.state.boardzoom-5
+                        
+                            var smallx = (art.position[0]<art.position[2])?art.position[0]:art.position[2]
+                            var bigx = (art.position[0]<art.position[2])?art.position[2]:art.position[0]
+                            var smally = (art.position[1]<art.position[3])?art.position[1]:art.position[3]
+                            var bigy = (art.position[1]<art.position[3])?art.position[3]:art.position[1]
+                            var x = bigx* this.state.boardlength*this.state.boardzoom+5
+                            var y = smally* this.state.boardlength*this.state.boardzoom-5
 
-                        var width = 100//(bigx-smallx)*this.props.boardlength
-                        var height = 200//(bigy-smally)*this.props.boardlength
-                        var _this = this
-                        return (<div style={{position:'absolute', left:x, top: y, width:'fit-content', height: 'fit-content'}} className='controller'>
-                            <div><b>Machine label</b></div>
-                            {Object.keys(art.labels).map(function(key, idx){
-                                if(art.labels[key]!=0){
-                                    var label_width = (art.labels[key]*50>100)?100:art.labels[key]*50
+                            var width = 100//(bigx-smallx)*this.props.boardlength
+                            var height = 200//(bigy-smally)*this.props.boardlength
+                            var _this = this
+                            return (<div style={{position:'absolute', left:x, top: y, width:'fit-content', height: 'fit-content'}} className='controller'>
+                                <div><b>Machine label</b></div>
+                                {Object.keys(art.labels).map(function(key, idx){
+                                    if(art.labels[key]!=0 && _this.state.groups[key]!=undefined){
+                                        var label_width = (art.labels[key]*50>100)?100:art.labels[key]*50
+                                        
+                                        return (<div>
+                                            <div style={{display:'inline-block'}}>{_this.state.groups[key].group_name}</div>
+                                            <div style={{display:'inline-block', marginLeft:'3px', height:'10px', width:label_width, backgroundColor:'#eeeeee'}}></div>
+                                            </div>)
+                                    }
                                     
-                                    return (<div>
-                                        <div style={{display:'inline-block'}}>{_this.state.groups[key].group_name}</div>
-                                        <div style={{display:'inline-block', marginLeft:'3px', height:'10px', width:label_width, backgroundColor:'#eeeeee'}}></div>
-                                        </div>)
-                                }
-                                
-                            })}
-                        </div>)
+                                })}
+                            </div>)
+                        
+                        
                     }
                 }
                 

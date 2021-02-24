@@ -194,26 +194,34 @@ class Board extends Component{
 
         Api.app.service('arts').on('patched', (data)=>{
             console.log('patched!', data.updated, _this.moodboard)
-            var arts = _this.moodboard.state.arts
-            if(data.updated=='arts_label'){
-                console.log('aaarrrrttttssss', data.labels)
-                arts[data._id]['labels'] = data.labels
-            } else if(data.updated!='moodboard_color_swatch_change' && data.updated!='moodboard_update_arts_embedding'){
-                if(data.position!=undefined){
-                    arts[data._id].position = data.position
+            if(_this.moodboard!=null){
+                var arts = _this.moodboard.state.arts
+            
+                if(data.updated=='arts_label'){
+                    console.log('aaarrrrttttssss', data.labels)
+                    arts[data._id]['labels'] = data.labels
+                } else if(data.updated!='moodboard_color_swatch_change' && data.updated!='moodboard_update_arts_embedding'){
+                    if(data.position!=undefined){
+                        if(arts[data._id]!=undefined){
+                            arts[data._id].position = data.position
+                        }
+                    }
+                    if(data.choosen_by!=undefined){
+                        if(arts[data._id]!=undefined){
+                            arts[data._id].choosen_by = data.choosen_by
+                        }   
+                    }
+                }else if(data.updated.indexOf('moodboard_update_arts_embedding')!=-1){
+                    // TODO
+                    arts[data._id]['enabled']=data.enabled
+                    
+                }else{
+                    arts[data._id].file=data.file
+                    arts[data._id].color = data.color
                 }
-                if(data.choosen_by!=undefined){
-                    arts[data._id].choosen_by = data.choosen_by
-                }
-            }else if(data.updated.indexOf('moodboard_update_arts_embedding')!=-1){
-                // TODO
-                arts[data._id]['enabled']=data.enabled
-                
-            }else{
-                arts[data._id].file=data.file
-                arts[data._id].color = data.color
+                _this.moodboard.setState({arts})
             }
-            _this.moodboard.setState({arts})
+            
         })
 
         Api.app.service('layers').on('created', (data)=>{
@@ -932,21 +940,23 @@ class Board extends Component{
         // var arts = this.moodboard.state.arts
         patch['updated'] = 'moodboard_arts_texts_choosen'
         var unset={}
-        for(var i in art_ids){
-            var art_id = art_ids[i]
-            // arts[art_id].choosen_by=this.state.user_id
-            Api.app.service('arts').patch(art_id, {$set:{choosen_by: this.state.user_id, updated:'moodboard_arts_texts_choosen'}})
-        }
+        // for(var i in art_ids){
+        //     var art_id = art_ids[i]
+        //     // arts[art_id].choosen_by=this.state.user_id
+        //     Api.app.service('arts').patch(art_id, {$set:{choosen_by: this.state.user_id, updated:'moodboard_arts_texts_choosen'}})
+        // }
+        Api.app.service('arts').patch(null, {$set:{choosen_by: this.state.user_id, updated:'moodboard_arts_texts_choosen'}}, {query: {_id: {$in: art_ids}}})
         for (var i in text_ids){
             var text_id = text_ids[i]
             patch['updated'] = patch['updated']+'.text_'+text_id
             patch['texts.'+text_id+'.choosen_by'] = this.state.user_id
         }
-        for(var i in d_art_ids){
-            var art_id = d_art_ids[i]
-            // arts[art_id].choosen_by=''
-            Api.app.service('arts').patch(art_id, {$set:{choosen_by: '', updated: 'moodboard_arts_texts_choosen'}})
-        }
+        // for(var i in d_art_ids){
+        //     var art_id = d_art_ids[i]
+        //     // arts[art_id].choosen_by=''
+        //     Api.app.service('arts').patch(art_id, {$set:{choosen_by: '', updated: 'moodboard_arts_texts_choosen'}})
+        // }
+        Api.app.service('arts').patch(null, {$set:{choosen_by: '', updated:'moodboard_arts_texts_choosen'}}, {query: {_id: {$in: d_art_ids}}})
         for (var i in d_text_ids){
             var text_id = d_text_ids[i]
             patch['updated'] = patch['updated']+'.text_'+text_id

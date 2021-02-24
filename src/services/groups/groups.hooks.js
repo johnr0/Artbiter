@@ -114,29 +114,49 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
     context.app.service('group_models').find({query:{board_id: context.result.board_id}})
     .then((res)=>{
       to_remove=[]
+      to_remove_ids = []
       for(var i in res){
         // console.log('overlap is', res[i].groups.filter(value => Object.keys(cavs).includes(value)))
         if(res[i].groups.filter(value => Object.keys(cavs).includes(value)).length>0){
-          to_remove.push(context.app.service('group_models').remove(res[i]._id))
+          to_remove_ids.push(res[i]._id)
+          // to_remove.push(context.app.service('group_models').remove(res[i]._id))
         }
       }
+      console.log('group find')
       context.app.service('groups').find({query: {_id: {$in: Object.keys(cavs)}}})
       .then((res2)=>{
-        Promise.all(to_remove).then(data=>{
-          var _id = res2[0].higher_group
-          // console.log('id of high', _id)
+        var _id = res2[0].higher_group
+        console.log('group model remove', to_remove_ids)
+        context.app.service('group_models').remove(null, {query: {_id: {$in: to_remove_ids}}})
+        .then(()=>{
+          console.log('group model find')
           context.app.service('group_models').find({query:{_id:_id}})
           .then((res_fin)=>{
+            console.log('group model create')
             if(res_fin.length==0){
               context.app.service('group_models').create({ '_id': _id, board_id: context.result.board_id, 
                 'group_model': response.data['group_model'], 'l2t': response.data['l2t'], 'dec': response.data['dec'], groups: Object.keys(cavs)
               })
             }
           })
-          
-        }).catch(function(err){
-          console.log('err')
         })
+
+
+      //   Promise.all(to_remove).then(data=>{
+      //     var _id = res2[0].higher_group
+      //     // console.log('id of high', _id)
+      //     context.app.service('group_models').find({query:{_id:_id}})
+      //     .then((res_fin)=>{
+      //       if(res_fin.length==0){
+      //         context.app.service('group_models').create({ '_id': _id, board_id: context.result.board_id, 
+      //           'group_model': response.data['group_model'], 'l2t': response.data['l2t'], 'dec': response.data['dec'], groups: Object.keys(cavs)
+      //         })
+      //       }
+      //     })
+          
+      //   }).catch(function(err){
+      //     console.log('err')
+      //   })
       })
       
       
@@ -346,19 +366,30 @@ const UnrelateCAV = async context => {
             for(var j in res3){
               art_embeddings[res3[j]._id] = res3[j].embedding
             }
+            var embeddings = {}
+            var embeddings2 = {}
             for(var i in res2){
-              var embeddings = {}
               var group = res2[i]
-              embeddings[group._id] = []
-              for(var j in group.art_ids){
-                var art_id = group.art_ids[j]
-                embeddings[group._id].push(art_embeddings[art_id])
+              if(group._id != context.arguments[0]){
+                embeddings[group._id] = []
+                for(var j in group.art_ids){
+                  var art_id = group.art_ids[j]
+                  embeddings[group._id].push(art_embeddings[art_id])
 
+                }
+              }else{
+                embeddings2[group._id] = []
+                for(var j in group.art_ids){
+                  var art_id = group.art_ids[j]
+                  embeddings2[group._id].push(art_embeddings[art_id])
+
+                }
               }
-              // console.log(embeddings, 'embeddings')
-              trainCAV(embeddings, context, res[0].board_id)
+              
             }
-            
+            trainCAV(embeddings, context, res[0].board_id)
+            trainCAV(embeddings2, context, res[0].board_id)
+
           })
 
           // context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
