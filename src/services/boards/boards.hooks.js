@@ -157,8 +157,8 @@ function generateImage(content, content_weight, styles, style_weights, context){
 
 function generateImageWithScaling(content, styles, context){
   console.log('start and error?')
-  console.log(typeof JSON.stringify(content))
-  console.log(typeof JSON.stringify(styles))
+  // console.log(typeof JSON.stringify(content))
+  // console.log(typeof JSON.stringify(styles))
 
   axios.post(context.app.get('ml_server')+'generateImageWithScaling', {
     content: JSON.stringify(content),
@@ -226,7 +226,7 @@ const boardSearchImage = async context => {
     var search_start_image = context.result.search_image_selected
     var search_slider_values = context.result.search_slider_values
     var search_slider_groups = Object.keys(search_slider_values)
-    console.log(search_slider_values)
+    // console.log(search_slider_values)
     if(search_start_image!=undefined && search_slider_values!=undefined){
       console.log(search_start_image, search_slider_values)
       context.app.service('arts').find({query: {_id: search_start_image}})

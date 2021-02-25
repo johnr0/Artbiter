@@ -97,7 +97,7 @@ function sliderImpact(board_id, context){
 }
 
 function trainCAV(embeddings, context, board_id, added_id=undefined){
-  console.log('embedding--', Object.keys(embeddings))
+  // console.log('embedding--', Object.keys(embeddings))
   // console.log(JSON.stringify(styles))
   axios.post(context.app.get('ml_server')+'trainCAV', {
     embeddings: JSON.stringify(embeddings),
@@ -128,10 +128,10 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
       context.app.service('groups').find({query: {_id: {$in: Object.keys(cavs)}}})
       .then((res2)=>{
         var _id = res2[0].higher_group
-        console.log('group model remove', to_remove_ids)
+        console.log('group model remove')
         context.app.service('group_models').remove(null, {query: {_id: {$in: to_remove_ids}}})
         .then(()=>{
-          console.log('group model find', _id)
+          console.log('group model find')
           context.app.service('group_models').find({query:{_id:{$in: [_id]}}})
           .then((res_fin)=>{
             console.log('group model create')
@@ -247,7 +247,7 @@ function averageStyles(styles, context){
 }
 
 const createTrainCAV = async context => {
-  console.log('art ids are ', context.arguments[0].art_ids)
+  console.log('art ids are ')
   // console.log(context.result)
   context.app.service('arts').find({query: {_id: {$in:context.arguments[0].art_ids}}})
   .then((res)=>{
