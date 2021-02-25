@@ -62,6 +62,8 @@ class SketchPad extends ProtoBoard {
 
         prev_shift_key: 'move', 
 
+        shift_pressed: false, 
+
         content_stamp_img: undefined, 
         content_stamp_ratio: undefined,
         content_stamp_init_pos: undefined,
@@ -90,8 +92,8 @@ class SketchPad extends ProtoBoard {
                         }
                     }
                 }   
-                
-                
+            }else if(e.key=='Shift'){
+                _this.setState({shift_pressed:true})
             }
         })
 
@@ -103,9 +105,8 @@ class SketchPad extends ProtoBoard {
                         _this.setState({control_state: _this.state.prev_shift_key, action: 'idle'})
                     }
                 }
-                
-                
-                
+            }else if(e.key=='Shift'){
+                _this.setState({shift_pressed:false})
             }
         })
     }
@@ -786,11 +787,68 @@ class SketchPad extends ProtoBoard {
         
     }
 
+    adjustResizeToRatio(pos){
+        var init_x_name, init_y_name
+        if(this.state.lasso_resize_direction=='se'){
+            init_x_name = 'left'
+            init_y_name = 'top'
+        }else if(this.state.lasso_resize_direction=='sw'){
+            init_x_name = 'right'
+            init_y_name = 'top'
+        }else if(this.state.lasso_resize_direction=='ne'){
+            init_x_name = 'left'
+            init_y_name = 'bottom'
+        }else if(this.state.lasso_resize_direction=='nw'){
+            init_x_name = 'right'
+            init_y_name = 'bottom'
+        }
+
+        var init_x = this.state.resize_ret[init_x_name]
+        var init_y = this.state.resize_ret[init_y_name]
+
+        var cur_w = Math.abs(init_x-pos[0])
+        var cur_h = Math.abs(init_y-pos[1])
+        var cur_ratio = cur_h/cur_w
+
+        var ideal_ratio = this.state.resize_ret['height']/this.state.resize_ret['width']
+
+        if(cur_ratio > ideal_ratio){
+            cur_h = ideal_ratio * cur_w
+        }else{
+            cur_w = cur_h / ideal_ratio
+        }
+
+        if(init_x>pos[0]){
+            pos[0] = init_x-cur_w
+        }else{
+            pos[0] = init_x+cur_w
+        }
+        if(init_y>pos[1]){
+            pos[1] = init_y-cur_h
+        }else{
+            pos[1] = init_y+cur_h
+        }
+     
+        return pos
+
+    }
+
     resizeLayerMove(e){
         e.stopPropagation()
         var pos = this.getCurrentMouseOnBoard(e)
         var init_pos = this.state.resize_layer_init_pos
         var resize_ret = this.state.resize_ret
+
+        if(this.state.shift_pressed){
+            if(this.state.lasso_resize_direction=='nw'||this.state.lasso_resize_direction=='ne'||this.state.lasso_resize_direction=='se'||this.state.lasso_resize_direction=='sw'){
+            
+                pos = this.adjustResizeToRatio(pos)
+            
+            }
+            
+
+            
+        }
 
         // change what is drawn on the canvas
         var adjust_pre_canvas = this.state.adjust_pre_canvas
@@ -917,6 +975,9 @@ class SketchPad extends ProtoBoard {
 
     resizeLayerEnd(e){
         var pos = this.getCurrentMouseOnBoard(e)
+        if(this.state.shift_pressed){
+            pos = this.adjustResizeToRatio(pos)
+        }
         var init_pos = this.state.resize_layer_init_pos
         var resize_ret = this.state.resize_ret
         var lassoed_canvas = document.createElement('canvas')

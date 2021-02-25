@@ -325,6 +325,7 @@ class MoodBoard extends ProtoBoard{
     pasteImages(e){
         // console.log(e.clipboardData.items)
         var _this = this
+        this.props.board_this.ChooseArtsTexts([],[], this.state.current_image.slice(0), this.state.current_text.slice(0))
         this.setState({current_image:[], current_text: [],current_selected_pos: undefined, current_selected_ratio: undefined},function(){
             window.navigator.clipboard.read().then((items)=>{
                 console.log(items)
@@ -355,12 +356,18 @@ class MoodBoard extends ProtoBoard{
 
     pasteImage(item, type, counter){ 
         var _this = this
+        var horizontal_offset
+        if(this.props.board_this.state.moodboard_collapsed==false && this.props.board_this.state.sketchpad_collapsed==true){
+            horizontal_offset = 0
+        }else{
+            horizontal_offset = this.state.boardwidth+22.5
+        }
         return new Promise((resolve, reject)=>{
             item.getType(type).then((it)=>{
             
                 var reader = new FileReader();
                 reader.onload = function(){
-                    _this.addAnImage(reader.result, document.getElementById(_this.state.boardname).offsetLeft+document.getElementById(_this.state.boardname).querySelector('.boardrender').offsetLeft,
+                    _this.addAnImage(reader.result, document.getElementById(_this.state.boardname).offsetLeft+document.getElementById(_this.state.boardname).querySelector('.boardrender').offsetLeft+horizontal_offset,
                     document.getElementById(_this.state.boardname).offsetTop+document.getElementById(_this.state.boardname).querySelector('.boardrender').offsetTop,
                     _this.state.arts, counter, resolve)
                 }

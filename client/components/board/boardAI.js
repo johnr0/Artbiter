@@ -113,6 +113,7 @@ class BoardAI extends Board{
                 if(res.length==0){
                     window.location.href='/boardlist'
                 }else{
+                    this.setState({board_loaded: true})
                     Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
                     console.log(res[0])
                     for(var j in res[0].collaborators){
@@ -146,6 +147,7 @@ class BoardAI extends Board{
                     Api.app.service('layers').find({query: {board_id: board_id}})
                     .then((res)=>{
                         console.log(res)
+                        this.setState({layers_loaded: true})
                         for(var li in res){
                             var layer_dict = _this.sketchpad.state.layer_dict
                             layer_dict[res[li]._id] = res[li]
@@ -197,6 +199,7 @@ class BoardAI extends Board{
                             $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height', 'enabled', 'labels']
                         }})
                         .then((res)=>{
+                            this.setState({arts_loaded: true})
                             for(var i in res){
                                 var art = res[i]
                                 arts[art._id] = art
@@ -214,6 +217,7 @@ class BoardAI extends Board{
                                 $select: ['_id', 'art_ids', 'group_name', 'higher_group', 'board_id', 'pos', 'user_info', 'updated'],
                             }})
                             .then((res)=>{
+                                this.setState({groups_loaded: true})
                                 for(var i in res){
                                     var group = res[i]
                                     groups[group._id] = group
@@ -223,6 +227,7 @@ class BoardAI extends Board{
                                 var searched_arts = _this.moodboard.state.searched_arts
                                 Api.app.service('searched_arts').find({query: {board_id: board_id}})
                                 .then((res)=>{
+                                    this.setState({searched_arts_loaded: true})
                                     for(var i in res){
                                         searched_arts[res[i]._id] = res[i]
                                     }
@@ -260,7 +265,7 @@ class BoardAI extends Board{
                                     // console.log(layers, arts, texts, sketchundo)
                                     Api.app.service('boards').update(board_id, {$set: set})
                                     .then((res)=>{
-                                        _this.setState({current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email}, function(){
+                                        _this.setState({loaded:true, current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email}, function(){
                                             // _this.sketchpad.setState({sketchundo: sketchundo})
                                                 // , function(){
                                             //     var promises = []
@@ -270,6 +275,7 @@ class BoardAI extends Board{
                                             //     Promise.all(promises)
                                             // })
                                             _this.moodboard.setState({texts:texts})
+                                            
                                             // console.log('done')
                                         })
                                     })
@@ -314,7 +320,7 @@ class BoardAI extends Board{
     
                 <SketchPadAI board_this={this} board_state={this.state} ref={c=>this.sketchpad=c}></SketchPadAI>
                 <MoodBoardAI board_this={this} board_state={this.state} ref={c=>this.moodboard=c}></MoodBoardAI>
-                <div style={{position:'absolute', right: '10px', top: '10px'}}>
+                <div style={{position:'absolute', right: (this.state.moodboard_collapsed&&this.state.sketchpad_collapsed==false)?'40px':'10px', top: '10px'}}>
                     {this.renderCollaboartorStatus()}
                 </div>
                 <div style={{position:'absolute', left: 'calc(50% - 30px)', top: 'calc(50% + 38px)', 
@@ -322,6 +328,16 @@ class BoardAI extends Board{
                 color: 'white', textAlign:'center', fontSize: '40px', cursor:'default', display: (this.state.moodboard_collapsed==false && this.state.sketchpad_collapsed==false)?'':'none'}} onPointerDown={this.addSketchIntoMoodboard.bind(this)}>
                     →
                 </div>
+                {this.state.loaded==false && <div style={{position: 'absolute', width: '100%', height: '100%', backgroundColor:'white', textAlign:'center', paddingTop: window.outerHeight/2-10}}>
+                    <div>Page is being loaded...</div>
+                    <div>
+                        {this.state.board_loaded==true&&<span>●</span>}{this.state.board_loaded!=true&&<span>○</span>}
+                        {this.state.layers_loaded==true&&<span>●</span>}{this.state.layers_loaded!=true&&<span>○</span>}
+                        {this.state.arts_loaded==true&&<span>●</span>}{this.state.arts_loaded!=true&&<span>○</span>}
+                        {this.state.groups_loaded==true&&<span>●</span>}{this.state.groups_loaded!=true&&<span>○</span>}
+                        {this.state.searched_arts_loaded==true&&<span>●</span>}{this.state.searched_arts_loaded!=true&&<span>○</span>}
+                    </div>
+                </div>}
             </div>)
     }
 }

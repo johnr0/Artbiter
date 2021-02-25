@@ -17,6 +17,10 @@ function sliderImpact(board_id, context){
       search_slider_values = {}
     }
     var search_image_selected = res0[0].search_image_selected
+    console.log('search_image_selected', search_image_selected)
+    if(search_image_selected==undefined){
+      return
+    }
     
     context.app.service('groups').find({query: {board_id:board_id}})
     .then((res1)=>{
@@ -74,6 +78,9 @@ function sliderImpact(board_id, context){
 
       context.app.service('arts').find({query: {_id: search_image_selected}})
       .then((res2)=>{
+        if(res2.length==0){
+          return
+        }
         // console.log(search_image_selected, res2[0]._id)
         var embedding = res2[0].embedding
         axios.post(context.app.get('ml_server')+'sliderImpact', {
@@ -136,6 +143,7 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
           .then((res_fin)=>{
             console.log('group model create')
             if(res_fin.length==0){
+              // console.log('source of error?')
               context.app.service('group_models').create({ '_id': _id, board_id: context.result.board_id, 
                 'group_model': response.data['group_model'], 'l2t': response.data['l2t'], 'dec': response.data['dec'], groups: Object.keys(cavs)
               })

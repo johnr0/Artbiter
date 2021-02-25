@@ -17,6 +17,10 @@ class Board extends Component{
         // lastmouseupdate: new Date(),
         sketchpad_collapsed: false,
         moodboard_collapsed: false,
+        loaded: false,
+
+        arts_loaded: false,
+        board_loaded: false,
     }
 
     getRandomColor() {
@@ -70,102 +74,121 @@ class Board extends Component{
             Api.app.service('boards').find({query: {_id: board_id,
                 $select: ['name', 'owner', 'texts', 'collaborators', 'current_collaborators', 'layers']
             }})
-            .then((res)=>{
-                
-                if(res.length==0){
+            .then((res0)=>{
+                this.setState({board_loaded: true})
+                if(res0.length==0){
                     window.location.href='/boardlist'
                 }else{
                     Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
-                    console.log(res[0])
-                    var owner = res[0].owner
-                    for(var j in res[0].collaborators){
-                        if(res[0].collaborators[j]!=user_id){
-                            this.addCollaboratorEmail(res[0].collaborators[j])
+                    console.log(res0[0])
+                    var owner = res0[0].owner
+                    for(var j in res0[0].collaborators){
+                        if(res0[0].collaborators[j]!=user_id){
+                            this.addCollaboratorEmail(res0[0].collaborators[j])
                         }
                         
                     }
-                    if(res[0].owner!=user_id){
-                        this.addCollaboratorEmail(res[0].owner)
+                    if(res0[0].owner!=user_id){
+                        this.addCollaboratorEmail(res0[0].owner)
                     }
 
                     // propage board contents to sketchpad and moodboard
-                    var layers = res[0]['layers']
+                    var layers = res0[0]['layers']
                     
                     // _this.sketchpad.setState({layers: layers, sketchundo: sketchundo}, function(){
                     _this.sketchpad.setState({layers: layers}, function(){
-                        for(var layer_idx in layers){
-                            var layer_id = layers[layer_idx]
-                            console.log(layer_id)
-                            Api.app.service('layers').find({query: {_id: layer_id}})
-                            .then((res)=>{
-                                console.log(res)
-                                var layer_dict = _this.sketchpad.state.layer_dict
-                                layer_dict[res[0]._id] = res[0]
-                                _this.sketchpad.setState({layer_dict})
-                                _this.loadALayer(res[0])
-                            })
-                        }
+                        // for(var layer_idx in layers){
+                        //     var layer_id = layers[layer_idx]
+                        //     console.log(layer_id)
+                        //     Api.app.service('layers').find({query: {_id: layer_id}})
+                        //     .then((res)=>{
+                        //         console.log(res)
+                        //         var layer_dict = _this.sketchpad.state.layer_dict
+                        //         layer_dict[res[0]._id] = res[0]
+                        //         _this.sketchpad.setState({layer_dict})
+                        //         _this.loadALayer(res[0])
+                        //     })
+                        // }
                     })
-                    // find and retrieve layers
-                    var arts = _this.moodboard.state.arts
-                    Api.app.service('arts').find({query: {board_id: board_id, 
-                        $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height', 'enabled', 'labels']
-                    }})
+                    Api.app.service('layers').find({query: {board_id: board_id}})
                     .then((res)=>{
-                        console.log('art', res)
-                        for(var i in res){
-                            var art = res[i]
-                            arts[art._id] = art
+                        this.setState({layers_loaded: true})
+                        for(var li in res){
+                            var layer_dict = _this.sketchpad.state.layer_dict
+                            layer_dict[res[li]._id] = res[li]
+                            
+                            _this.loadALayer(res[li])
+                        }
+                        _this.sketchpad.setState({layer_dict})
+
+                        var arts = _this.moodboard.state.arts
+                        Api.app.service('arts').find({query: {board_id: board_id, 
+                            $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height', 'enabled', 'labels']
+                        }})
+                        .then((res)=>{
+                            this.setState({arts_loaded: true})
+                            console.log('art', res)
+                            for(var i in res){
+                                var art = res[i]
+                                arts[art._id] = art
+                                
+                            }
                             _this.moodboard.setState({arts: arts})
-                        }
-                    })
-                    
 
+                            // var arts = res[0]['arts']
+                            var texts = res0[0]['texts']
+                            // var sketchundo = res[0]['sketchundo']
+                            var moodboardundo = res0[0]['moodboardundo']
+                            var current_collaborators = res0[0]['current_collaborators']
 
-                    // var arts = res[0]['arts']
-                    var texts = res[0]['texts']
-                    // var sketchundo = res[0]['sketchundo']
-                    var moodboardundo = res[0]['moodboardundo']
-                    var current_collaborators = res[0]['current_collaborators']
-
-                    var noone=true
-                    console.log(current_collaborators)
-                    for(var _id in current_collaborators){
-                        if(current_collaborators[_id].active && user_id!=_id){
-                            noone=false
-                        }
-                    }
-                    console.log(noone)
-                    if(noone){
-                        console.log('harabangtang', Object.keys(this.moodboard.state.arts))
-                        this.ChooseArtsTexts([],[],Object.keys(this.moodboard.state.arts), Object.keys(this.moodboard.state.texts))
-                        this.ChooseLayers([],this.sketchpad.layers)
-                    }
-                    
-                    current_collaborators[user_id] = {
-                        sketch_pos:[-1,-1],
-                        moodboard_pos: [-1, -1],
-                        active: true
-                    }
-                    var set = {}
-                    set['current_collaborators.'+user_id] = current_collaborators[user_id]
-                    set['updated']='current_collaborators.'+user_id
-                    console.log(set)
-                    // console.log(layers, arts, texts, sketchundo)
-                    Api.app.service('boards').update(board_id, {$set: set})
-                    .then((res)=>{
-                        _this.setState({current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email, board_owner: owner}, function(){
-                            // _this.sketchpad.setState({sketchundo: sketchundo})
-                                // , function(){
-                            //     var promises = []
-                            //     for(var i in layers){
-                            //         promises.push(_this.loadALayer(layers[i]))
-                            //     }
-                            //     Promise.all(promises)
-                            // })
-                            _this.moodboard.setState({texts:texts})
+                            var noone=true
+                            console.log(current_collaborators)
+                            for(var _id in current_collaborators){
+                                if(current_collaborators[_id].active && user_id!=_id){
+                                    noone=false
+                                }
+                            }
+                            console.log(noone)
+                            if(noone){
+                                console.log('harabangtang', Object.keys(this.moodboard.state.arts))
+                                this.ChooseArtsTexts([],[],Object.keys(this.moodboard.state.arts), Object.keys(this.moodboard.state.texts))
+                                this.ChooseLayers([],this.sketchpad.layers)
+                            }
+                            
+                            current_collaborators[user_id] = {
+                                sketch_pos:[-1,-1],
+                                moodboard_pos: [-1, -1],
+                                active: true
+                            }
+                            var set = {}
+                            set['current_collaborators.'+user_id] = current_collaborators[user_id]
+                            set['updated']='current_collaborators.'+user_id
+                            console.log(set)
+                            // console.log(layers, arts, texts, sketchundo)
+                            Api.app.service('boards').update(board_id, {$set: set})
+                            .then((res)=>{
+                                _this.setState({loaded:true, current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email, board_owner: owner}, function(){
+                                    // _this.sketchpad.setState({sketchundo: sketchundo})
+                                        // , function(){
+                                    //     var promises = []
+                                    //     for(var i in layers){
+                                    //         promises.push(_this.loadALayer(layers[i]))
+                                    //     }
+                                    //     Promise.all(promises)
+                                    // })
+                                    _this.moodboard.setState({texts:texts})
+                                })
+                            })
                         })
                     })
+
+
+                    // find and retrieve layers
+                    
+                    
+
+
+                    
 
                     
                     
@@ -1225,7 +1248,7 @@ class Board extends Component{
 
             <SketchPad board_this={this} board_state={this.state} ref={c => this.sketchpad=c}></SketchPad>
             <MoodBoard board_this={this} board_state={this.state} ref={c => this.moodboard=c}></MoodBoard>
-            <div style={{position:'absolute', right: '10px', top: '10px'}}>
+            <div style={{position:'absolute', right: (this.state.moodboard_collapsed&&this.state.sketchpad_collapsed==false)?'40px':'10px', top: '10px'}}>
                 {this.renderCollaboartorStatus()}
             </div>
             <div style={{position:'absolute', left: 'calc(50% - 30px)', top: 'calc(50% + 38px)', 
@@ -1233,7 +1256,14 @@ class Board extends Component{
             color: 'white', textAlign:'center', fontSize: '40px', cursor:'default', display: (this.state.moodboard_collapsed==false && this.state.sketchpad_collapsed==false)?'':'none'}} onPointerDown={this.addSketchIntoMoodboard.bind(this)}>
                 →
             </div>
-            
+            {this.state.loaded==false && <div style={{position: 'absolute', width: '100%', height: '100%', backgroundColor:'white', textAlign:'center', paddingTop: window.outerHeight/2-10}}>
+                    <div>Page is being loaded...</div>
+                    <div>
+                        {this.state.board_loaded==true&&<span>●</span>}{this.state.board_loaded!=true&&<span>○</span>}
+                        {this.state.layers_loaded==true&&<span>●</span>}{this.state.layers_loaded!=true&&<span>○</span>}
+                        {this.state.arts_loaded==true&&<span>●</span>}{this.state.arts_loaded!=true&&<span>○</span>}
+                    </div>
+                </div>}
         </div>)
     }
 }

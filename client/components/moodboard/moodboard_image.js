@@ -184,7 +184,7 @@ class MoodboardImage extends Component{
             e.stopPropagation()
             // console.log('look',this.props.mother_state.control_state, this.props.mother_state.action)
             var ecopied = {pageX: e.pageX, pageY: e.pageY}
-            if(this.props.mother_state.action!='object_moving'){
+            if(this.props.mother_state.action!='object_moving'&&this.props.mother_state.action!='object_resizing'){
                 // console.log(this.props.mother_state.current_image.indexOf(this.props.art._id))
                 if(this.props.mother_state.control_state=='control_object'){
                     if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
@@ -208,7 +208,7 @@ class MoodboardImage extends Component{
                     // console.log('yeah')
                     this.select_new_image(false, ecopied)
                 }
-            }else{
+            }else if(this.props.mother_state.action=='object_moving'){
                 
                 if(this.props.mother_state.current_image.indexOf(this.props.art._id)!=-1&&this.state.remove){
                     // console.log('deselect')
@@ -224,6 +224,8 @@ class MoodboardImage extends Component{
                     
                 }
                 this.props.mother_this.object_moving_end(e)
+            }else if(this.props.mother_state.action=='object_resizing'){
+                this.props.mother_this.end_object_resizing(e)
             }
             this.setState({remove:false})
         }

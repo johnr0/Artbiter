@@ -207,6 +207,34 @@ class SketchpadStyleStampControllerAI extends Component{
         
     }
 
+    selectAllArea(){
+        var target_layer = document.getElementById('sketchpad_canvas_'+this.props.mother_state.layers[this.props.mother_state.current_layer])
+
+
+        var black = document.createElement('canvas')
+        black.width=1000
+        black.height=1000
+        var black_ctx = black.getContext('2d')
+        black_ctx.drawImage(target_layer, 0, 0, 1000, 1000, 0, 0, 1000, 1000)
+        black_ctx.globalCompositeOperation = 'source-out'
+        black_ctx.fillStyle='black'
+        black_ctx.fillRect(0,0,1000,1000)
+        var white = document.createElement('canvas')
+        white.width = 1000
+        white.height = 1000
+        var white_ctx = white.getContext('2d')
+        white_ctx.drawImage(target_layer, 0, 0, 1000, 1000, 0, 0, 1000, 1000)
+        white_ctx.globalCompositeOperation = 'source-in'
+        white_ctx.fillStyle = 'white'
+        white_ctx.fillRect(0, 0, 1000, 1000)
+
+        var el = document.getElementById('style-stamp-canvas')
+        var canvas = el.getContext('2d')
+        canvas.drawImage(black, 0, 0, 1000, 1000)
+        canvas.drawImage(white, 0, 0, 1000, 1000)
+        this.props.mother_this.sketchPadStyleContentFinalize()
+    }
+
     render(){
         var el = document.getElementById('style-stamp-canvas')
         var canvas = el.getContext('2d')
@@ -234,6 +262,7 @@ class SketchpadStyleStampControllerAI extends Component{
                 <div style={{display:'inline-block', color:(this.props.mother_state.style_stamp_mode=='subtract')?'white':'#888888'}} onClick={this.setStyleStampMode.bind(this, 'subtract')}>subtract</div>
                 
             </div>
+            <div className='btn' style={{display:'inline-block', width:50, marginRight: '4px', padding: 0}} onPointerDown={this.selectAllArea.bind(this)}>All</div>
             <div className='btn' style={{display:'inline-block', width:70, marginRight: '4px', padding: 0}} onPointerDown={this.resetStyleStamp.bind(this)}>Reset</div>
             {/* <div>
                 
