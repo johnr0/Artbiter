@@ -278,22 +278,24 @@ class Board extends Component{
                 layer_dict[data._id].choosen_by = data.choosen_by
                 this.sketchpad.setState({layer_dict})
             }else if(updated.indexOf('sketchpad_update_a_layer')!=-1 || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
-                layer_dict[data._id].image = data.image
-                this.sketchpad.setState({layer_dict}, function(){
-                    var el = document.getElementById('sketchpad_canvas_'+data._id)
-                    var ctx = el.getContext('2d')
-                    var temp_el = document.getElementById('temp_canvas')
-                    var temp_ctx = temp_el.getContext('2d')
-                    var im = new Image()
-                    im.src = data.image
-                    im.onload=function(){
-                        console.log('first')
-                        temp_ctx.drawImage(im, 0,0,1000,1000)
-                        ctx.clearRect(0,0,1000,1000)
-                        ctx.drawImage(im, 0,0,1000,1000)
-                        temp_ctx.clearRect(0,0,1000,1000)
-                    }   
-                })
+                if(layer_dict[data._id].choosen_by != this.state.user_id){
+                    layer_dict[data._id].image = data.image
+                    this.sketchpad.setState({layer_dict}, function(){
+                        var el = document.getElementById('sketchpad_canvas_'+data._id)
+                        var ctx = el.getContext('2d')
+                        var temp_el = document.getElementById('temp_canvas')
+                        var temp_ctx = temp_el.getContext('2d')
+                        var im = new Image()
+                        im.src = data.image
+                        im.onload=function(){
+                            console.log('first')
+                            temp_ctx.drawImage(im, 0,0,1000,1000)
+                            ctx.clearRect(0,0,1000,1000)
+                            ctx.drawImage(im, 0,0,1000,1000)
+                            temp_ctx.clearRect(0,0,1000,1000)
+                        }   
+                    })
+                }
             }else if(updated.indexOf('sketchpad_layer_hide')!=-1){
                 layer_dict[data._id].hide = data.hide
                 this.sketchpad.setState({layer_dict})
@@ -656,6 +658,7 @@ class Board extends Component{
     updateALayerImage(layer_idx, layer_id, image, origin_image, cond='', selection=undefined){
         console.log('yaeh', cond, selection)
         var set = {}
+        this.sketchpad.state.layer_dict[layer_id].image = image
         set['image'] = image
         set['updated'] = 'sketchpad_update_a_layer'
         var set2={}
