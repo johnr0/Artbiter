@@ -134,7 +134,7 @@ class MoodBoardSearchPaneAI extends Component{
     addSearchedImageToMoodboard(val){
         var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         var arts = this.props.mother_state.arts
-        var pos = this.props.mother_this.getPositionOnBoard(document.getElementById('moodboard').offsetWidth/2, document.getElementById('moodboard').offsetHeight/2)
+        var pos = this.props.mother_this.getPositionOnBoard(document.getElementById('moodboard').offsetWidth/2, document.getElementById('moodboard').offsetHeight/2, true)
         var position = [pos[0], pos[1], pos[0], pos[1]]
         
         console.log(val[1])
@@ -309,14 +309,14 @@ class MoodBoardSearchPaneAI extends Component{
             }
             higher_groups[group.higher_group].push(group._id)
         }
-        console.log(higher_groups)
+        // console.log(higher_groups)
         return Object.keys(higher_groups).map((hkey, kidx)=>{
             var groups_in_h = higher_groups[hkey]
-            console.log(groups_in_h)
+            // console.log(groups_in_h)
             return (<div style={{borderBottom: 'solid 2px white', paddingBottom: '3px'}}>
                 {groups_in_h.map((key, idx)=>{
                     var group = this.props.mother_state.groups[key]
-                    console.log(key, group)
+                    // console.log(key, group)
                     var val = this.props.mother_state.generate_slider_values[key]
                     if(val==undefined){
                         val = 0
@@ -486,11 +486,12 @@ class MoodBoardSearchPaneAI extends Component{
                     </div>
                     <div className='col s3 moodboard_search_pane_subpane' style={{textAlign:'center'}}>
                         {group_exist && <div style={{position: 'absolute', top: '-30px'}}>
-                            <div className='btn tiny-btn' style={{marginRight:'3px', backgroundColor: (this.props.mother_state.searchMode!='search')?'#333333':''}} 
+                            <div className='btn tiny-btn search-panel-tab' style={{marginRight:'3px', backgroundColor: (this.props.mother_state.searchMode!='search')?'#333333':'#888888'}} 
                             disabled={(!art_exist||!group_exist)} onPointerUp={this.searchModeToggle.bind(this, 'search')}>Search</div>
-                            <div className='btn tiny-btn' style={{marginRight:'3px', backgroundColor: (this.props.mother_state.searchMode=='search')?'#333333':''}}
+                            <div className='btn tiny-btn search-panel-tab' style={{marginRight:'3px', backgroundColor: (this.props.mother_state.searchMode=='search')?'#333333':'#888888'}}
                             disabled={(!art_exist||!group_exist)} onPointerUp={this.searchModeToggle.bind(this, 'generate')}>Generate</div>
                         </div>}
+                        <div style={{position:'absolute', top: '-8px', height: '3px', width: '133px', backgroundColor: '#888888'}}></div>
                         {group_exist && <div className='moodboard_search_pane_subpane_div' style={{overflowY: 'auto'}} onWheel={this.searchWheel.bind(this)}>
                             <div style={{borderBottom: 'solid 2px white'}}>{(this.props.mother_state.searchMode=='search')?'Search':'Gen'} Controls</div>
                             <div>{this.props.mother_state.searchMode=='search' &&

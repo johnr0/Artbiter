@@ -66,8 +66,8 @@ class MoodboardImageAI extends MoodboardImage{
     }
 
     choose_image(down,e){
-        console.log(this.props.art.enabled, down)
-        console.log('choooose imaaaage')
+        // console.log(this.props.art.enabled, down)
+        // console.log('choooose imaaaage')
         if(this.props.mother_state.control_state!='style-stamp'){
             super.choose_image(e)
         }

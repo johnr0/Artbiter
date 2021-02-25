@@ -111,7 +111,7 @@ class MoodBoardAI extends MoodBoard{
             for(var k in groups){
                 var art_ids = groups[k].art_ids
                 var filtered = art_ids.filter(value => this.state.current_image.includes(value))
-                console.log(filtered)
+                // console.log(filtered)
                 if(filtered.length>0){
                     Api.app.service('groups').patch(k, {$set: {pos: groups[k].pos, updated:'groups_position'}})
                 }
@@ -283,12 +283,13 @@ class MoodBoardAI extends MoodBoard{
     }
 
     selectGroup(group_id, e){
-        if(this.state.control_state=='content-stamp'){
+        if(this.state.control_state=='content-stamp' || this.state.control_state=='add_image' || this.state.control_state=='add_text' || this.state.control_state=='add_color'){
             return
         }
         // TODO revise
         e.stopPropagation()
         e.preventDefault()
+        var ecopied = {pageX: e.pageX, pageY: e.pageY}
         var art_ids = this.state.groups[group_id].art_ids
         var _this = this
         var filtered = this.state.current_image.filter(value => !art_ids.includes(value))
@@ -347,6 +348,8 @@ class MoodBoardAI extends MoodBoard{
             Promise.all([
                 this.props.board_this.ChooseArtsTexts(art_ids.slice(),[],filtered,this.state.current_text.slice(0)),
                 this.setState({action:'idle', current_image:art_ids.slice(), current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
+                    _this.object_moving_init(ecopied);
+                    console.log(this.getCurrentMouseOnBoard(ecopied))
                     _this.props.board_this.sketchpad.setState({})
                 }),
                 Api.app.service('event_logs').create({event: 'select_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
@@ -550,10 +553,12 @@ class MoodBoardAI extends MoodBoard{
             }
 
             return (<g>
-                <rect x={backx+width/2-zwidth/2} y={backy+height/2-zheight/2}  width={zwidth} height={zheight} fill={group.higher_group}
-                    onPointerDown={this.selectGroup.bind(this, key)}></rect>
-                <text x={backx+width/2} y={backy+height/2+fontSize/4} textAnchor='middle' fontSize={fontSize}
-                    onPointerDown={this.selectGroup.bind(this, key)}>{group.group_name}</text>
+                <g>
+                    <rect x={backx+width/2-zwidth/2} y={backy+height/2-zheight/2}  width={zwidth} height={zheight} fill={group.higher_group}
+                        onPointerDown={this.selectGroup.bind(this, key)}></rect>
+                    <text x={backx+width/2} y={backy+height/2+fontSize/4} textAnchor='middle' fontSize={fontSize}
+                        onPointerDown={this.selectGroup.bind(this, key)}>{group.group_name}</text>
+                </g>
                 {removable && 
                 <g>
                     <rect x={backx+width/2+zwidth/2-10} y={backy+height/2-20} width="20" height="20" fill='#eb4542' rx='4'
@@ -664,6 +669,25 @@ class MoodBoardAI extends MoodBoard{
         }
     }
 
+    renderGroupConnectors(){
+        var groups = this.state.groups
+        var group_list = Object.keys(groups)
+        var scaler = this.state.boardlength*this.state.boardzoom
+
+        return group_list.map((val, idx)=>{
+            return group_list.map((val2, idx2)=>{
+                if(idx<idx2){
+                    if(groups[val].higher_group==groups[val2].higher_group){
+                        // render edge
+                    
+                        return (<line x1={scaler*(groups[val].pos[0]+groups[val].pos[2])/2} y1={scaler*(groups[val].pos[1]+groups[val].pos[3])/2} 
+                        x2={scaler*(groups[val2].pos[0]+groups[val2].pos[2])/2} y2={scaler*(groups[val2].pos[1]+groups[val2].pos[3])/2} stroke='#888888' strokeWidth='5'></line>)
+                    }
+                }
+            })
+        })
+    }
+
     render(){
         var boardrender_cursor
         if((this.state.control_state=='add_image'||this.state.control_state=='add_color') && this.state.action!='idle'){
@@ -677,8 +701,17 @@ class MoodBoardAI extends MoodBoard{
         }else{
             boardrender_cursor='default'
         }
-        return (<div className='col s6 oneboard'>
-            <h2>Mood Board {this.renderInitMoodboardMessage()}</h2>
+
+        var panel_size = ' s6 ' 
+        var horizontal_offset = 0
+        if(this.props.board_this.state.moodboard_collapsed==false && this.props.board_this.state.sketchpad_collapsed==true){
+            panel_size = ' s12 '
+            horizontal_offset = this.state.boardwidth/2
+        }
+
+        return (<div className={'col '+panel_size+' oneboard'} style={{display: (this.props.board_this.state.moodboard_collapsed)?'none':''}}>
+            <h2 style={{paddingLeft:'25px'}}>Mood Board {this.renderInitMoodboardMessage()}</h2>
+            <div className={'panel_collapser'} style={{left: '11px', top: 7.25}} onPointerDown={this.collapseMoodboard.bind(this)}> ▶ </div>
             <div id='moodboard' className='moodboard select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
                 //onPointerOut={this.moveBoardEnd.bind(this)}
                 
@@ -697,12 +730,13 @@ class MoodBoardAI extends MoodBoard{
                     width:this.state.boardzoom*this.state.boardlength, 
                     height: this.state.boardzoom*this.state.boardlength,
                     top: this.state.boardheight/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[1],
-                    left: this.state.boardwidth/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[0],
+                    left: horizontal_offset+this.state.boardwidth/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[0],
 
                     cursor: boardrender_cursor,
                 }}>
                     
                     <svg width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength}>
+                        {this.renderGroupConnectors()}
                         {this.renderGroupBack()}
                         {this.state.control_state=='control_object'&&(this.state.current_image.length>0||this.state.current_text.length>0)&&this.state.current_selected_pos!=undefined && 
                             this.renderImageHandle()

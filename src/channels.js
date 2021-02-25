@@ -301,9 +301,11 @@ module.exports = function(app) {
         data_to_return._id = data._id
         data_to_return.position = data.position
         data_to_return.choosen_by = data.choosen_by
+        data_to_return.enabled=data.enabled
       }else if(data.updated .indexOf('moodboard_arts_texts_choosen')!=-1){
         data_to_return._id = data._id
         data_to_return.choosen_by = data.choosen_by
+        data_to_return.enabled=data.enabled
       }else if(data.updated=='moodboard_color_swatch_change'){
         data_to_return._id = data._id
         data_to_return.color=data.color

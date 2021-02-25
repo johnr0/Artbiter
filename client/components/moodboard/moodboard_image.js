@@ -179,24 +179,24 @@ class MoodboardImage extends Component{
 
     choose_image(e){
         
-        console.log('this???')
+        // console.log('this???')
         if(this.props.mother_state.control_state!='crop'){
             e.stopPropagation()
-            console.log('look',this.props.mother_state.control_state, this.props.mother_state.action)
+            // console.log('look',this.props.mother_state.control_state, this.props.mother_state.action)
             var ecopied = {pageX: e.pageX, pageY: e.pageY}
             if(this.props.mother_state.action!='object_moving'){
-                console.log(this.props.mother_state.current_image.indexOf(this.props.art._id))
+                // console.log(this.props.mother_state.current_image.indexOf(this.props.art._id))
                 if(this.props.mother_state.control_state=='control_object'){
                     if(this.props.mother_state.current_image.length==0 && this.props.mother_state.current_text.length==0){
                         // this.select_new_image(true, ecopied)
                         if(this.props.art.choosen_by==this.props.mother_this.props.board_this.state.user_id){
-                            console.log('ddd')
+                            // console.log('ddd')
                             this.deselect_image(ecopied)
                         }else{
                             this.select_new_image(true, ecopied)
                         }
                     }else if(this.props.mother_state.current_image.indexOf(this.props.art._id)!=-1){
-                        console.log('deselect')
+                        // console.log('deselect')
                         this.deselect_image(ecopied)
                     }else if(this.props.mother_state.shift_down==false){
                         this.select_new_image(true, ecopied)
@@ -205,13 +205,13 @@ class MoodboardImage extends Component{
                     }
                     
                 }else if(this.props.mother_state.control_state=='content-stamp'){
-                    console.log('yeah')
+                    // console.log('yeah')
                     this.select_new_image(false, ecopied)
                 }
             }else{
                 
                 if(this.props.mother_state.current_image.indexOf(this.props.art._id)!=-1&&this.state.remove){
-                    console.log('deselect')
+                    // console.log('deselect')
                     var cur_mouse_pos = this.props.mother_this.getCurrentMouseOnBoard(e)
                     if(this.props.mother_state.init_mouse_pos[0]==cur_mouse_pos[0]&&this.props.mother_state.init_mouse_pos[1]==cur_mouse_pos[1]){
                         if(this.props.mother_state.current_image.length==1){
@@ -235,7 +235,7 @@ class MoodboardImage extends Component{
     }
 
     object_moving_init(e){
-        console.log('here????')
+        // console.log('here????')
         if(this.props.mother_state.control_state!='crop'){
             if(this.props.mother_state.action!='object_moving'){
                 this.setState({remove:true})

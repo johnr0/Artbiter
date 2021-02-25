@@ -60,7 +60,7 @@ class SketchPad extends ProtoBoard {
         resize_layer_init_pos: undefined, 
         resize_ret: undefined, 
 
-        prev_shift_key: undefined, 
+        prev_shift_key: 'move', 
 
         content_stamp_img: undefined, 
         content_stamp_ratio: undefined,
@@ -83,9 +83,14 @@ class SketchPad extends ProtoBoard {
         document.addEventListener('keydown', function(e){
             e = e||window.event;
             if(e.key=="z"){
-                if(_this.state.action=='idle'&&_this.state.control_state!='move'){
-                    _this.setState({prev_shift_key: _this.state.control_state, control_state: 'move'})
-                }
+                if(_this.state.current_layer>=0){
+                    if(_this.state.layer_dict[_this.state.layers[_this.state.current_layer]].hide!=true){
+                        if(_this.state.action=='idle'&&_this.state.control_state!='move'){
+                            _this.setState({prev_shift_key: _this.state.control_state, control_state: 'move'})
+                        }
+                    }
+                }   
+                
                 
             }
         })
@@ -93,7 +98,12 @@ class SketchPad extends ProtoBoard {
         document.addEventListener('keyup', function(e){
             e = e||window.event;
             if(e.key=="z"){
-                _this.setState({control_state: _this.state.prev_shift_key, action: 'idle'})
+                if(_this.state.current_layer>=0){
+                    if(_this.state.layer_dict[_this.state.layers[_this.state.current_layer]].hide!=true){
+                        _this.setState({control_state: _this.state.prev_shift_key, action: 'idle'})
+                    }
+                }
+                
                 
                 
             }
@@ -101,13 +111,18 @@ class SketchPad extends ProtoBoard {
     }
 
     getPositionOnBoard(xpix, ypix){
-        var xpos = 1000*(this.state.boardcenter[0]-this.state.boardwidth/2/this.state.boardlength/this.state.boardzoom+xpix/this.state.boardzoom/this.state.boardlength)
+        var horizontal_offset = 0
+        if(this.props.board_this.state.moodboard_collapsed==true && this.props.board_this.state.sketchpad_collapsed==false){
+            horizontal_offset = this.state.boardwidth/2
+        }
+        var xpos = 1000*(this.state.boardcenter[0]-(this.state.boardwidth/2+horizontal_offset)/this.state.boardlength/this.state.boardzoom+xpix/this.state.boardzoom/this.state.boardlength)
         var ypos = 1000*(this.state.boardcenter[1]-this.state.boardheight/2/this.state.boardlength/this.state.boardzoom+ypix/this.state.boardzoom/this.state.boardlength)
         return [xpos, ypos]
     }
 
     getCurrentMouseOnBoard(e){
         // console.log(e.pageX, e.pageY)
+        
         var xpix = e.pageX - document.getElementById(this.state.boardname).offsetLeft
         var ypix = e.pageY - document.getElementById(this.state.boardname).offsetTop
         
@@ -1369,9 +1384,43 @@ class SketchPad extends ProtoBoard {
         return false;
     }
 
+    setboardlength(){
+        var boardwidth = document.getElementById(this.state.boardname).offsetWidth
+        var boardheight = document.getElementById(this.state.boardname).offsetHeight
+        if(this.props.board_this.state.moodboard_collapsed==true && this.props.board_this.state.sketchpad_collapsed==false){
+            boardwidth = boardwidth/2
+        }
+        if(this.props.board_this.state.moodboard_collapsed==false && this.props.board_this.state.sketchpad_collapsed==true){
+            boardwidth = document.getElementById('moodboard').offsetWidth/2
+            boardheight = document.getElementById('moodboard').offsetHeight
+        }
+        var boardlength = (boardwidth>boardheight)?boardheight:boardwidth
+        console.log(boardlength)
+        this.setState({boardlength:boardlength, boardheight:boardheight, boardwidth: boardwidth})
+    }
+
+    collapseSketchpad(){
+        var boardstate = this.props.board_this.state
+        if(boardstate.moodboard_collapsed==false && boardstate.sketchpad_collapsed==false){
+            this.props.board_this.setState({moodboard_collapsed:false, sketchpad_collapsed: true})
+
+        }else if(boardstate.moodboard_collapsed==true && boardstate.sketchpad_collapsed==false){
+            this.props.board_this.setState({moodboard_collapsed:false, sketchpad_collapsed: false})
+        }
+    }
+
     render(){
-        return (<div className='col s6 oneboard'>
+
+        var panel_size = ' s6 ' 
+        var horizontal_offset = 0
+        if(this.props.board_this.state.moodboard_collapsed==true && this.props.board_this.state.sketchpad_collapsed==false){
+            panel_size = ' s12 '
+            horizontal_offset = this.state.boardwidth/2
+        }
+
+        return (<div className={'col '+panel_size+' oneboard'}  style={{display: (this.props.board_this.state.sketchpad_collapsed)?'none':''}}>
         <h2 className='select_disabled'>Sketch Pad</h2>
+        <div className={'panel_collapser'} style={{left: 'calc(100% - 31px)', top: 7.25}} onPointerDown={this.collapseSketchpad.bind(this)}>◀</div>
         <div id='sketchpad' className='sketchpad select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
             onPointerOut={this.moveBoardEnd.bind(this)}
             onPointerMove={this.sketchPadMouseMove.bind(this)}> 
@@ -1384,7 +1433,7 @@ class SketchPad extends ProtoBoard {
                 width:this.state.boardzoom*this.state.boardlength, 
                 height: this.state.boardzoom*this.state.boardlength,
                 top: this.state.boardheight/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[1],
-                left: this.state.boardwidth/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[0],
+                left: horizontal_offset+this.state.boardwidth/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[0],
             }}>
                 
                 {this.renderCanvas()}

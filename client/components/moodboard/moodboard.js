@@ -132,9 +132,24 @@ class MoodBoard extends ProtoBoard{
         }
     }
     
-    getPositionOnBoard(xpix, ypix){
-        var xpos = this.state.boardcenter[0]-this.state.boardwidth/2/this.state.boardlength/this.state.boardzoom+xpix/this.state.boardzoom/this.state.boardlength
+    getPositionOnBoard(xpix, ypix, ori=false){
+        var horizontal_offset = 0
+        if(ori){
+            if(this.props.board_this.state.moodboard_collapsed==false && this.props.board_this.state.sketchpad_collapsed==true){
+                horizontal_offset = this.state.boardwidth/2
+            }else{
+                horizontal_offset = 0
+            }
+        }
+        else if(this.props.board_this.state.moodboard_collapsed==false && this.props.board_this.state.sketchpad_collapsed==true){
+            horizontal_offset = this.state.boardwidth/2
+        }else{
+            horizontal_offset = this.state.boardwidth+11.250+11.250
+        }
+        
+        var xpos = this.state.boardcenter[0]-(this.state.boardwidth/2+horizontal_offset)/this.state.boardlength/this.state.boardzoom+xpix/this.state.boardzoom/this.state.boardlength
         var ypos = this.state.boardcenter[1]-this.state.boardheight/2/this.state.boardlength/this.state.boardzoom+ypix/this.state.boardzoom/this.state.boardlength
+        // console.log(horizontal_offset, xpos, ypos)
         return [xpos, ypos]
     }
 
@@ -393,7 +408,7 @@ class MoodBoard extends ProtoBoard{
     moodBoardMouseMove(e){
         // var pos = this.getCurrentMouseOnBoard(e)
         // this.props.board_this.setMoodboardPosition(pos[0], pos[1]);
-
+        // console.log('objectmove', this.state.action)
         if((this.state.control_state=='control_object'||this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp'||this.state.control_state=='crop') && this.state.action=='move_board'){
             this.moveMouse(e)
         }else if(this.state.control_state=='control_object' && this.state.action=='object_resizing'){
@@ -575,14 +590,14 @@ class MoodBoard extends ProtoBoard{
     }
 
     object_moving_init(e){
-        console.log('init?')
+        // console.log('init?')
         if(e.stopPropagation!=undefined){
             e.stopPropagation()
         }   
 
         var init_mouse_pos = this.getCurrentMouseOnBoard(e)
         var init_image_pos = {}
-        console.log(this.state)
+        // console.log(this.state)
         for(var i in this.state.current_image){
             init_image_pos[this.state.current_image[i]] = this.state.arts[this.state.current_image[i]].position
         }
@@ -590,7 +605,7 @@ class MoodBoard extends ProtoBoard{
         for(var i in this.state.current_text){
             init_text_pos[this.state.current_text[i]] = this.state.texts[this.state.current_text[i]].position
         }
-        console.log(init_image_pos, init_mouse_pos, this.state.current_selected_pos)
+        // console.log(init_image_pos, init_mouse_pos, this.state.current_selected_pos)
         if(this.state.current_selected_pos!=undefined){
             this.setState({action:'object_moving', init_mouse_pos: init_mouse_pos, init_text_pos: init_text_pos,init_image_pos:init_image_pos,  init_group_pos:this.state.current_selected_pos.slice()})
         }
@@ -913,7 +928,7 @@ class MoodBoard extends ProtoBoard{
         if(this.state.current_image.length==1 && this.state.current_text.length==0 && this.state.arts[this.state.current_image[0]].color!=undefined){
             color = this.state.arts[this.state.current_image[0]].color
         }
-        console.log(color)
+        // console.log(color)
         return (<g>
             <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#333333' fill='transparent' strokeWidth='2' style={{cursor:'move'}}  onPointerDown={this.object_moving_init.bind(this)}></rect>
             
@@ -962,6 +977,29 @@ class MoodBoard extends ProtoBoard{
        return (<span style={{fontSize:'30px', verticalAlign:'top'}}><i onClick={this.toastMessage.bind(this)} class='fas fa-info-circle'></i></span>) 
     }
     
+    collapseMoodboard(){
+        var boardstate = this.props.board_this.state
+        if(boardstate.moodboard_collapsed==false && boardstate.sketchpad_collapsed==false){
+            this.props.board_this.setState({moodboard_collapsed:true, sketchpad_collapsed: false})
+        }else if(boardstate.moodboard_collapsed==false && boardstate.sketchpad_collapsed==true){
+            this.props.board_this.setState({moodboard_collapsed:false, sketchpad_collapsed: false})
+        }
+    }
+
+    setboardlength(){
+        var boardwidth = document.getElementById(this.state.boardname).offsetWidth
+        var boardheight = document.getElementById(this.state.boardname).offsetHeight
+        if(this.props.board_this.state.moodboard_collapsed==false && this.props.board_this.state.sketchpad_collapsed==true){
+            boardwidth = boardwidth/2
+        }
+        if(this.props.board_this.state.moodboard_collapsed==true && this.props.board_this.state.sketchpad_collapsed==false){
+            boardwidth = document.getElementById('sketchpad').offsetWidth/2
+            boardheight = document.getElementById('sketchpad').offsetHeight
+        }
+        var boardlength = (boardwidth>boardheight)?boardheight:boardwidth
+        console.log(boardlength)
+        this.setState({boardlength:boardlength, boardheight:boardheight, boardwidth: boardwidth})
+    }
 
     // TODO add image through url
     // TODO make the image manipulatable
@@ -982,8 +1020,20 @@ class MoodBoard extends ProtoBoard{
         }else{
             boardrender_cursor='default'
         }
-        return (<div className='col s6 oneboard'>
-            <h2>Mood board {this.renderInitMoodboardMessage()}</h2>
+        var panel_size = ' s6 ' 
+        var horizontal_offset = 0
+        if(this.props.board_this.state.moodboard_collapsed==false && this.props.board_this.state.sketchpad_collapsed==true){
+            panel_size = ' s12 '
+            horizontal_offset = this.state.boardwidth/2
+        }
+
+        
+
+        
+
+        return (<div className={'col '+panel_size+' oneboard'} style={{display: (this.props.board_this.state.moodboard_collapsed)?'none':''}}>
+            <h2 style={{paddingLeft:'25px'}}>Mood board</h2>
+            <div className={'panel_collapser'} style={{left: '11px', top: 7.25}} onPointerDown={this.collapseMoodboard.bind(this)}> ▶ </div>
             <div id='moodboard' className='moodboard select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
                 //onPointerOut={this.moveBoardEnd.bind(this)}
                 
@@ -1002,7 +1052,7 @@ class MoodBoard extends ProtoBoard{
                     width:this.state.boardzoom*this.state.boardlength, 
                     height: this.state.boardzoom*this.state.boardlength,
                     top: this.state.boardheight/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[1],
-                    left: this.state.boardwidth/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[0],
+                    left: horizontal_offset+this.state.boardwidth/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[0],
 
                     cursor: boardrender_cursor,
                 }}>

@@ -222,8 +222,16 @@ class SketchPadAI extends SketchPad{
     }
 
     render(){
-        return (<div className='col s6 oneboard'>
+        var panel_size = ' s6 ' 
+        var horizontal_offset = 0
+        if(this.props.board_this.state.moodboard_collapsed==true && this.props.board_this.state.sketchpad_collapsed==false){
+            panel_size = ' s12 '
+            horizontal_offset = this.state.boardwidth/2
+        }
+
+        return (<div className={'col '+panel_size+' oneboard'}  style={{display: (this.props.board_this.state.sketchpad_collapsed)?'none':''}}>
         <h2>Sketch Pad</h2>
+        <div className={'panel_collapser'} style={{left: 'calc(100% - 31px)', top: 7.25}} onPointerDown={this.collapseSketchpad.bind(this)}>◀</div>
         <div id='sketchpad' className='sketchpad select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
             onPointerOut={this.moveBoardEnd.bind(this)}
             onPointerMove={this.sketchPadMouseMove.bind(this)}> 
@@ -236,7 +244,7 @@ class SketchPadAI extends SketchPad{
                 width:this.state.boardzoom*this.state.boardlength, 
                 height: this.state.boardzoom*this.state.boardlength,
                 top: this.state.boardheight/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[1],
-                left: this.state.boardwidth/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[0],
+                left: horizontal_offset+this.state.boardwidth/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[0],
             }}>
                 
                 {this.renderCanvas()}

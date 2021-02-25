@@ -270,7 +270,7 @@ class BoardAI extends Board{
                                             //     Promise.all(promises)
                                             // })
                                             _this.moodboard.setState({texts:texts})
-                                            console.log('done')
+                                            // console.log('done')
                                         })
                                     })
 
@@ -319,7 +319,7 @@ class BoardAI extends Board{
                 </div>
                 <div style={{position:'absolute', left: 'calc(50% - 30px)', top: 'calc(50% + 38px)', 
                 width:'60px', height:'60px', borderRadius: '50%', backgroundColor: '#333333',
-                color: 'white', textAlign:'center', fontSize: '40px', cursor:'default'}} onPointerDown={this.addSketchIntoMoodboard.bind(this)}>
+                color: 'white', textAlign:'center', fontSize: '40px', cursor:'default', display: (this.state.moodboard_collapsed==false && this.state.sketchpad_collapsed==false)?'':'none'}} onPointerDown={this.addSketchIntoMoodboard.bind(this)}>
                     →
                 </div>
             </div>)

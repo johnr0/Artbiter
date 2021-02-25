@@ -1,4 +1,5 @@
 import { setManager } from '@feathersjs/hooks/lib'
+import callOnce from 'material-ui/utils/callOnce'
 import React, {Component} from 'react'
 import Api from '../../middleware/api'
 import MoodBoard from '../moodboard/moodboard'
@@ -14,6 +15,8 @@ class Board extends Component{
         board_owner: undefined, 
         collaborator_dict: {},
         // lastmouseupdate: new Date(),
+        sketchpad_collapsed: false,
+        moodboard_collapsed: false,
     }
 
     getRandomColor() {
@@ -193,7 +196,7 @@ class Board extends Component{
         })
 
         Api.app.service('arts').on('patched', (data)=>{
-            console.log('patched!', data.updated, _this.moodboard)
+            console.log('patched!', data.updated)
             if(_this.moodboard!=null){
                 var arts = _this.moodboard.state.arts
             
@@ -210,6 +213,14 @@ class Board extends Component{
                         if(arts[data._id]!=undefined){
                             arts[data._id].choosen_by = data.choosen_by
                         }   
+                    }
+                    if(data.enabled!=undefined){
+                        if(arts[data._id]!=undefined){
+                            if(arts[data._id].enabled!=true){
+                                arts[data._id].enabled = data.enabled
+                            }
+                            
+                        }
                     }
                 }else if(data.updated.indexOf('moodboard_update_arts_embedding')!=-1){
                     // TODO
@@ -326,7 +337,7 @@ class Board extends Component{
 
         Api.app.service('boards').on('patched', data=>{
             var updated = data.updated
-            console.log(data, updated)
+            // console.log(data, updated)
             if(updated.indexOf('sketchpad_update_a_layer')!=-1 || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
                 var layers = _this.sketchpad.state.layers
                 // var sketchundo = _this.sketchpad.state.sketchundo
@@ -854,7 +865,7 @@ class Board extends Component{
         
         for(var i in art_ids){
             var create = arts[i]
-            console.log(arts)
+            // console.log(arts)
             create['_id']=art_ids[i]
             create['updated'] = 'moodboard_add_arts'
             create['board_id'] = this.state.board_id
@@ -935,7 +946,7 @@ class Board extends Component{
     }
 
     ChooseArtsTexts(art_ids, text_ids, d_art_ids, d_text_ids){
-        console.log('chooseartstexts', art_ids)
+        // console.log('chooseartstexts', art_ids)
         var patch={}
         // var arts = this.moodboard.state.arts
         patch['updated'] = 'moodboard_arts_texts_choosen'
@@ -972,7 +983,7 @@ class Board extends Component{
 
     ChooseLayers(layer_idxs, d_layer_idxs){
         var layers = this.sketchpad.state.layers.slice()
-        console.log(layer_idxs, d_layer_idxs)
+        // console.log(layer_idxs, d_layer_idxs)
         for(var i in layer_idxs){
             var patch={}
             patch['updated'] = 'sketchpad_layers_choosen'
@@ -1051,7 +1062,7 @@ class Board extends Component{
         var arts =this.moodboard.state.arts
         var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
-        var pos = this.moodboard.getPositionOnBoard(0, document.getElementById('moodboard').offsetHeight/2)
+        var pos = this.moodboard.getPositionOnBoard(0, document.getElementById('moodboard').offsetHeight/2, true)
         var pos0 = Math.max(pos[0], 0)
         
         console.log(pos0, pos)
@@ -1204,6 +1215,7 @@ class Board extends Component{
         this.moodboard=el
     }
 
+
     render(){
         return (
         <div id='board_whole' style={{flex: 'auto', width: '100%', position:'relative'}} className='row'>
@@ -1215,9 +1227,10 @@ class Board extends Component{
             </div>
             <div style={{position:'absolute', left: 'calc(50% - 30px)', top: 'calc(50% + 38px)', 
             width:'60px', height:'60px', borderRadius: '50%', backgroundColor: '#333333',
-            color: 'white', textAlign:'center', fontSize: '40px', cursor:'default'}} onPointerDown={this.addSketchIntoMoodboard.bind(this)}>
+            color: 'white', textAlign:'center', fontSize: '40px', cursor:'default', display: (this.state.moodboard_collapsed==false && this.state.sketchpad_collapsed==false)?'':'none'}} onPointerDown={this.addSketchIntoMoodboard.bind(this)}>
                 →
             </div>
+            
         </div>)
     }
 }
