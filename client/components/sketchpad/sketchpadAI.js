@@ -259,6 +259,7 @@ class SketchPadAI extends SketchPad{
                     {/* {this.renderLasso()} */}
                 </svg>
                 {this.props.board_this.renderCollaboratorsOnSketchpad()}
+                
             </div>
             <SketchpadMainControllerAI mother_state={this.state} mother_this={this}></SketchpadMainControllerAI>
             <SketchpadLayerController mother_state={this.state} mother_this={this}></SketchpadLayerController>
@@ -266,6 +267,8 @@ class SketchPadAI extends SketchPad{
             <SketchpadStyleStampControllerAI2 ref={c=>this.stylestampcontroller=c} mother_state={this.state} mother_this={this}></SketchpadStyleStampControllerAI2>
             
         </div>
+        {this.state.control_state=='brush' && this.state.action=='brush' && this.renderBrushMark()}
+        {this.state.control_state=='erase' && this.state.action=='erase' && this.renderEraserMark()}
     </div>)
     }
 }

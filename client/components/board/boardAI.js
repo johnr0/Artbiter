@@ -328,6 +328,7 @@ class BoardAI extends Board{
                 color: 'white', textAlign:'center', fontSize: '40px', cursor:'default', display: (this.state.moodboard_collapsed==false && this.state.sketchpad_collapsed==false)?'':'none'}} onPointerDown={this.addSketchIntoMoodboard.bind(this)}>
                     →
                 </div>
+                {/* {this.sketchpad!=undefined && this.sketchpad.state.control_state=='brush' && this.sketchpad.state.action=='brush' && this.sketchpad.renderBrushMark()} */}
                 {this.state.loaded==false && <div style={{position: 'absolute', width: '100%', height: '100%', backgroundColor:'white', textAlign:'center', paddingTop: window.outerHeight/2-10}}>
                     <div>Page is being loaded...</div>
                     <div>

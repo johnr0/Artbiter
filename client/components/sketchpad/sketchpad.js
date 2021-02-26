@@ -69,6 +69,7 @@ class SketchPad extends ProtoBoard {
         content_stamp_init_pos: undefined,
         content_stamp_cur_pos: undefined,
 
+        cur_mouse_pos: [0,0]
     }
 
     // TODO lasso tool - nonlasso-based resize
@@ -233,6 +234,8 @@ class SketchPad extends ProtoBoard {
         // var pos = this.getCurrentMouseOnBoard(e)
         // this.props.board_this.setSketchpadPosition(pos[0], pos[1]);
         // console.log('sdkfjo', this.state.action)
+        console.log(this.state.cur_mouse_pos)
+        this.setState({cur_mouse_pos: [e.pageX, e.pageY]})
         if((this.state.control_state=='move'||this.state.control_state=='move-layer') && this.state.action=='move_board'){
             this.moveMouse(e)
         }else if(this.state.control_state=='brush' && this.state.action=='brush'){
@@ -1470,6 +1473,17 @@ class SketchPad extends ProtoBoard {
         }
     }
 
+    renderBrushMark(){
+        var height = this.state.brush_size/1000*this.state.boardlength*this.state.boardzoom
+        return (<img src={location.protocol+'//'+location.host+'/img/brush.png'} style={{height: height, position:'absolute', zorder:100000, pointerEvents: 'none', top: this.state.cur_mouse_pos[1]-15, left: this.state.cur_mouse_pos[0]-15}}></img>)
+    }
+
+    renderEraserMark(){
+        var height = this.state.erase_size/1000*this.state.boardlength*this.state.boardzoom
+        return (<div style={{border: 'solid 1px black', borderRadius: '50%', height:height, width: height, position:'absolute', zorder: 100000, pointerEvents:'none', top: this.state.cur_mouse_pos[1]-height/2, left: this.state.cur_mouse_pos[0]-height/2}}></div>)
+        // return (<img src={location.protocol+'//'+location.host+'/img/brush.png'} style={{height: height, position:'absolute', zorder:100000, pointerEvents: 'none', top: this.state.cur_mouse_pos[1]-15, left: this.state.cur_mouse_pos[0]-15}}></img>)
+    }
+
     render(){
 
         var panel_size = ' s6 ' 
@@ -1508,11 +1522,14 @@ class SketchPad extends ProtoBoard {
                     {/* {this.renderLasso()} */}
                 </svg>
                 {this.props.board_this.renderCollaboratorsOnSketchpad()}
+                
             </div>
             <SketchpadMainController mother_state={this.state} mother_this={this}></SketchpadMainController>
             <SketchpadLayerController mother_state={this.state} mother_this={this}></SketchpadLayerController>
             {/* <SketchpadUndo mother_state={this.state} mother_this={this}></SketchpadUndo> */}
         </div>
+        {this.state.control_state=='brush' && this.state.action=='brush' && this.renderBrushMark()}
+        {this.state.control_state=='erase' && this.state.action=='erase' && this.renderEraserMark()}
     </div>)
     }
 }
