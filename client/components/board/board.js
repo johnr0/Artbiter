@@ -229,12 +229,18 @@ class Board extends Component{
                 } else if(data.updated!='moodboard_color_swatch_change' && data.updated!='moodboard_update_arts_embedding'){
                     if(data.position!=undefined){
                         if(arts[data._id]!=undefined){
-                            arts[data._id].position = data.position
+                            if(data.choosen_by!=this.state.user_id){
+                                arts[data._id].position = data.position
+                            }
+                            
                         }
                     }
                     if(data.choosen_by!=undefined){
                         if(arts[data._id]!=undefined){
-                            arts[data._id].choosen_by = data.choosen_by
+                            if(data.choosen_by!=this.state.user_id){
+                                arts[data._id].choosen_by = data.choosen_by
+                            }
+                            
                         }   
                     }
                     if(data.enabled!=undefined){
