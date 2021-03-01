@@ -216,7 +216,7 @@ class SketchPad extends ProtoBoard {
         }
 
         if(this.state.lasso.length>0 || this.state.nonlasso_ret!=undefined){
-            console.log(xmin, xmax, ymin, ymax)
+            // console.log(xmin, xmax, ymin, ymax)
             var mpos = this.getCurrentMouseOnBoard(e)
 
             if(mpos[0]>xmin && mpos[0]<xmax && mpos[1]>ymin && mpos[1]<ymax){
@@ -234,7 +234,7 @@ class SketchPad extends ProtoBoard {
         // var pos = this.getCurrentMouseOnBoard(e)
         // this.props.board_this.setSketchpadPosition(pos[0], pos[1]);
         // console.log('sdkfjo', this.state.action)
-        console.log(this.state.cur_mouse_pos)
+        // console.log(this.state.cur_mouse_pos)
         this.setState({cur_mouse_pos: [e.pageX, e.pageY]})
         if((this.state.control_state=='move'||this.state.control_state=='move-layer') && this.state.action=='move_board'){
             this.moveMouse(e)

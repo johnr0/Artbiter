@@ -104,6 +104,7 @@ class BoardAI extends Board{
             Api.app.service('boards').timeout = 60000
             Api.app.service('arts').timeout = 60000
             Api.app.service('layers').timeout = 60000
+            Api.app.service('groups').timeout = 60000
             console.log('timeout after...', Api.app.service('boards').timeout)
             Api.app.service('boards').find({query: {_id: board_id,
                 $select: ['name', 'owner', 'texts', 'collaborators', 'current_collaborators', 'layers', 'searchMode', 'searchPane', 'search_image_selected', 'search_slider_values', 'search_slider_distances', 'generate_slider_values', 'agreementPane', 'agreement_userSelection']

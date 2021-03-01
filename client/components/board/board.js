@@ -773,14 +773,14 @@ class Board extends Component{
         var patch={}
         patch['layers']=new_layer
         patch['updated']='sketchpad_reorder_layers'
-        patch['$push'] = {
-            // sketchundo: {
-            //     undo_id: Math.random().toString(36).substring(2, 15), 
-            //     user_id: this.state.user_id,
-            //     type: 'layer_reorder',
-            //     layers: prev_layer
-            // }
-        }
+        // patch['$push'] = {
+        //     // sketchundo: {
+        //     //     undo_id: Math.random().toString(36).substring(2, 15), 
+        //     //     user_id: this.state.user_id,
+        //     //     type: 'layer_reorder',
+        //     //     layers: prev_layer
+        //     // }
+        // }
         Api.app.service('boards').patch(this.state.board_id, patch).then(()=>{
             // Api.app.service('boards').patch(this.state.board_id, {$set: {updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
         })
