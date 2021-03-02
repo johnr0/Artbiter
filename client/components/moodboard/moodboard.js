@@ -977,10 +977,10 @@ class MoodBoard extends ProtoBoard{
             <rect x={x+4} y={y-8} width={width-8} height={12} fill='transparent' strokeWidth='0' style={{cursor:'ns-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-right')}></rect>
             <rect x={x+4} y={y+height-4} width={width-8} height={12} fill='transparent' strokeWidth='0' style={{cursor:'ns-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></rect>
 
-            <circle className='bottom-right' cx={x} cy={y} r='6' stroke='#333333' fill='white' style={{cursor:'nw-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-right')}></circle>
+            {/* <circle className='bottom-right' cx={x} cy={y} r='6' stroke='#333333' fill='white' style={{cursor:'nw-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-right')}></circle>
             <circle cx={x+width} cy={y} r='6' stroke='#333333' fill='white' style={{cursor:'ne-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-left')}></circle>
             <circle cx={x} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'sw-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-right')}></circle>
-            <circle cx={x+width} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'se-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></circle>
+            <circle cx={x+width} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'se-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></circle> */}
 
             {this.state.current_image.length==1 && this.state.current_text.length==0 && this.state.arts[this.state.current_image[0]].color!=undefined &&
             <foreignObject x={x+width+5} y={y+height-color_height} width={color_width} height={color_height}>
@@ -988,6 +988,43 @@ class MoodBoard extends ProtoBoard{
                 <input id='color_swatch_picker' className='colorHandle' type='color' value={this.state.color} onChange={this.colorChange.bind(this)} onPointerDown={this.colorChangeMode.bind(this, 'change_color')}></input>
                 <div className='btn tiny-btn' style={{width: '100%', height:'20px', lineHeight:'14px'}} onPointerDown={this.changeColor.bind(this)}>Apply</div>
             </foreignObject>}
+        </g>)
+    }
+
+    renderImageHandle2(){
+        // console.log(this.state.current_selected_pos)
+        var smallx = (this.state.current_selected_pos[0]<this.state.current_selected_pos[2])?this.state.current_selected_pos[0]:this.state.current_selected_pos[2]
+        var bigx = (this.state.current_selected_pos[0]>this.state.current_selected_pos[2])?this.state.current_selected_pos[0]:this.state.current_selected_pos[2]
+        var smally = (this.state.current_selected_pos[1]<this.state.current_selected_pos[3])?this.state.current_selected_pos[1]:this.state.current_selected_pos[3]
+        var bigy = (this.state.current_selected_pos[1]>this.state.current_selected_pos[3])?this.state.current_selected_pos[1]:this.state.current_selected_pos[3]
+        var x = smallx* this.state.boardlength*this.state.boardzoom
+        var y = smally* this.state.boardlength*this.state.boardzoom
+
+        var width = (bigx-smallx)* this.state.boardlength*this.state.boardzoom
+        var height = (bigy-smally)* this.state.boardlength*this.state.boardzoom
+
+        var color_width = 50
+        var color_height = 40
+
+        var color 
+        if(this.state.current_image.length==1 && this.state.current_text.length==0 && this.state.arts[this.state.current_image[0]].color!=undefined){
+            color = this.state.arts[this.state.current_image[0]].color
+        }
+        // console.log(color)
+        return (<g>
+            {/* <rect x={x-2} y={y-2} width={width+4} height={height+4} stroke='#333333' fill='transparent' strokeWidth='2' style={{cursor:'move'}}  onPointerDown={this.object_moving_init.bind(this)}></rect>
+            
+            <rect x={x-8} y={y+4} width={12} height={height-8} fill='transparent' strokeWidth='0' style={{cursor:'ew-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-right')}></rect>
+            <rect x={x+width-4} y={y+4} width={12} height={height-8} fill='transparent' strokeWidth='0' style={{cursor:'ew-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></rect>
+            <rect x={x+4} y={y-8} width={width-8} height={12} fill='transparent' strokeWidth='0' style={{cursor:'ns-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-right')}></rect>
+            <rect x={x+4} y={y+height-4} width={width-8} height={12} fill='transparent' strokeWidth='0' style={{cursor:'ns-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></rect> */}
+
+            <circle className='bottom-right' cx={x} cy={y} r='6' stroke='#333333' fill='white' style={{cursor:'nw-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-right')}></circle>
+            <circle cx={x+width} cy={y} r='6' stroke='#333333' fill='white' style={{cursor:'ne-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'bottom-left')}></circle>
+            <circle cx={x} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'sw-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-right')}></circle>
+            <circle cx={x+width} cy={y+height} r='6' stroke='#333333' fill='white'  style={{cursor:'se-resize'}} onPointerDown={this.object_resizing_init.bind(this, 'top-left')}></circle>
+
+            
         </g>)
     }
 
@@ -1098,10 +1135,14 @@ class MoodBoard extends ProtoBoard{
                 }}>
                     
                     <svg width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength}>
-                        {this.renderImages()}
+                        
                         {this.renderTexts()}
                         {this.state.control_state=='control_object'&&(this.state.current_image.length>0||this.state.current_text.length>0)&&this.state.current_selected_pos!=undefined && 
                             this.renderImageHandle()
+                        }
+                        {this.renderImages()}
+                        {this.state.control_state=='control_object'&&(this.state.current_image.length>0||this.state.current_text.length>0)&&this.state.current_selected_pos!=undefined && 
+                            this.renderImageHandle2()
                         }
                         {this.rendereditingTexts()}
                         

@@ -752,6 +752,9 @@ class MoodBoardAI extends MoodBoard{
                             this.renderImageHandle()
                         }
                         {this.renderImages()}
+                        {this.state.control_state=='control_object'&&(this.state.current_image.length>0||this.state.current_text.length>0)&&this.state.current_selected_pos!=undefined && 
+                            this.renderImageHandle2()
+                        }
                         {this.renderTexts()}
                         
                         {/* {this.renderSelfs()} */}
