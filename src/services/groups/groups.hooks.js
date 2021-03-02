@@ -17,10 +17,7 @@ function sliderImpact(board_id, context){
       search_slider_values = {}
     }
     var search_image_selected = res0[0].search_image_selected
-    console.log('search_image_selected', search_image_selected)
-    if(search_image_selected==undefined){
-      return
-    }
+    // console.log('search_image_selected', search_image_selected)
     
     context.app.service('groups').find({query: {board_id:board_id}})
     .then((res1)=>{
@@ -75,12 +72,18 @@ function sliderImpact(board_id, context){
       for(var i in search_slider_values){
         cavs[i] = res1[ids.indexOf(i)].cav
       }
-
+      if(search_image_selected==undefined){
+        // console.log('gsv', generate_slider_values)
+        context.app.service('boards').patch(board_id, {$set: {search_slider_values: search_slider_values, generate_slider_values: generate_slider_values, updated:'moodboard_search_slider_distances'}})
+        return
+      }
       context.app.service('arts').find({query: {_id: search_image_selected}})
       .then((res2)=>{
         if(res2.length==0){
           return
         }
+        
+        
         // console.log(search_image_selected, res2[0]._id)
         var embedding = res2[0].embedding
         axios.post(context.app.get('ml_server')+'sliderImpact', {
@@ -139,12 +142,12 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
         context.app.service('group_models').remove(null, {query: {_id: {$in: to_remove_ids}}})
         .then(()=>{
           console.log('group model find')
-          context.app.service('group_models').find({query:{_id:{$in: [_id]}}})
+          context.app.service('group_models').find({query:{_id:{$in: [context.result.board_id+'_'+_id]}}})
           .then((res_fin)=>{
             console.log('group model create')
             if(res_fin.length==0){
               // console.log('source of error?')
-              context.app.service('group_models').create({ '_id': _id, board_id: context.result.board_id, 
+              context.app.service('group_models').create({ '_id': context.result.board_id+'_'+_id, board_id: context.result.board_id, 
                 'group_model': response.data['group_model'], 'l2t': response.data['l2t'], 'dec': response.data['dec'], groups: Object.keys(cavs)
               })
             }
@@ -515,10 +518,10 @@ const RemoveGroupCAV = async context => {
         var art_ids = []
 
         if(res2.length==1){
-          context.app.service('group_models').find({query:{_id: res[0].higher_group}})
+          context.app.service('group_models').find({query:{_id: res[0].board_id+'_'+res[0].higher_group}})
           .then((res_gm)=>{
             if(res_gm.length>0){
-              context.app.service('group_models').remove(res[0].higher_group)
+              context.app.service('group_models').remove(res[0].board_id+'_'+res[0].higher_group)
             }
           })
           
@@ -534,7 +537,8 @@ const RemoveGroupCAV = async context => {
 
         context.app.service('arts').find({query:{board_id: res[0].board_id}})
         .then((res_arts)=>{
-          var promises = []
+          // var promises = []
+          var batch = []
           for(var k in res_arts){
             if(res_arts[k].labels!=undefined){
               var labels = JSON.parse(JSON.stringify(res_arts[k].labels))
@@ -544,12 +548,13 @@ const RemoveGroupCAV = async context => {
                 var set = {}
                 unset['labels.'+context.arguments[0]] =1
                 set['updated'] = 'arts_label'
-                promises.push(context.app.service('arts').patch(res_arts[k]._id, {$set:set, $unset: unset}))
+                // promises.push(context.app.service('arts').patch(res_arts[k]._id, {$set:set, $unset: unset}))
+                batch.push(['patch', 'arts', res_arts[k]._id, {$set:set, $unset: unset}])
               }
               
             }
           }
-          Promise.all(promises)
+          context.app.service('batch').create({calls:batch})
           .then(function(){
             context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
           })

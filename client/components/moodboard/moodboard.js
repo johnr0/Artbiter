@@ -56,19 +56,22 @@ class MoodBoard extends ProtoBoard{
         document.addEventListener('keydown', function(e){
             e = e||window.event;
             console.log(e.key)
-            if(e.key=="Shift"){
-                _this.setState({shift_down: true})
-                console.log('shiftdown')
-            }else if(e.key=="Backspace"){
-                console.log('delete')
-                _this.delete_object()
-            }else if(e.key=="Control"){
-                _this.setState({control_down: true})
-            }else if(e.key=='v'){
-                if(_this.state.control_down){
-                    _this.pasteImages(e)
+            if(_this.state.group_updating!=true){
+                if(e.key=="Shift"){
+                    _this.setState({shift_down: true})
+                    console.log('shiftdown')
+                }else if(e.key=="Backspace"){
+                    console.log('delete')
+                    _this.delete_object()
+                }else if(e.key=="Control"){
+                    _this.setState({control_down: true})
+                }else if(e.key=='v'){
+                    if(_this.state.control_down){
+                        _this.pasteImages(e)
+                    }
                 }
             }
+            
         })
 
         document.addEventListener('keyup', function(e){

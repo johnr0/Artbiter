@@ -54,6 +54,7 @@
     "exports-loader": "^0.6.3",
     "feathers": "^2.0.1",
     "feathers-authentication": "^0.7.10",
+    "feathers-batch": "^1.1.0",
     "feathers-client": "^1.5.3",
     "feathers-configuration": "^0.2.3",
     "feathers-errors": "^2.4.0",

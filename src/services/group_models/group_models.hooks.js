@@ -2,7 +2,7 @@ var axios =require('axios')
 var ml_server = require('../../config')
 
 const labelAllImages = async context => {
-    // console.log(':P')
+    // console.log(context.arguments[0].group_model)
     var group_model = [context.arguments[0].group_model]
     var l2t = [context.arguments[0].l2t]
     var dec = [context.arguments[0].dec]
@@ -29,7 +29,8 @@ const labelAllImages = async context => {
             l2t: JSON.stringify(l2t),
             dec: JSON.stringify(dec),
         }).then((response)=>{
-            promises = []
+            // promises = []
+            var batch = []
             var label_result = JSON.parse(response.data['result'])
             for(var key in label_result){
                 for(var j in l2t[0]){
@@ -46,13 +47,20 @@ const labelAllImages = async context => {
                 }
                 // var set = {labels: JSON.parse(JSON.stringify(label_result[key]))}
                 set['updated'] = 'arts_label'
-                promises.push(context.app.service('arts').patch(key, {$set: set}))
+                batch.push(['patch', 'arts', key, {$set:set}])
+                // promises.push(context.app.service('arts').patch(key, {$set: set}))
                 
             }
-            Promise.all(promises)
-            .then(function(){
+            context.app.service('batch').create({calls: batch})
+            .then(()=>{
                 context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
+            }, (err)=>{
+                console.log(err)
             })
+            // Promise.all(promises)
+            // .then(function(){
+            //     context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
+            // })
         })
     })
 

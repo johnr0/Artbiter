@@ -480,10 +480,10 @@ class MoodBoardAI extends MoodBoard{
                 ypos = ypos*this.state.boardlength*this.state.boardzoom
     
                 return (<g>
-                    <rect x={xpos-70} y={ypos-20} width='140' height='40' fill='white' stroke='black'>
+                    <rect x={xpos-70} y={ypos-20} width='140' height='40' fill='white' stroke='black' onPointerDown={this.createAGroup.bind(this, this.state.current_selected_pos.slice())}>
                     </rect>
                     <text x={xpos-63} y={ypos+7} fontSize='20' onPointerDown={this.createAGroup.bind(this, this.state.current_selected_pos.slice())}
-                    >Create a group</text>
+                    >Create a concept</text>
                 </g>)
                 
             }
@@ -539,17 +539,26 @@ class MoodBoardAI extends MoodBoard{
                 }
             }
 
+            var loaded=true
+
+            for(var img_idx in current_image){
+                var img_id = current_image[img_idx]
+                if(this.state.arts[img_id].enabled!=true){
+                    loaded=false
+                }
+            }
+
             var removable = false
-            if(filtered.length>0 && filtered.length == current_image.length && this.state.current_text.length==0 && art_ids.length-current_image.length>1){
+            if(filtered.length>0 && filtered.length == current_image.length && this.state.current_text.length==0 && art_ids.length-current_image.length>1 && loaded){
                 removable = true
             }
             var addable = false
-            if(filtered.length==0 && current_image.length>0 && this.state.current_text.length==0){
+            if(filtered.length==0 && current_image.length>0 && this.state.current_text.length==0 && loaded){
                 addable = true
             }
 
             var deletable = false
-            if(filtered.length>0 && filtered.length == current_image.length && filtered.length == art_ids.length){
+            if(filtered.length>0 && filtered.length == current_image.length && filtered.length == art_ids.length && loaded){
                 deletable = true
             }
 
@@ -764,10 +773,11 @@ class MoodBoardAI extends MoodBoard{
                     <MoodBoardColorAddController mother_this={this} mother_state={this.state}></MoodBoardColorAddController>}
                 <MoodBoardSearchPaneAI mother_this={this} mother_state={this.state}></MoodBoardSearchPaneAI>
                 {/* <MoodboardDisagreementRevealerAI mother_this={this} mother_state={this.state}></MoodboardDisagreementRevealerAI> */}
-            </div>
-            {this.state.group_updating==true && <div style={{position:'absolute', width:'100%', height: '100%', left: '0', top: '0', textAlign: 'center', backgroundColor: '#ffffff88', paddingTop: document.getElementById('moodboard').offsetHeight/2-15}}>
+                {this.state.group_updating==true && <div style={{position:'absolute', zOrder: 1000000,width:'100%', height: '100%', left: '0', top: '0', textAlign: 'center', backgroundColor: '#ffffff88', paddingTop: document.getElementById('moodboard').offsetHeight/2-15}}>
                 Artbiter is learning the concept and applying the concept to images...
                 </div>}
+            </div>
+            
         </div>)
     }
     

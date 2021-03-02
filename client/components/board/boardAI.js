@@ -188,6 +188,9 @@ class BoardAI extends Board{
                         if(res0[0].generate_slider_values!=undefined){
                             generate_slider_values = res0[0].generate_slider_values
                         }
+                        if(generate_slider_values==undefined){
+                            generate_slider_values ={}
+                        }
 
                         if(res0[0].agreementPane!=undefined){
                             agreementPane = res0[0].agreementPane

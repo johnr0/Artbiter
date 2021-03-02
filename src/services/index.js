@@ -9,6 +9,7 @@ const group_styles = require('./group_styles/group_styles.service.js');
 const disagreed_arts = require('./disagreed_arts/disagreed_arts.service.js');
 const group_models = require('./group_models/group_models.service.js')
 const event_logs = require('./event_logs/event_logs.service.js')
+const {BatchService} = require('feathers-batch')
 
 module.exports = function (app) {
   app.configure(users);
@@ -21,5 +22,6 @@ module.exports = function (app) {
   app.configure(group_styles);
   app.configure(disagreed_arts);
   app.configure(group_models);
-  app.configure(event_logs)
+  app.configure(event_logs);
+  app.use('/batch', new BatchService(app));
 };

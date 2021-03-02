@@ -649,8 +649,14 @@ class Board extends Component{
             }else if(updated.indexOf('moodboard_generate_slider_change')!=-1){
                 _this.moodboard.setState({generate_slider_values: data.generate_slider_values})
             }else if(updated.indexOf('moodboard_search_slider_distances')!=-1){
-                _this.moodboard.setState({search_slider_distances: data.search_slider_distances,
-                generate_slider_values: data.generate_slider_values})
+                console.log(data.search_slider_distances)
+                if(data.search_slider_distances!=undefined){
+                    _this.moodboard.setState({search_slider_distances: data.search_slider_distances,
+                        generate_slider_values: data.generate_slider_values})
+                }else{
+                    _this.moodboard.setState({generate_slider_values: data.generate_slider_values})
+                }
+                
             }else if(updated.indexOf('moodboard_search_mode_toggle')!=-1){
                 _this.moodboard.setState({searchMode: data.searchMode})
             }else if(updated.indexOf('moodboard_disagreement_search')!=-1){
@@ -1084,7 +1090,7 @@ class Board extends Component{
             if(this.sketchpad.state.layer_dict[key].hide!=true){
                 var el = document.getElementById('sketchpad_canvas_'+key)
                 var cur_canvas = el.getContext('2d')
-                output_canvas.drawImage(el, 0, 0);
+                output_canvas.drawImage(el, 0, 0, 512,512);
             }
             
         }
