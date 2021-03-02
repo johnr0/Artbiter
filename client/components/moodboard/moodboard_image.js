@@ -335,6 +335,10 @@ class MoodboardImage extends Component{
         var canvas = document.createElement('canvas')
         var art = this.props.art
         var arts = this.props.mother_state.arts
+        if(this.props.mother_state.crop==undefined){
+            this.props.mother_this.setState({control_state:'control_object'})
+            return
+        }
         canvas.width = art.width*(this.props.mother_state.crop[2]-this.props.mother_state.crop[0])
         canvas.height = art.height*(this.props.mother_state.crop[3]-this.props.mother_state.crop[1])
 
@@ -348,6 +352,11 @@ class MoodboardImage extends Component{
         var x2 = art.position[0] + (art.position[2]-art.position[0])*this.props.mother_state.crop[2]
         var y1 = art.position[1]+(art.position[3]-art.position[1])*this.props.mother_state.crop[1]
         var y2 = art.position[1] + (art.position[3]-art.position[1])*this.props.mother_state.crop[3]
+        if(this.props.mother_state.crop[0]==0 && this.props.mother_state.crop[1]==0 && this.props.mother_state.crop[2]==1 && this.props.mother_state.crop[3]==1){
+            console.log('hup')
+            this.props.mother_this.setState({control_state:'control_object'})
+            return
+        }
         im.onload = function(){
             console.log('dims', art.width*_this.props.mother_state.crop[0], art.height*_this.props.mother_state.crop[1],canvas.width, canvas.height)
             canvas.getContext('2d').drawImage(im, art.width*_this.props.mother_state.crop[0], art.height*_this.props.mother_state.crop[1],canvas.width, canvas.height, 0, 0, canvas.width, canvas.height)

@@ -409,52 +409,58 @@ const sketchpadStyleApply = async context => {
 const afterRemove = async context => {
   var _id = context.result._id
   console.log(_id)
-  context.app.service('group_styles').find({query:{board_id: _id}}).then((res)=>{
-    for(var i in res){
-      context.app.service('group_styles').remove(res[i]._id)
-    }
-  })
+  // context.app.service('group_styles').find({query:{board_id: _id}}).then((res)=>{
+  //   for(var i in res){
+  //     context.app.service('group_styles').remove(res[i]._id)
+  //   }
+  // })
   context.app.service('groups').find({query:{board_id: _id}}).then((res)=>{
+    var group_remove_calls = []
     for(var i in res){
-      context.app.service('groups').remove(res[i]._id)
+      group_remove_calls.push(['remove', 'groups', res[i]._id])
+      // context.app.service('groups').remove(res[i]._id)
     }
+    context.app.service('batch').create({calls: group_remove_calls})
+    .then(()=>{
+      context.app.service('searched_arts').find({query:{board_id: _id}}).then((res)=>{
+        for(var i in res){
+          context.app.service('searched_arts').remove(res[i]._id)
+        }
+      })
+    
+      context.app.service('art_styles').find({query:{board_id: _id}}).then((res)=>{
+        for(var i in res){
+          context.app.service('art_styles').remove(res[i]._id)
+        }
+      })
+      context.app.service('arts').find({query:{board_id: _id}}).then((res)=>{
+        for(var i in res){
+          context.app.service('arts').remove(res[i]._id)
+        }
+      })
+    
+      // context.app.service('texts').find({query:{board_id: _id}}).then((res)=>{
+      //   for(var i in res){
+      //     context.app.service('texts').remove(res[i]._id)
+      //   }
+      // })
+    
+      context.app.service('layers').find({query:{board_id: _id}}).then((res)=>{
+        for(var i in res){
+          context.app.service('layers').remove(res[i]._id)
+        }
+      })
+    
+      context.app.service('disagreed_arts').find({query:{board_id: _id}}).then((res)=>{
+        for(var i in res){
+          context.app.service('disagreed_arts').remove(res[i]._id)
+        }
+      })
+    })
   })
 
   
-  context.app.service('searched_arts').find({query:{board_id: _id}}).then((res)=>{
-    for(var i in res){
-      context.app.service('searched_arts').remove(res[i]._id)
-    }
-  })
-
-  context.app.service('art_styles').find({query:{board_id: _id}}).then((res)=>{
-    for(var i in res){
-      context.app.service('art_styles').remove(res[i]._id)
-    }
-  })
-  context.app.service('arts').find({query:{board_id: _id}}).then((res)=>{
-    for(var i in res){
-      context.app.service('arts').remove(res[i]._id)
-    }
-  })
-
-  // context.app.service('texts').find({query:{board_id: _id}}).then((res)=>{
-  //   for(var i in res){
-  //     context.app.service('texts').remove(res[i]._id)
-  //   }
-  // })
-
-  context.app.service('layers').find({query:{board_id: _id}}).then((res)=>{
-    for(var i in res){
-      context.app.service('layers').remove(res[i]._id)
-    }
-  })
-
-  context.app.service('disagreed_arts').find({query:{board_id: _id}}).then((res)=>{
-    for(var i in res){
-      context.app.service('disagreed_arts').remove(res[i]._id)
-    }
-  })
+  
             
 }
 
