@@ -165,14 +165,16 @@ class MoodBoardSearchPaneAI extends Component{
                 position[3] = position[1]+0.05/ratio
             }
 
+            var resized = _this.props.mother_this.resizeImage(this)
+
 
             arts[id] = {
-                file: val[1],
+                file: resized[0],
                 position: position,
                 ratio: ratio,
                 choosen_by: _this.props.mother_this.props.board_this.state.user_id,
-                width: this.width,
-                height: this.height,
+                width: resized[1],
+                height: resized[2],
             }
             Promise.all([
                 _this.props.mother_this.props.board_this.ChooseArtsTexts([],[],_this.props.mother_state.current_image, _this.props.mother_state.current_text),

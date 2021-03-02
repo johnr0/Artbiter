@@ -29,6 +29,7 @@ const labelAllImages = async context => {
             l2t: JSON.stringify(l2t),
             dec: JSON.stringify(dec),
         }).then((response)=>{
+            promises = []
             var label_result = JSON.parse(response.data['result'])
             for(var key in label_result){
                 for(var j in l2t[0]){
@@ -45,8 +46,13 @@ const labelAllImages = async context => {
                 }
                 // var set = {labels: JSON.parse(JSON.stringify(label_result[key]))}
                 set['updated'] = 'arts_label'
-                context.app.service('arts').patch(key, {$set: set})
+                promises.push(context.app.service('arts').patch(key, {$set: set}))
+                
             }
+            Promise.all(promises)
+            .then(function(){
+                context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
+            })
         })
     })
 

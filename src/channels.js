@@ -250,6 +250,9 @@ module.exports = function(app) {
         }else if(data.updated=='moodboard_disagreement_user_selection'){
           data_to_return['updated'] = data.updated
           data_to_return['agreement_userSelection']=data.agreement_userSelection
+        }else if(data.updated=='group_updating'){
+          data_to_return['updated'] = data.updated
+          data_to_return['group_updating'] = data.group_updating
         }else{
           data_to_return = data
           
@@ -317,6 +320,7 @@ module.exports = function(app) {
         data_to_return._id = data._id
         data_to_return.labels = data.labels
       }else{
+        console.log('arts created?')
         data_to_return = JSON.parse(JSON.stringify(data))
         delete data_to_return['embedding']
         delete data_to_return['style']

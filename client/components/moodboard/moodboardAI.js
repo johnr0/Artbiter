@@ -242,6 +242,7 @@ class MoodBoardAI extends MoodBoard{
             } 
         }
         // analytics.logEvent("remove_from_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, removed_arts: this.state.current_image.slice()})
+        
         Api.app.service('groups').patch(group_id, {$set:{updated:'groups_remove', pos: pos}, $pull:pull})
         .then(()=>{
             Api.app.service('event_logs').create({event: 'remove_from_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, removed_arts: this.state.current_image.slice()})
@@ -764,6 +765,9 @@ class MoodBoardAI extends MoodBoard{
                 <MoodBoardSearchPaneAI mother_this={this} mother_state={this.state}></MoodBoardSearchPaneAI>
                 {/* <MoodboardDisagreementRevealerAI mother_this={this} mother_state={this.state}></MoodboardDisagreementRevealerAI> */}
             </div>
+            {this.state.group_updating==true && <div style={{position:'absolute', width:'100%', height: '100%', left: '0', top: '0', textAlign: 'center', backgroundColor: '#ffffff88', paddingTop: document.getElementById('moodboard').offsetHeight/2-15}}>
+                Artbiter is learning the concept and applying the concept to images...
+                </div>}
         </div>)
     }
     

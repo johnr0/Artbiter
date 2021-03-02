@@ -661,6 +661,8 @@ class Board extends Component{
                 _this.moodboard.setState({searching:data.searching})
             }else if(updated=='moodboard_search_done'){
                 _this.moodboard.setState({searching:data.searching})
+            }else if(updated=='group_updating'){
+                _this.moodboard.setState({group_updating:data.group_updating})
             }
         })
 
@@ -1071,8 +1073,8 @@ class Board extends Component{
         e.stopPropagation();
         var _this = this
         var output_el= document.createElement('canvas')
-        output_el.width = 1000
-        output_el.height = 1000
+        output_el.width = 512
+        output_el.height = 512
         var output_canvas = output_el.getContext('2d')
         output_canvas.globalCompositeOperation = 'destination-over'
 
@@ -1087,7 +1089,7 @@ class Board extends Component{
             
         }
         output_canvas.fillStyle = 'white'
-        output_canvas.fillRect(0, 0, 1000, 1000);
+        output_canvas.fillRect(0, 0, 512, 512);
         console.log('sketch image generated')
 
         var image = output_el.toDataURL()
@@ -1103,8 +1105,8 @@ class Board extends Component{
             position: [pos0, pos[1]-0.05, pos0+0.1,pos[1]+0.05],
             ratio: 1,
             choosen_by: this.state.user_id,
-            width: 1000,
-            height: 1000,
+            width: 512,
+            height: 512,
         }
 
         Promise.all([

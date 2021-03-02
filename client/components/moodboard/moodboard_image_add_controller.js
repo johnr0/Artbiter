@@ -41,12 +41,14 @@ class MoodBoardImageAddController extends Component {
         var _this = this
         image.src = src
         image.onload = function(){
+
+            var resized = _this.props.mother_this.resizeImage(this)
             arts[id]={
-                file: src,
+                file: resized[0],
                 position: undefined, 
                 ratio:  this.width/this.height,
-                width: this.width,
-                height: this.height,
+                width: resized[1],
+                height: resized[2],
                 choosen_by: _this.props.mother_this.props.board_this.state.user_id,
             }
             Promise.all([

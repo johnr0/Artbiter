@@ -256,6 +256,33 @@ class MoodBoard extends ProtoBoard{
 
     }
 
+    resizeImage(image){
+        var canvas = document.createElement('canvas');
+        var max_size = 512
+        var width = image.width
+        var height = image.height
+        if(width>height){
+            if(width>max_size){
+                height *= max_size / width;
+                width = max_size;
+            }
+        }else {
+            if (height > max_size) {
+                width *= max_size / height;
+                height = max_size;
+            }
+        }
+
+        canvas.width = width
+        canvas.height = height
+        canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+        var dataUrl = canvas.toDataURL();
+        // var resizedImage = dataURLToBlob(dataUrl);
+
+        return [dataUrl, width, height]
+
+    }
+
     addAnImage(imgsrc, pageX, pageY, arts, counter, resolve){
         // console.log(this.state.current_image, this.state.images_to_add)
         // return
@@ -271,14 +298,17 @@ class MoodBoard extends ProtoBoard{
             var xpix = pageX - document.getElementById(_this.state.boardname).offsetLeft+ 100/this.height*this.width+counter*10
             var cur = _this.getPositionOnBoard(xpix, ypix)
             var origin = _this.getPositionOnBoard(xpixo, ypixo)
+
+            var resized = _this.resizeImage(this)
+
             // console.log(xpixo, ypixo, xpix, ypix)
             // console.log([origin[0], origin[1], cur[0], cur[1]])
             arts[id]={
-                file: imgsrc,
+                file: resized[0],
                 position: [origin[0], origin[1], cur[0], cur[1]], 
                 ratio:  this.width/this.height,
-                width: this.width,
-                height: this.height, 
+                width: resized[1],
+                height: resized[2], 
                 choosen_by: _this.props.board_this.state.user_id, 
             }
             if(typeof resolve === 'function'){

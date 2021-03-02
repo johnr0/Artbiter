@@ -256,38 +256,42 @@ function averageStyles(styles, context){
 
 const createTrainCAV = async context => {
   console.log('art ids are ')
-  // console.log(context.result)
-  context.app.service('arts').find({query: {_id: {$in:context.arguments[0].art_ids}}})
-  .then((res)=>{
-    // console.log('length is ', res.length,',', context.result._id)
-    var embeddings = {}
-    // var styles = {}
+  console.log(context.result)
+  context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
+  .then(()=>{
+    context.app.service('arts').find({query: {_id: {$in:context.arguments[0].art_ids}}})
+    .then((res)=>{
+      // console.log('length is ', res.length,',', context.result._id)
+      var embeddings = {}
+      // var styles = {}
 
-    embeddings[context.result._id] = []
-    // styles[context.result._id] = []
-    for(var i in res){
-      // console.log(res[i]._id)
-      if(res[i].embedding!=undefined){
-        embeddings[context.result._id].push(res[i].embedding)
+      embeddings[context.result._id] = []
+      // styles[context.result._id] = []
+      for(var i in res){
+        // console.log(res[i]._id)
+        if(res[i].embedding!=undefined){
+          embeddings[context.result._id].push(res[i].embedding)
+        }
       }
-    }
-    // console.log(embeddings)
+      // console.log(embeddings)
 
-    trainCAV(embeddings, context, res[0].board_id, context.result._id)
-    // averageStyles(style)
-  })
+      trainCAV(embeddings, context, res[0].board_id, context.result._id)
+      // averageStyles(style)
+    })
 
-  context.app.service('art_styles').find({query: {art_id:{$in: context.arguments[0].art_ids}}})
-  .then((res2)=>{
-    var styles = {}
-    styles[context.result._id] = []
-    for(var j in res2){
-      if(res2[j].style!=undefined){
-        styles[context.result._id].push(res2[j].style)
-      }  
-    }
-    averageStyles(styles, context)
+    context.app.service('art_styles').find({query: {art_id:{$in: context.arguments[0].art_ids}}})
+    .then((res2)=>{
+      var styles = {}
+      styles[context.result._id] = []
+      for(var j in res2){
+        if(res2[j].style!=undefined){
+          styles[context.result._id].push(res2[j].style)
+        }  
+      }
+      averageStyles(styles, context)
+    })
   })
+  
   // context.app.service('boards').find({query: {_id: context.arguments[0].board_id}})
   // .then((res)=>{
   //   var search_slider_values = res[0].search_slider_values
@@ -304,52 +308,56 @@ const RelateCAV = async context => {
   if(context.result.updated=='groups_relate_r'){
     // console.log('relate 2')
     // console.log(context.result.higher_group)
-    context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
+    context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
     .then((res)=>{
-      var art_ids = []
-      var embeddings = {}
-      var styles = {}
-      for(var i in res){
-        var group = res[i]
-        art_ids = art_ids.concat(group.art_ids)
-      }
-      context.app.service('arts').find({query:{_id:{$in:art_ids}}})
-      .then((res2)=>{
-        var art_embeddings = {}
-        for(var j in res2){
-          art_embeddings[res2[j]._id] = res2[j].embedding
-        }
+      context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
+      .then((res)=>{
+        var art_ids = []
+        var embeddings = {}
+        var styles = {}
         for(var i in res){
           var group = res[i]
-          embeddings[group._id] = []
-          for(var j in group.art_ids){
-            var art_id = group.art_ids[j]
-            // console.log(art_id, 'fourth')
-            embeddings[group._id].push(art_embeddings[art_id])
-          }
+          art_ids = art_ids.concat(group.art_ids)
         }
-        // console.log(embeddings, 'embeddings')
-        trainCAV(embeddings, context, res[0].board_id)
-      })
+        context.app.service('arts').find({query:{_id:{$in:art_ids}}})
+        .then((res2)=>{
+          var art_embeddings = {}
+          for(var j in res2){
+            art_embeddings[res2[j]._id] = res2[j].embedding
+          }
+          for(var i in res){
+            var group = res[i]
+            embeddings[group._id] = []
+            for(var j in group.art_ids){
+              var art_id = group.art_ids[j]
+              // console.log(art_id, 'fourth')
+              embeddings[group._id].push(art_embeddings[art_id])
+            }
+          }
+          // console.log(embeddings, 'embeddings')
+          trainCAV(embeddings, context, res[0].board_id)
+        })
 
-      // context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
-      // .then((res3)=>{
-      //   var art_styles = {}
-      //   for(var j in res3){
-      //     art_styles[res3[j].art_id] = res3[j].style
-      //   }
-      //   for(var i in res){
-      //     var group = res[i]
-      //     styles[group._id] = []
-      //     for(var j in group.art_ids){
-      //       var art_id = group.art_ids[j]
-      //       styles[group._id].push(art_styles[art_id])
-      //     }
-      //   }
-      //   averageStyles(styles, context)
-      // })
-      
+        // context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
+        // .then((res3)=>{
+        //   var art_styles = {}
+        //   for(var j in res3){
+        //     art_styles[res3[j].art_id] = res3[j].style
+        //   }
+        //   for(var i in res){
+        //     var group = res[i]
+        //     styles[group._id] = []
+        //     for(var j in group.art_ids){
+        //       var art_id = group.art_ids[j]
+        //       styles[group._id].push(art_styles[art_id])
+        //     }
+        //   }
+        //   averageStyles(styles, context)
+        // })
+        
+      })
     })
+    
 
     
   }
@@ -359,9 +367,13 @@ const UnrelateCAV = async context => {
 
   // console.log(context.arguments[1], 'unrelate')
   if(context.arguments[1]['$set'].updated=='groups_relate_u'){
-      context.app.service('groups').find({query:{_id: context.arguments[0]}})
-      .then((res)=>{
-        // console.log(res[0].higher_group)
+    // console.log(context)
+   
+
+    context.app.service('groups').find({query:{_id: context.arguments[0]}})
+    .then((res)=>{
+      context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: true, updated:'group_updating'}})
+      .then(()=>{
         context.app.service('groups').find({query: {higher_group: res[0].higher_group}})
         .then((res2)=>{
           // console.log(res2.length)
@@ -398,8 +410,9 @@ const UnrelateCAV = async context => {
               }
               
             }
-            trainCAV(embeddings, context, res[0].board_id)
-            trainCAV(embeddings2, context, res[0].board_id)
+            Promise.all([trainCAV(embeddings, context, res[0].board_id),
+            trainCAV(embeddings2, context, res[0].board_id)])
+            
 
           })
 
@@ -425,6 +438,11 @@ const UnrelateCAV = async context => {
           // })
         })
       })
+      // console.log(res[0].higher_group)
+      
+    })
+
+      
       
   }
 }
@@ -432,51 +450,55 @@ const UnrelateCAV = async context => {
 const AddRemoveArtCAV = async context => {
   // console.log('add remove')
   if(context.result.updated=='groups_add' || context.result.updated=='groups_remove'){
-    context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
+    context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
     .then((res)=>{
-      var art_ids = []
-      var embeddings = {}
-      var styles = {}
-      for(var i in res){
-        var group = res[i]
-        art_ids = art_ids.concat(group.art_ids)
-      }
-      context.app.service('arts').find({query:{_id:{$in:art_ids}}})
-      .then((res2)=>{
-        var art_embeddings = {}
-        for(var j in res2){
-          art_embeddings[res2[j]._id] = res2[j].embedding
-        }
-        // console.log('arts',Object.keys(art_embeddings))
+      context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
+      .then((res)=>{
+        var art_ids = []
+        var embeddings = {}
+        var styles = {}
         for(var i in res){
           var group = res[i]
-          embeddings[group._id] = []
-          for(var j in group.art_ids){
-            var art_id = group.art_ids[j]
-            embeddings[group._id].push(art_embeddings[art_id])
-          }
+          art_ids = art_ids.concat(group.art_ids)
         }
-        // console.log(embeddings, 'embeddings')
-        trainCAV(embeddings, context, res[0].board_id)
-      })
+        context.app.service('arts').find({query:{_id:{$in:art_ids}}})
+        .then((res2)=>{
+          var art_embeddings = {}
+          for(var j in res2){
+            art_embeddings[res2[j]._id] = res2[j].embedding
+          }
+          // console.log('arts',Object.keys(art_embeddings))
+          for(var i in res){
+            var group = res[i]
+            embeddings[group._id] = []
+            for(var j in group.art_ids){
+              var art_id = group.art_ids[j]
+              embeddings[group._id].push(art_embeddings[art_id])
+            }
+          }
+          // console.log(embeddings, 'embeddings')
+          trainCAV(embeddings, context, res[0].board_id)
+        })
 
-      context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
-      .then((res3)=>{
-        var art_styles = {}
-        for(var j in res3){
-          art_styles[res3[j].art_id] = res3[j].style
-        }
-        for(var i in res){
-          var group = res[i]
-          styles[group._id] = []
-          for(var j in group.art_ids){
-            var art_id = group.art_ids[j]
-            styles[group._id].push(art_styles[art_id])
+        context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
+        .then((res3)=>{
+          var art_styles = {}
+          for(var j in res3){
+            art_styles[res3[j].art_id] = res3[j].style
           }
-        }
-        averageStyles(styles, context)
+          for(var i in res){
+            var group = res[i]
+            styles[group._id] = []
+            for(var j in group.art_ids){
+              var art_id = group.art_ids[j]
+              styles[group._id].push(art_styles[art_id])
+            }
+          }
+          averageStyles(styles, context)
+        })
       })
     })
+    
   } 
 }
 
@@ -484,76 +506,94 @@ const RemoveGroupCAV = async context => {
   console.log('remove group')
   context.app.service('groups').find({query:{_id: context.arguments[0]}})
   .then((res)=>{
-    // console.log(res[0].higher_group)
+    // console.log(res[0])
     context.app.service('groups').find({query: {higher_group: res[0].higher_group}})
     .then((res2)=>{
-      // console.log(res2.length)
-      var art_ids = []
+      context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: true, updated:'group_updating'}})
+      .then(()=>{
+        // console.log(res2.length)
+        var art_ids = []
 
-      if(res2.length==1){
-        context.app.service('group_models').find({query:{_id: res[0].higher_group}})
-        .then((res_gm)=>{
-          if(res_gm.length>0){
-            context.app.service('group_models').remove(res[0].higher_group)
-          }
-        })
-        
-      }
-      
-      for(var i in res2){
-        var group = res2[i]
-        if(group._id!=context.arguments[0]){
-          art_ids = art_ids.concat(group.art_ids)
+        if(res2.length==1){
+          context.app.service('group_models').find({query:{_id: res[0].higher_group}})
+          .then((res_gm)=>{
+            if(res_gm.length>0){
+              context.app.service('group_models').remove(res[0].higher_group)
+            }
+          })
+          
         }
         
-      }
+        for(var i in res2){
+          var group = res2[i]
+          if(group._id!=context.arguments[0]){
+            art_ids = art_ids.concat(group.art_ids)
+          }
+          
+        }
 
-      context.app.service('arts').find({query:{board_id: res[0].board_id}})
-      .then((res_arts)=>{
-        for(var k in res_arts){
-          if(res_arts[k].labels!=undefined){
-            var labels = JSON.parse(JSON.stringify(res_arts[k].labels))
-            // console.log(labels, context.arguments[0])
-            if(labels[context.arguments[0]]!=undefined){
-              var unset = {}
-              var set = {}
-              unset['labels.'+context.arguments[0]] =1
-              set['updated'] = 'arts_label'
-              context.app.service('arts').patch(res_arts[k]._id, {$set:set, $unset: unset})
+        context.app.service('arts').find({query:{board_id: res[0].board_id}})
+        .then((res_arts)=>{
+          var promises = []
+          for(var k in res_arts){
+            if(res_arts[k].labels!=undefined){
+              var labels = JSON.parse(JSON.stringify(res_arts[k].labels))
+              // console.log(labels, context.arguments[0])
+              if(labels[context.arguments[0]]!=undefined){
+                var unset = {}
+                var set = {}
+                unset['labels.'+context.arguments[0]] =1
+                set['updated'] = 'arts_label'
+                promises.push(context.app.service('arts').patch(res_arts[k]._id, {$set:set, $unset: unset}))
+              }
+              
+            }
+          }
+          Promise.all(promises)
+          .then(function(){
+            context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
+          })
+          
+
+        })
+
+        context.app.service('arts').find({query:{_id:{$in:art_ids}}})
+        .then((res3)=>{
+          var art_embeddings = {}
+          for(var j in res3){
+            art_embeddings[res3[j]._id] = res3[j].embedding
+            // remove the group label from images
+            
+          }
+
+          var embeddings = {}
+          
+          for(var i in res2){
+            var group = res2[i]
+            // console.log(group._id, context.arguments[0])
+            if(group._id!=context.arguments[0]){
+              // console.log('proce...')
+              embeddings[group._id] = []
+              for(var j in group.art_ids){
+                var art_id = group.art_ids[j]
+                // console.log(art_id, 'fourth')
+                embeddings[group._id].push(art_embeddings[art_id])
+              }
+              // console.log('resres000', res[0].board_id)
+              
             }
             
           }
-        }
-        
-
-      })
-
-      context.app.service('arts').find({query:{_id:{$in:art_ids}}})
-      .then((res3)=>{
-        var art_embeddings = {}
-        for(var j in res3){
-          art_embeddings[res3[j]._id] = res3[j].embedding
-          // remove the group label from images
-          
-        }
-        for(var i in res2){
-          var embeddings = {}
-          var group = res2[i]
-          // console.log(group._id, context.arguments[0])
-          if(group._id!=context.arguments[0]){
-            // console.log('proce...')
-            embeddings[group._id] = []
-            for(var j in group.art_ids){
-              var art_id = group.art_ids[j]
-              // console.log(art_id, 'fourth')
-              embeddings[group._id].push(art_embeddings[art_id])
-            }
-            // console.log('resres000', res[0].board_id)
-            trainCAV(embeddings, context, res[0].board_id)
+          console.log(Object.keys(embeddings))
+          if(Object.keys(embeddings).length>0){
+            console.log(Object.keys(embeddings).length, '??')
+              trainCAV(embeddings, context, res[0].board_id)
           }
           
-        }
+        })
       })
+      
+      
 
       // context.app.service('art_styles').find({query: {art_id:{$in: art_ids}}})
       // .then((res4)=>{
