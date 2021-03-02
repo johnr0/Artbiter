@@ -374,7 +374,7 @@ class MoodBoardSearchPaneAI extends Component{
         // console.log(searched_arts)
 
         return searched_arts.map((val,idx)=>{
-            return (<div style={{display:'inline-block', height: 'calc(100% - 6px)', padding: '3px', position: 'relative'}}>
+            return (<div style={{display:'inline-block', padding: '3px', position: 'relative'}}>
                 <div className='btn' style={{position: 'absolute', top: '10px', right: '10px', width:'30px', height:'30px', fontSize:'30', lineHeight:'26px', padding: 0}}
                     onPointerDown={this.addSearchedImageToMoodboard.bind(this, val)}
                 >+</div>
