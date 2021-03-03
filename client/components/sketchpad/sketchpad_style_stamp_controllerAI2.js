@@ -492,7 +492,7 @@ class SketchpadStyleStampControllerAI2 extends Component{
                                     <input id={'sketchpad_content_scale'} type='range' style={{width: side_length, height: '20px', margin: '0', border:'solid 1px transparent'}} min={0} max={100} value={this.state.content_ratio*100} onChange={this.changeRatio.bind(this, 'content')}></input>
                                 </div>
                                 <div>
-                                    <input id={'sketchpad_content_weight'} type='range' style={{width: side_length, height: '20px', margin: '0', border:'solid 1px transparent'}} min={0} max={100}></input>
+                                    <input id={'sketchpad_content_weight'} type='range' style={{width: side_length, height: '20px', margin: '0', border:'solid 1px transparent'}} min={0} max={100} value={0}></input>
                                 </div>
                             </div>
                             

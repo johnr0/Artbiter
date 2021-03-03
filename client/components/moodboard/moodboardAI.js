@@ -40,12 +40,46 @@ class MoodBoardAI extends MoodBoard{
             
 
     getRandomColor() {
-        var letters = 'ABCDEF';
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 6)];
+        var group_colors = []
+        for(var gk in this.state.groups){
+            var group = this.state.groups[gk]
+            if(group_colors.indexOf(group.higher_group)==-1){
+                group_colors.push(group.higher_group)
+            }
         }
-        return color;
+        var colors = [
+            '#FFB300',
+            '#803E75',
+            '#FF6800',
+            '#A6BDD7',
+            '#C10020',
+            '#CEA262',
+            '#817066',
+            '#007D34',
+            '#F6768E',
+            '#00538A',
+            '#FF7A5C',
+            '#53377A',
+            '#FF8E00',
+            '#B32851',
+            '#F4C800',
+            '#7F180D',
+            '#93AA00',
+            '#593315',
+            '#F13A13',
+            '#232C16'
+        ]
+        if(group_colors.length>=colors){
+            var letters = 'ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 6)];
+            }
+            return color;
+        }else{
+            return colors[group_colors.length]
+        }
+        
     }
 
     object_moving(e){

@@ -243,21 +243,23 @@ class MoodBoardSearchPaneAI extends Component{
                     
                     return (<div key={'slider_'+group._id}>
                         {higher_groups[group.higher_group].length==2 && 
-                        <div style={{position: 'relative'}}>
-                            <div style={{display:'inline-block', float:'right'}}>{group.group_name}</div>
-                            <div style={{position:'absolute', left: 'calc(50% - 5px)'}}>0</div>
-                            <div style={{display:'inline-block', float:'left'}}>{group_name2}</div>
+                        <div style={{position: 'relative', display:'flex', justifyContent:'space-between'}}>
+                            <div style={{}}>{group_name2}</div>
+                            <div style={{}}>{group.group_name}</div>
+                            
+                            
+                            {/* <div style={{position:'absolute', left: 'calc(50% - 5px)'}}>0</div> */}
                         </div>
                         }
                         {higher_groups[group.higher_group].length!=2 && 
-                        <div>
+                        <div style={{position: 'relative'}}>
                             <div style={{display:'inline-block', float:'right'}}>1</div>
                             <div style={{display:'inline-block'}}>{group.group_name}</div>
                             <div style={{display:'inline-block', float:'left'}}>-1</div>
                         </div>
                             }
                         <div style={{width: '100%', position:'relative'}}>
-                            <svg width='100%' height='15.2px' preserveAspectRatio="none" viewBox="0 0 300 15.2" style={{display:'inline-block',position:'absolute'}}>
+                            <svg width='100%' height='12px' preserveAspectRatio="none" viewBox="0 0 300 12" style={{display:'inline-block',position:'absolute', left:0, top: 1}}>
                                 <defs>
                                     <linearGradient id={'grad'+kidx+'_'+idx} x1="0%" y1="0%" x2="100%" y2="0%">
                                     {this.renderGradientFromDistance(distance)}
