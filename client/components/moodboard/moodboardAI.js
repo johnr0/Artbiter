@@ -69,16 +69,20 @@ class MoodBoardAI extends MoodBoard{
             '#F13A13',
             '#232C16'
         ]
-        if(group_colors.length>=colors){
-            var letters = 'ABCDEF';
-            var color = '#';
-            for (var i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 6)];
+
+        for(var i in colors){
+            var color = colors[i]
+            if(group_colors.indexOf(color)==-1){
+                return color
             }
-            return color;
-        }else{
-            return colors[group_colors.length]
         }
+        var letters = 'ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 6)];
+        }
+        return color;
+        
         
     }
 
