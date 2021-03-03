@@ -68,6 +68,7 @@ module.exports = function(app) {
         // console.log(data.updated)
         if(data.updated.indexOf('sketchpad_update_a_layer')!=-1){
           data_to_return['updated']=data.updated
+          data_to_return['undoable'] = data.undoable
           data_to_return['layers']=[]
           for(var i in data.layers){
             if(data.layers[i].layer_id==data.updated.split('.')[1]){
@@ -259,7 +260,7 @@ module.exports = function(app) {
           data_to_return['sketchundo']=data.sketchpad_undoable
           data_to_return['updated']=data.updated
           data_to_return['undoable']=data.undoable
-        }else if(data.updated=='sketchpad_undo_start'){
+        }else if(data.updated.indexOf('sketchpad_undo_start')!=-1){
           data_to_return['updated']=data.updated
           data_to_return['undoable']=data.undoable
         }else{

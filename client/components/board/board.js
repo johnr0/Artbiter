@@ -307,6 +307,7 @@ class Board extends Component{
                 layer_dict[data._id].choosen_by = data.choosen_by
                 this.sketchpad.setState({layer_dict})
             }else if(updated.indexOf('sketchpad_update_a_layer')!=-1 || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
+                
                 if(layer_dict[data._id].choosen_by != this.state.user_id || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
                     layer_dict[data._id].image = data.image
                     this.sketchpad.setState({layer_dict}, function(){
@@ -371,11 +372,13 @@ class Board extends Component{
             // console.log(data, updated)
             if(updated.indexOf('sketchpad_update_a_layer')!=-1 || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
                 var layers = _this.sketchpad.state.layers
+                
                 // var sketchundo = _this.sketchpad.state.sketchundo
                 // console.log(sketchundo)
                 if(updated.indexOf('undo')==-1){
                     // sketchundo.shift();
                     // sketchundo.push(data.sketchundo)
+                    this.sketchpad.setState({undoable: data.undoable})
                     
                 }else{
                     // var undo_id = updated.split('.')[1] 
@@ -706,7 +709,7 @@ class Board extends Component{
                 _this.moodboard.setState({group_updating:data.group_updating})
             }else if(updated=='sketchpad_undoable'){
                 _this.sketchpad.setState({undoable: data.undoable, sketchundo:data.sketchundo})
-            }else if(updated=='sketchpad_undo_start'){
+            }else if(updated.indexOf('sketchpad_undo_start')!=-1){
                 _this.sketchpad.setState({undoable: data.undoable})
             }
         })
@@ -744,6 +747,7 @@ class Board extends Component{
         set2['$push']  = {
             sketchundo: {undo_id, user_id: this.state.user_id, type: 'layer_image', layer_id: layer_id}
         }
+        set2['undoable']=false
 
         var sketchundo = {
             _id: undo_id, 
@@ -860,6 +864,7 @@ class Board extends Component{
         var patch={}
         patch['layers']=new_layer
         patch['updated']='sketchpad_reorder_layers'
+        patch['undoable']=false
         var undo_id = Math.random().toString(36).substring(2, 15)
         patch['$push'] = {
             sketchundo: {undo_id, user_id: this.state.user_id, type: 'layer_reorder', layers: prev_layer}

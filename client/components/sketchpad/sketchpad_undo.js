@@ -61,10 +61,10 @@ class SketchpadUndo extends Component{
         if(info[1]==false){
             var sketchundo = this.props.mother_state.sketchundo[info[0]]
             console.log(sketchundo)
-            Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {undoable:false, updated: 'sketchpad_undo_start'}})
-            .then(()=>{
-                Api.app.service('sketchundos').patch(sketchundo.undo_id, {$set:{doundo:true}})
-            })
+            Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {undoable:false, updated: 'sketchpad_undo_start.'+sketchundo.undo_id}})
+            // .then(()=>{
+            //     Api.app.service('sketchundos').patch(sketchundo.undo_id, {$set:{doundo:true}})
+            // })
             
             // this.props.mother_this.props.board_this.SketchUndo(info[0], sketchundo)
         }
