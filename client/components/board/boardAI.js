@@ -107,7 +107,7 @@ class BoardAI extends Board{
             Api.app.service('groups').timeout = 60000
             console.log('timeout after...', Api.app.service('boards').timeout)
             Api.app.service('boards').find({query: {_id: board_id,
-                $select: ['name', 'owner', 'texts', 'collaborators', 'current_collaborators', 'layers', 'searchMode', 'searchPane', 'search_image_selected', 'search_slider_values', 'search_slider_distances', 'generate_slider_values', 'agreementPane', 'agreement_userSelection']
+                $select: ['name', 'owner', 'undoable', 'texts', 'collaborators', 'sketchundo','current_collaborators', 'layers', 'searchMode', 'searchPane', 'search_image_selected', 'search_slider_values', 'search_slider_distances', 'generate_slider_values', 'agreementPane', 'agreement_userSelection']
             }})
             .then((res0)=>{
                 var res = res0
@@ -129,9 +129,9 @@ class BoardAI extends Board{
 
                     // propage board contents to sketchpad and moodboard
                     var layers = res[0]['layers']
-                    
+                    var sketchundo = res[0]['sketchundo']
                     // _this.sketchpad.setState({layers: layers, sketchundo: sketchundo}, function(){
-                    _this.sketchpad.setState({layers: layers}, function(){
+                    _this.sketchpad.setState({layers: layers, sketchundo: sketchundo, undoable: res0[0].undoable}, function(){
                         // for(var layer_idx in layers){
                         //     var layer_id = layers[layer_idx]
                         //     console.log(layer_id)
@@ -188,9 +188,7 @@ class BoardAI extends Board{
                         if(res0[0].generate_slider_values!=undefined){
                             generate_slider_values = res0[0].generate_slider_values
                         }
-                        if(generate_slider_values==undefined){
-                            generate_slider_values ={}
-                        }
+                        
 
                         if(res0[0].agreementPane!=undefined){
                             agreementPane = res0[0].agreementPane

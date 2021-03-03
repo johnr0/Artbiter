@@ -181,26 +181,36 @@ function generateImageWithScaling(content, styles, context){
       choosen_by: '',
       updated: 'sketchpad_add_a_layer',
     }
+    var undo_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
     var push ={
       layers: {
         $each: [layer_id],
         $position: parseInt(content['current_layer']),
       },
-      // sketchundo: {
-      //   undo_id: Math.random().toString(36).substring(2, 15), 
-      //   user_id: context.arguments[2]['user']['_id'],
-      //   type: 'layer_add',
-      //   layer_idx: content['current_layer'],
-      //   layer_id: layer_id,
-      //   layer: layer
-      // }
+      sketchundo: {
+        undo_id: undo_id, 
+        user_id: context.arguments[2]['user']['_id'],
+        type: 'layer_add',
+        layer_id: layer_id,
+      }
+    }
+    var sketchundo = {
+      _id: undo_id, 
+      user_id: context.arguments[2]['user']['_id'],
+      type: 'layer_add',
+      layer_idx: content['current_layer'],
+      layer_id: layer_id,
+      layer: layer,
+      board_id: context.arguments[0]
     }
     var set ={
-      updated: 'sketchpad_add_a_layer_style_stamp_'+context.arguments[2]['user']['_id']
+      updated: 'sketchpad_add_a_layer_style_stamp_'+context.arguments[2]['user']['_id'], 
+      undoable: false,
     }
-
-    context.app.service('layers').create(layer).then(()=>{
-      context.app.service('boards').patch(context.arguments[0], {$set:set, $push:push}).then(()=>{
+    
+    context.app.service('boards').patch(context.arguments[0], {$set:set, $push:push}).then(()=>{
+      context.app.service('layers').create(layer).then(()=>{
+        context.app.service('sketchundos').create(sketchundo)
         // context.app.service('boards').patch(context.arguments[0], {$set:{updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
       })
     })
@@ -454,6 +464,12 @@ const afterRemove = async context => {
       context.app.service('disagreed_arts').find({query:{board_id: _id}}).then((res)=>{
         for(var i in res){
           context.app.service('disagreed_arts').remove(res[i]._id)
+        }
+      })
+
+      context.app.service('sketchundos').find({query:{board_id: _id}}).then((res)=>{
+        for(var i in res){
+          context.app.service('sketchundos').remove(res[i]._id)
         }
       })
     })

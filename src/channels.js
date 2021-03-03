@@ -79,6 +79,7 @@ module.exports = function(app) {
         }else if(data.updated.indexOf('sketchpad_remove_a_layer')!=-1 || data.updated.indexOf('sketchpad_add_a_layer')!=-1 || data.updated.indexOf('sketchpad_reorder_layers')!=-1){
           data_to_return['updated']=data.updated
           data_to_return['layers']=data.layers
+          data_to_return['undoable']=data.undoable
           // data_to_return['sketchundo'] = data.sketchundo[data.sketchundo.length-1]
           
         }else if(data.updated.indexOf('sketchpad_layers_choosen')!=-1){
@@ -96,6 +97,7 @@ module.exports = function(app) {
         }else if(data.updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
           data_to_return['updated']=data.updated
           data_to_return['layers'] = []
+          data_to_return['sketchundo_send'] = data.sketchundo_send
           for(var i in data.layers){
             if(data.layers[i].layer_id==data.updated.split('.')[1]){
               data_to_return['layers'].push(data.layers[i])
@@ -253,6 +255,13 @@ module.exports = function(app) {
         }else if(data.updated=='group_updating'){
           data_to_return['updated'] = data.updated
           data_to_return['group_updating'] = data.group_updating
+        }else if(data.updated=='sketch_undoable'){
+          data_to_return['sketchundo']=data.sketchpad_undoable
+          data_to_return['updated']=data.updated
+          data_to_return['undoable']=data.undoable
+        }else if(data.updated=='sketchpad_undo_start'){
+          data_to_return['updated']=data.updated
+          data_to_return['undoable']=data.undoable
         }else{
           data_to_return = data
           

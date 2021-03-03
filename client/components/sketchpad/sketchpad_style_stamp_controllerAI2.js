@@ -7,6 +7,7 @@ class SketchpadStyleStampControllerAI2 extends Component{
     state={
         open: true,
         content_ratio: 1, 
+        content_value: 0, 
         style_ratio: {},
         style_area: {},
         crop: false,
@@ -32,6 +33,11 @@ class SketchpadStyleStampControllerAI2 extends Component{
             this.setState({style_ratio})
         }
         
+    }
+
+    changeContentValue(e){
+        var value = e.target.value
+        this.setState({content_value: value})
     }
 
     startCrop(art_key, e){
@@ -492,7 +498,7 @@ class SketchpadStyleStampControllerAI2 extends Component{
                                     <input id={'sketchpad_content_scale'} type='range' style={{width: side_length, height: '20px', margin: '0', border:'solid 1px transparent'}} min={0} max={100} value={this.state.content_ratio*100} onChange={this.changeRatio.bind(this, 'content')}></input>
                                 </div>
                                 <div>
-                                    <input id={'sketchpad_content_weight'} type='range' style={{width: side_length, height: '20px', margin: '0', border:'solid 1px transparent'}} min={0} max={100} value={0}></input>
+                                    <input id={'sketchpad_content_weight'} type='range' style={{width: side_length, height: '20px', margin: '0', border:'solid 1px transparent'}} min={0} max={100} value={this.state.content_value} onChange={this.changeContentValue.bind(this)}></input>
                                 </div>
                             </div>
                             
