@@ -131,7 +131,7 @@ class BoardAI extends Board{
                     var layers = res[0]['layers']
                     var sketchundo = res[0]['sketchundo']
                     // _this.sketchpad.setState({layers: layers, sketchundo: sketchundo}, function(){
-                    _this.sketchpad.setState({layers: layers, sketchundo: sketchundo, undoable: res0[0].undoable}, function(){
+                    _this.sketchpad.setState({layers: layers, sketchundo: sketchundo,}, function(){
                         // for(var layer_idx in layers){
                         //     var layer_id = layers[layer_idx]
                         //     console.log(layer_id)

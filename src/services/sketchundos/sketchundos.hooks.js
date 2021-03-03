@@ -1,7 +1,7 @@
 // const { default: Api } = require("../../../client/middleware/api")
 
 const SketchUndoBeforeCreate = async context =>{
-    context.app.service('sketchundos').find({query: {board_id: context.data.board_id, $sort: {date:-1}}})
+    context.app.service('sketchundos').find({query: {board_id: context.data.board_id, $sort: {date:1}}})
     .then((res)=>{
         if(res.length>20){
             context.app.service('sketchundos').remove(res[0]._id)
@@ -16,7 +16,8 @@ const SketchUndoAfterCreate = async context => {
     // console.log(context.result)
     context.app.service('boards').find({query: {_id: context.result.board_id}})
     .then((res)=>{
-        console.log(res)
+        // console.log(res)
+        // console.log('cr')
         var sketchundo = res[0].sketchundo
         if(sketchundo.length>20){
             sketchundo.splice(0, 1)
@@ -28,32 +29,33 @@ const SketchUndoAfterCreate = async context => {
     
 }
 function removeSketchundoFromBoard(sketchundo, context){
-    console.log('1', sketchundo)
+    // console.log('1')
     context.app.service('boards').find({query: {_id: sketchundo.board_id}}).then((res)=>{
-        console.log('2')
+        // console.log('2')
         var board = res[0]
         var sketchundo_list = board.sketchundo.slice()
         var idx=-1
-        console.log('3')
+        // console.log('3')
         for(var i in sketchundo_list){
             if(sketchundo_list[i].undo_id==sketchundo._id){
                 idx = i
             }
         }
-        console.log(idx, sketchundo_list.length)
+        // console.log(idx, sketchundo_list.length)
         
         if(idx!=-1){
             sketchundo_list.splice(idx,1)
         }
-        console.log(idx, sketchundo_list.length)
+        // console.log(idx, sketchundo_list.length)
         context.app.service('boards').patch(sketchundo.board_id, {$set: {sketchundo: sketchundo_list, undoable:true, updated:'sketchpad_undoable'}})
+        context.app.service('sketchundos').remove(sketchundo._id)
     })
 }
 
 const Undo = async context =>{
     // console.log(context.result)
     var sketchundo = context.result 
-
+    // console.log('undo', sketchundo.type)
     if(sketchundo.type == 'layer_image'){
         var sketchundo_send = {
             user_id: sketchundo.user_id,

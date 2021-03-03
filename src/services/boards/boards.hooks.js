@@ -208,6 +208,7 @@ function generateImageWithScaling(content, styles, context){
       undoable: false,
     }
     
+
     context.app.service('boards').patch(context.arguments[0], {$set:set, $push:push}).then(()=>{
       context.app.service('layers').create(layer).then(()=>{
         context.app.service('sketchundos').create(sketchundo)
