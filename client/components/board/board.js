@@ -395,6 +395,7 @@ class Board extends Component{
                     if (undo_obj!=undefined){
                         console.log('here?', undo_obj, this.state.user_id)
                         if(undo_obj.user_id==this.state.user_id){
+                            console.log(undo_obj.cond)
                             if(undo_obj.cond=='lasso'){
                                 console.log('this??', _this.sketchpad.state.lasso[0])
                                 _this.sketchpad.setState({lasso:undo_obj.selection, control_state:'area'}, function(){
