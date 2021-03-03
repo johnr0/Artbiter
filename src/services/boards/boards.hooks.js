@@ -484,10 +484,10 @@ const afterRemove = async context => {
 const undoStart = async context =>{
   if(context.result.updated.indexOf('sketchpad_undo_start.')!=-1){
     var undo_id = context.result.updated.split('.')[1]
-    console.log(undo_id)
+    // console.log(undo_id)
     context.app.service('sketchundos').find({query:{_id:undo_id}})
     .then((res)=>{
-      console.log(res)
+      // console.log(res)
       if(res.length>0){
         context.app.service('sketchundos').patch(undo_id, {$set:{doundo:true}})
       }

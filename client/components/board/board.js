@@ -396,29 +396,33 @@ class Board extends Component{
                     console.log('undo here?')
                     var undo_obj = data.sketchundo_send
                     if (undo_obj!=undefined){
-                        console.log('here?', undo_obj, this.state.user_id)
-                        if(undo_obj.user_id==this.state.user_id){
-                            console.log(undo_obj.cond)
-                            if(undo_obj.cond=='lasso'){
-                                // console.log('this??', _this.sketchpad.state.lasso[0])
-                                _this.sketchpad.setState({lasso:undo_obj.selection, control_state:'area'}, function(){
-                                    console.log(_this.sketchpad.state.lasso[0])
-                                    Promise.all([
-                                        _this.sketchpad.lassoEnd(),
-                                        _this.sketchpad.setState({}, function(){
-                                            _this.sketchpad.initializeMoveLayer()
-                                        }),
-                                        _this.sketchpad.setState({control_state: 'move-layer'})
-                                    ])
-                                })
-                                
-                            }else if(undo_obj.cond=='nonlasso'){
-                                console.log('initialize...')
-                                _this.sketchpad.setState({nonlasso_ret:undo_obj.selection}, function(){
-                                    _this.sketchpad.initializeMoveLayer();
-                                })
+                        setTimeout(function(){
+                            console.log('here?', undo_obj, _this.state.user_id)
+                            if(undo_obj.user_id==_this.state.user_id){
+                                console.log(undo_obj.cond)
+                                if(undo_obj.cond=='lasso'){
+                                    // console.log('this??', _this.sketchpad.state.lasso[0])
+                                    _this.sketchpad.setState({lasso:undo_obj.selection, control_state:'area'}, function(){
+                                        console.log(_this.sketchpad.state.lasso[0])
+                                        Promise.all([
+                                            _this.sketchpad.lassoEnd(),
+                                            _this.sketchpad.setState({}, function(){
+                                                _this.sketchpad.initializeMoveLayer()
+                                            }),
+                                            _this.sketchpad.setState({control_state: 'move-layer'})
+                                        ])
+                                    })
+                                    
+                                }else if(undo_obj.cond=='nonlasso'){
+                                    console.log('initialize...')
+                                    _this.sketchpad.setState({nonlasso_ret:undo_obj.selection}, function(){
+                                        _this.sketchpad.initializeMoveLayer();
+                                    })
+                                }
                             }
-                        }
+
+                        }, 100)
+                        
                     }
                     // sketchundo.unshift(null)
 
