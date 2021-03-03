@@ -492,13 +492,16 @@ class Board extends Component{
                         var temp_el = document.getElementById('temp_canvas')
                         var temp_ctx = temp_el.getContext('2d')
                         var im = new Image()
-                        im.src = _this.sketchpad.state.layer_dict[layer_id].image
-                        im.onload=function(){
-                            temp_ctx.drawImage(im, 0,0,1000,1000)
-                            ctx.clearRect(0,0,1000,1000)
-                            ctx.drawImage(im, 0,0,1000,1000)
-                            temp_ctx.clearRect(0,0,1000,1000)
-                        } 
+                        if(layer_id in _this.sketchpad.state.layer_dict){
+                            im.src = _this.sketchpad.state.layer_dict[layer_id].image
+                            im.onload=function(){
+                                temp_ctx.drawImage(im, 0,0,1000,1000)
+                                ctx.clearRect(0,0,1000,1000)
+                                ctx.drawImage(im, 0,0,1000,1000)
+                                temp_ctx.clearRect(0,0,1000,1000)
+                            } 
+                        }
+                        
                     }
 
                       
