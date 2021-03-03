@@ -170,7 +170,8 @@ class MoodBoard extends ProtoBoard{
         e.stopPropagation();
         e.preventDefault();
         if(this.state.control_state=='content-stamp'||this.state.control_state=='style-stamp'){
-            return  
+            this.props.board_this.sketchpad.setState({control_state:'move'})
+            // return  
         }
         
         var files = e.dataTransfer.files

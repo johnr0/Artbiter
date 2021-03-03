@@ -518,9 +518,9 @@ class MoodBoardAI extends MoodBoard{
                 ypos = ypos*this.state.boardlength*this.state.boardzoom
     
                 return (<g>
-                    <rect x={xpos-70} y={ypos-20} width='140' height='40' fill='white' stroke='black' onPointerDown={this.createAGroup.bind(this, this.state.current_selected_pos.slice())}>
+                    <rect x={xpos-75} y={ypos-20} width='150' height='40' fill='white' stroke='black' onPointerDown={this.createAGroup.bind(this, this.state.current_selected_pos.slice())}>
                     </rect>
-                    <text x={xpos-63} y={ypos+7} fontSize='20' onPointerDown={this.createAGroup.bind(this, this.state.current_selected_pos.slice())}
+                    <text x={xpos-73} y={ypos+7} fontSize='20' onPointerDown={this.createAGroup.bind(this, this.state.current_selected_pos.slice())}
                     >Create a concept</text>
                 </g>)
                 
