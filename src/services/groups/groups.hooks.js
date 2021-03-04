@@ -107,7 +107,7 @@ function sliderImpact(board_id, context){
 }
 
 function trainCAV(embeddings, context, board_id, added_id=undefined){
-  // console.log('embedding--', Object.keys(embeddings))
+  console.log('embedding--', Object.keys(embeddings))
   // console.log(JSON.stringify(styles))
   axios.post(context.app.get('ml_server')+'trainCAV', {
     embeddings: JSON.stringify(embeddings),
