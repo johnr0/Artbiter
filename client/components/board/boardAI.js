@@ -103,6 +103,7 @@ class BoardAI extends Board{
             console.log('timeout before...', Api.app.service('boards').timeout)
             Api.app.service('boards').timeout = 60000
             Api.app.service('arts').timeout = 60000
+            Api.app.service('searched_arts').timeout = 60000
             Api.app.service('layers').timeout = 60000
             Api.app.service('groups').timeout = 60000
             console.log('timeout after...', Api.app.service('boards').timeout)
