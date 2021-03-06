@@ -36,21 +36,21 @@ function sliderImpact(board_id, context){
       // console.log(higher_groups)
       for(var i in res1){
         if(search_slider_values[res1[i]._id]==undefined){
-          if(higher_groups[res1[i].higher_group].length==2 ){
-            if(higher_groups[res1[i].higher_group][1]==res1[i]._id){
-              delete search_slider_values[res1[i]._id]
-            }else if(higher_groups[res1[i].higher_group][0]==res1[i]._id){
-              search_slider_values[res1[i]._id]=0
-            }
-          }else{
+          // if(higher_groups[res1[i].higher_group].length==2 ){
+          //   if(higher_groups[res1[i].higher_group][1]==res1[i]._id){
+          //     delete search_slider_values[res1[i]._id]
+          //   }else if(higher_groups[res1[i].higher_group][0]==res1[i]._id){
+          //     search_slider_values[res1[i]._id]=0
+          //   }
+          // }else{
             search_slider_values[res1[i]._id]=0
-          }
+          // }
         }else{
-          if(higher_groups[res1[i].higher_group].length==2 ){
-            if(higher_groups[res1[i].higher_group][1]==res1[i]._id){
-              delete search_slider_values[res1[i]._id]
-            }
-          }
+          // if(higher_groups[res1[i].higher_group].length==2 ){
+          //   if(higher_groups[res1[i].higher_group][1]==res1[i]._id){
+          //     delete search_slider_values[res1[i]._id]
+          //   }
+          // }
         }
       }
 

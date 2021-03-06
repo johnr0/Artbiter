@@ -4,7 +4,11 @@ import React, {Component} from 'react'
 class MoodBoardMainController extends Component{
 
     changeControlState(control_state){
-        if(this.props.mother_state.control_state!='content-stamp' && this.props.mother_state.control_state!='style-stamp'){
+        if(this.props.mother_state.control_state=='content-stamp' || this.props.mother_state.control_state=='style-stamp'){
+            this.props.mother_this.props.board_this.sketchpad.setState({control_state:'move'})
+        }
+        
+        if(true){
             console.log(control_state)
             if(control_state!='control_object'){
                 var promises = [this.props.mother_this.props.board_this.ChooseArtsTexts([],[],this.props.mother_state.current_image.slice(0), this.props.mother_state.current_text.slice(0))]

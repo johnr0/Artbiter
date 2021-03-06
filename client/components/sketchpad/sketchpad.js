@@ -1161,7 +1161,9 @@ class SketchPad extends ProtoBoard {
         var cur_image = el.toDataURL()
         el.getContext('2d').drawImage(this.state.content_stamp_img, startx, starty, width, height)
         this.props.board_this.updateALayerImage(this.state.current_layer, this.state.layers[this.state.current_layer], el.toDataURL(), cur_image)
-        this.setState({action:'idle'})
+        this.setState({control_state:'move-layer', action:'idle'}, function(){
+            this.initializeMoveLayer()
+        })
     }
 
 

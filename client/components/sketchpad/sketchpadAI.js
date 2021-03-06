@@ -228,6 +228,12 @@ class SketchPadAI extends SketchPad{
             panel_size = ' s12 '
             horizontal_offset = this.state.boardwidth/2
         }
+        var boardrender_cursor
+        if(this.state.control_state=='content-stamp' && this.props.board_this.moodboard.state.current_image.length==1){
+            boardrender_cursor = 'crosshair'
+        }else{
+            boardrender_cursor = ' default'
+        }
 
         return (<div className={'col '+panel_size+' oneboard'}  style={{display: (this.props.board_this.state.sketchpad_collapsed)?'none':''}}>
         <h2>Sketch Pad</h2>
@@ -245,6 +251,8 @@ class SketchPadAI extends SketchPad{
                 height: this.state.boardzoom*this.state.boardlength,
                 top: this.state.boardheight/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[1],
                 left: horizontal_offset+this.state.boardwidth/2-this.state.boardzoom*this.state.boardlength*this.state.boardcenter[0],
+
+                cursor: boardrender_cursor,
             }}>
                 
                 {this.renderCanvas()}

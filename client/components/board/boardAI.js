@@ -144,148 +144,149 @@ class BoardAI extends Board{
                         //         _this.loadALayer(res[0])
                         //     })
                         // }
-                    })
-                    Api.app.service('layers').find({query: {board_id: board_id}})
-                    .then((res)=>{
-                        console.log(res)
-                        this.setState({layers_loaded: true})
-                        for(var li in res){
-                            var layer_dict = _this.sketchpad.state.layer_dict
-                            layer_dict[res[li]._id] = res[li]
-                            
-                            _this.loadALayer(res[li])
-                        }
-                        _this.sketchpad.setState({layer_dict})
-                        
-
-                        // find and retrieve layers
-                        var arts = _this.moodboard.state.arts
-                        var searchPane=false
-                        var searchMode = 'search'
-                        var search_image_selected = undefined
-                        var search_slider_values = {}
-                        var search_slider_distances = {}
-                        var generate_slider_values = {}
-
-                        var agreementPane=false
-                        var agreement_userSelection = {}
-                        
-                        if(res0[0].searchMode!=undefined){
-                            searchMode = res0[0].searchMode
-                        }
-                        if(res0[0].searchPane!=undefined){
-                            searchPane = res0[0].searchPane
-                        }
-                        if(res0[0].search_image_selected!=undefined){
-                            search_image_selected = res0[0].search_image_selected
-                        }
-                        if(res0[0].search_slider_values!=undefined){
-                            search_slider_values = res0[0].search_slider_values
-                        }
-                        if(res0[0].search_slider_distances!=undefined){
-                            search_slider_distances = res0[0].search_slider_distances
-                        }
-                        if(res0[0].generate_slider_values!=undefined){
-                            generate_slider_values = res0[0].generate_slider_values
-                        }
-                        
-
-                        if(res0[0].agreementPane!=undefined){
-                            agreementPane = res0[0].agreementPane
-                        }
-                        if(res0[0].agreement_userSelection!=undefined){
-                            agreement_userSelection = res0[0]['agreement_userSelection']
-                        }
-                        
-                        Api.app.service('arts').find({query: {board_id: board_id, 
-                            $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height', 'enabled', 'labels']
-                        }})
+                        Api.app.service('layers').find({query: {board_id: board_id}})
                         .then((res)=>{
-                            this.setState({arts_loaded: true})
-                            for(var i in res){
-                                var art = res[i]
-                                arts[art._id] = art
+                            console.log(res)
+                            this.setState({layers_loaded: true})
+                            for(var li in res){
+                                var layer_dict = _this.sketchpad.state.layer_dict
+                                layer_dict[res[li]._id] = res[li]
                                 
+                                _this.loadALayer(res[li])
+                            }
+                            _this.sketchpad.setState({layer_dict})
+                            
+
+                            // find and retrieve layers
+                            var arts = _this.moodboard.state.arts
+                            var searchPane=false
+                            var searchMode = 'search'
+                            var search_image_selected = undefined
+                            var search_slider_values = {}
+                            var search_slider_distances = {}
+                            var generate_slider_values = {}
+
+                            var agreementPane=false
+                            var agreement_userSelection = {}
+                            
+                            if(res0[0].searchMode!=undefined){
+                                searchMode = res0[0].searchMode
+                            }
+                            if(res0[0].searchPane!=undefined){
+                                searchPane = res0[0].searchPane
+                            }
+                            if(res0[0].search_image_selected!=undefined){
+                                search_image_selected = res0[0].search_image_selected
+                            }
+                            if(res0[0].search_slider_values!=undefined){
+                                search_slider_values = res0[0].search_slider_values
+                            }
+                            if(res0[0].search_slider_distances!=undefined){
+                                search_slider_distances = res0[0].search_slider_distances
+                            }
+                            if(res0[0].generate_slider_values!=undefined){
+                                generate_slider_values = res0[0].generate_slider_values
                             }
                             
-                            _this.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, 
-                                search_slider_values:search_slider_values, search_slider_distances: search_slider_distances, searchMode: searchMode,
-                                generate_slider_values: generate_slider_values, 
-                                agreementPane: agreementPane, agreement_userSelection: agreement_userSelection})
 
-                            var groups = _this.moodboard.state.groups
-
-                            Api.app.service('groups').find({query: {board_id: board_id,
-                                $select: ['_id', 'art_ids', 'group_name', 'higher_group', 'board_id', 'pos', 'user_info', 'updated'],
+                            if(res0[0].agreementPane!=undefined){
+                                agreementPane = res0[0].agreementPane
+                            }
+                            if(res0[0].agreement_userSelection!=undefined){
+                                agreement_userSelection = res0[0]['agreement_userSelection']
+                            }
+                            
+                            Api.app.service('arts').find({query: {board_id: board_id, 
+                                $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height', 'enabled', 'labels']
                             }})
                             .then((res)=>{
-                                this.setState({groups_loaded: true})
+                                this.setState({arts_loaded: true})
                                 for(var i in res){
-                                    var group = res[i]
-                                    groups[group._id] = group
-                                }
-                                _this.moodboard.setState({groups:groups})
-
-                                var searched_arts = _this.moodboard.state.searched_arts
-                                Api.app.service('searched_arts').find({query: {board_id: board_id}})
-                                .then((res)=>{
-                                    this.setState({searched_arts_loaded: true})
-                                    for(var i in res){
-                                        searched_arts[res[i]._id] = res[i]
-                                    }
-                                    console.log('searched arts', searched_arts)
-                                    _this.moodboard.setState({searched_arts:searched_arts})
-
-                                    var texts = res0[0]['texts']
-                                    // var sketchundo = res[0]['sketchundo']
-                                    var moodboardundo = res0[0]['moodboardundo']
-                                    var current_collaborators = res0[0]['current_collaborators']
-
-                                    var noone=true
-                                    console.log(current_collaborators)
-                                    for(var _id in current_collaborators){
-                                        if(current_collaborators[_id].active && user_id!=_id){
-                                            noone=false
-                                        }
-                                    }
-                                    console.log(noone)
-                                    if(noone){
-                                        console.log('harabangtang', Object.keys(this.moodboard.state.arts))
-                                        this.ChooseArtsTexts([],[],Object.keys(this.moodboard.state.arts), Object.keys(this.moodboard.state.texts))
-                                        this.ChooseLayers([],this.sketchpad.layers)
-                                    }
+                                    var art = res[i]
+                                    arts[art._id] = art
                                     
-                                    current_collaborators[user_id] = {
-                                        sketch_pos:[-1,-1],
-                                        moodboard_pos: [-1, -1],
-                                        active: true
-                                    }
-                                    var set = {}
-                                    set['current_collaborators.'+user_id] = current_collaborators[user_id]
-                                    set['updated']='current_collaborators.'+user_id
-                                    console.log(set)
-                                    // console.log(layers, arts, texts, sketchundo)
-                                    Api.app.service('boards').update(board_id, {$set: set})
-                                    .then((res)=>{
-                                        _this.setState({loaded:true, current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email}, function(){
-                                            // _this.sketchpad.setState({sketchundo: sketchundo})
-                                                // , function(){
-                                            //     var promises = []
-                                            //     for(var i in layers){
-                                            //         promises.push(_this.loadALayer(layers[i]))
-                                            //     }
-                                            //     Promise.all(promises)
-                                            // })
-                                            _this.moodboard.setState({texts:texts})
-                                            
-                                            // console.log('done')
-                                        })
-                                    })
+                                }
+                                
+                                _this.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, 
+                                    search_slider_values:search_slider_values, search_slider_distances: search_slider_distances, searchMode: searchMode,
+                                    generate_slider_values: generate_slider_values, 
+                                    agreementPane: agreementPane, agreement_userSelection: agreement_userSelection})
 
+                                var groups = _this.moodboard.state.groups
+
+                                Api.app.service('groups').find({query: {board_id: board_id,
+                                    $select: ['_id', 'art_ids', 'group_name', 'higher_group', 'board_id', 'pos', 'user_info', 'updated'],
+                                }})
+                                .then((res)=>{
+                                    this.setState({groups_loaded: true})
+                                    for(var i in res){
+                                        var group = res[i]
+                                        groups[group._id] = group
+                                    }
+                                    _this.moodboard.setState({groups:groups})
+
+                                    var searched_arts = _this.moodboard.state.searched_arts
+                                    Api.app.service('searched_arts').find({query: {board_id: board_id}})
+                                    .then((res)=>{
+                                        this.setState({searched_arts_loaded: true})
+                                        for(var i in res){
+                                            searched_arts[res[i]._id] = res[i]
+                                        }
+                                        console.log('searched arts', searched_arts)
+                                        _this.moodboard.setState({searched_arts:searched_arts})
+
+                                        var texts = res0[0]['texts']
+                                        // var sketchundo = res[0]['sketchundo']
+                                        var moodboardundo = res0[0]['moodboardundo']
+                                        var current_collaborators = res0[0]['current_collaborators']
+
+                                        var noone=true
+                                        console.log(current_collaborators)
+                                        for(var _id in current_collaborators){
+                                            if(current_collaborators[_id].active && user_id!=_id){
+                                                noone=false
+                                            }
+                                        }
+                                        console.log(noone)
+                                        if(noone){
+                                            console.log('harabangtang', Object.keys(_this.moodboard.state.arts))
+                                            _this.ChooseArtsTexts([],[],Object.keys(_this.moodboard.state.arts), Object.keys(_this.moodboard.state.texts))
+                                            _this.ChooseLayers([],_this.sketchpad.layers)
+                                        }
+                                        
+                                        current_collaborators[user_id] = {
+                                            sketch_pos:[-1,-1],
+                                            moodboard_pos: [-1, -1],
+                                            active: true
+                                        }
+                                        var set = {}
+                                        set['current_collaborators.'+user_id] = current_collaborators[user_id]
+                                        set['updated']='current_collaborators.'+user_id
+                                        console.log(set)
+                                        // console.log(layers, arts, texts, sketchundo)
+                                        Api.app.service('boards').update(board_id, {$set: set})
+                                        .then((res)=>{
+                                            _this.setState({loaded:true, current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email}, function(){
+                                                // _this.sketchpad.setState({sketchundo: sketchundo})
+                                                    // , function(){
+                                                //     var promises = []
+                                                //     for(var i in layers){
+                                                //         promises.push(_this.loadALayer(layers[i]))
+                                                //     }
+                                                //     Promise.all(promises)
+                                                // })
+                                                _this.moodboard.setState({texts:texts})
+                                                
+                                                // console.log('done')
+                                            })
+                                        })
+
+                                    })
                                 })
                             })
                         })
                     })
+                    
                     
 
                     

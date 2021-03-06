@@ -247,6 +247,11 @@ class SketchpadLayerController extends Component{
             Promise.all([this.props.mother_this.props.board_this.ChooseLayers([],[layers[cl]]),
                 this.setState({layer_mouse_down: false, mouse_y_pos:undefined, y_init_pos:undefined}, function(){
                     _this.props.mother_this.setState({current_layer:-1, control_state: 'move'})
+                    var mdbd_ct = _this.props.mother_this.props.board_this.moodboard.state.control_state
+                    console.log(mdbd_ct)
+                    if(['add_image', 'add_text', 'add_color', 'control_object'].indexOf(mdbd_ct)==-1){
+                        _this.props.mother_this.props.board_this.moodboard.setState({control_state: 'control_object'})
+                    }
                 })
 
         
