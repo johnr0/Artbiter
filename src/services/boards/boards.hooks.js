@@ -425,56 +425,60 @@ const afterRemove = async context => {
   //     context.app.service('group_styles').remove(res[i]._id)
   //   }
   // })
-  context.app.service('groups').find({query:{board_id: _id}}).then((res)=>{
-    var group_remove_calls = []
-    for(var i in res){
-      group_remove_calls.push(['remove', 'groups', res[i]._id])
-      // context.app.service('groups').remove(res[i]._id)
-    }
-    context.app.service('batch').create({calls: group_remove_calls})
-    .then(()=>{
-      context.app.service('searched_arts').find({query:{board_id: _id}}).then((res)=>{
-        for(var i in res){
-          context.app.service('searched_arts').remove(res[i]._id)
-        }
-      })
-    
-      context.app.service('art_styles').find({query:{board_id: _id}}).then((res)=>{
-        for(var i in res){
-          context.app.service('art_styles').remove(res[i]._id)
-        }
-      })
-      context.app.service('arts').find({query:{board_id: _id}}).then((res)=>{
-        for(var i in res){
-          context.app.service('arts').remove(res[i]._id)
-        }
-      })
-    
-      // context.app.service('texts').find({query:{board_id: _id}}).then((res)=>{
-      //   for(var i in res){
-      //     context.app.service('texts').remove(res[i]._id)
-      //   }
-      // })
-    
-      context.app.service('layers').find({query:{board_id: _id}}).then((res)=>{
-        for(var i in res){
-          context.app.service('layers').remove(res[i]._id)
-        }
-      })
-    
-      context.app.service('disagreed_arts').find({query:{board_id: _id}}).then((res)=>{
-        for(var i in res){
-          context.app.service('disagreed_arts').remove(res[i]._id)
-        }
-      })
 
-      context.app.service('sketchundos').find({query:{board_id: _id}}).then((res)=>{
+  context.app.service('searched_arts').find({query:{board_id: _id}}).then((res)=>{
+    var searched_arts_remove = []
+    for(var i in res){
+      searched_arts_remove.push(['remove', 'searched_arts', res[i]._id])
+    }
+    context.app.service('batch').create({calls: searched_arts_remove})
+    .then(()=>{
+      context.app.service('art_styles').find({query:{board_id: _id}}).then((res)=>{
+        var art_styles_remove = []
         for(var i in res){
-          context.app.service('sketchundos').remove(res[i]._id)
+          art_styles_remove.push(['remove', 'art_styles', res[i]._id])
         }
+        context.app.service('batch').create({calls: art_styles_remove}).then(()=>{
+          context.app.service('arts').find({query:{board_id: _id}}).then((res)=>{
+            var arts_remove = []
+            for(var i in res){
+              arts_remove.push(['remove', 'arts', res[i]._id])
+            }
+            context.app.service('batch').create({calls:arts_remove}).then(()=>{
+              context.app.service('layers').find({query:{board_id: _id}}).then((res)=>{
+                var layers_remove = []
+                for(var i in res){
+                  layers_remove.push(['remove', 'layers', res[i]._id])
+                }
+                context.app.service('batch').create({calls:layers_remove}).then(()=>{
+                  context.app.service('sketchundos').find({query:{board_id: _id}}).then((res)=>{
+                    var sketchundo_remove = []
+                    for(var i in res){
+                      sketchundo_remove.push(['remove', 'sketchundos', res[i]._id])
+                    }
+                    context.app.service('batch').create({calls:sketchundo_remove}).then((res)=>{
+                      console.log('success until gropu deletion')
+                      context.app.service('groups').find({query:{board_id: _id}}).then((res)=>{
+                        var group_remove_calls = []
+                        for(var i in res){
+                          group_remove_calls.push(['remove', 'groups', res[i]._id])
+                          // context.app.service('groups').remove(res[i]._id)
+                        }
+                        context.app.service('batch').create({calls: group_remove_calls})
+                      })
+                    })
+                  })
+                })
+              })
+            })
+          })
+        })
       })
     })
   })
+
+
+  
 
   
   

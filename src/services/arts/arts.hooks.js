@@ -24,7 +24,8 @@ const turnImageToEmbedding = async context => {
     
     context.app.service('art_styles').create({
       art_id: context.arguments[0]._id,
-      style: style
+      style: style,
+      board_id: context.arguments[0].board_id,
     })
   }, (error)=>{
     // console.log(error)
