@@ -194,9 +194,9 @@ class MoodBoardAI extends MoodBoard{
         groups[id] = a_group
         this.setState({groups, action:'idle'}, function(){
             Api.app.service('groups').create(a_group)
-            .then(()=>{
-                Api.app.service('event_logs').create({event:'create_a_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: id, group_name: name})
-            })
+            // .then(()=>{
+                // Api.app.service('event_logs').create({event:'create_a_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: id, group_name: name})
+            // })
         })
 
         
@@ -244,9 +244,9 @@ class MoodBoardAI extends MoodBoard{
             this.setState({groups}, function(){
                 // analytics.logEvent("add_to_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
                 Api.app.service('groups').patch(group_id, {$set: set, $push:{art_ids: {$each: this.state.current_image.slice()}}})
-                .then(()=>{
-                    Api.app.service('event_logs').create({event:'add_to_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
-                })
+                // .then(()=>{
+                    // Api.app.service('event_logs').create({event:'add_to_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
+                // })
             })
             
         }else{
@@ -259,9 +259,9 @@ class MoodBoardAI extends MoodBoard{
             
             this.setState({groups}, function(){
                 Api.app.service('groups').patch(group_id, {$set:{updated:'groups_add', pos: pos}, $push:push})
-                .then(()=>{
-                    Api.app.service('event_logs').create({event: 'add_to_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
-                })
+                // .then(()=>{
+                    // Api.app.service('event_logs').create({event: 'add_to_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
+                // })
             })
             
         }
@@ -312,9 +312,9 @@ class MoodBoardAI extends MoodBoard{
         groups[group_id] = group
         this.setState({groups: groups}, function(){
             Api.app.service('groups').patch(group_id, {$set:{updated:'groups_remove', pos: pos}, $pull:pull})
-            .then(()=>{
-                Api.app.service('event_logs').create({event: 'remove_from_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, removed_arts: this.state.current_image.slice()})
-            })
+            // .then(()=>{
+                // Api.app.service('event_logs').create({event: 'remove_from_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, removed_arts: this.state.current_image.slice()})
+            // })
         })
 
         // analytics.logEvent("remove_from_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, removed_arts: this.state.current_image.slice()})
@@ -354,9 +354,9 @@ class MoodBoardAI extends MoodBoard{
 
         this.setState({groups}, function(){
             Api.app.service('groups').remove(group_id)
-            .then(()=>{
-                Api.app.service('event_logs').create({event:'delete_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
-            })
+            // .then(()=>{
+            //     Api.app.service('event_logs').create({event:'delete_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
+            // })
         })  
         
         
@@ -415,7 +415,7 @@ class MoodBoardAI extends MoodBoard{
                 this.setState({action:'idle', current_image:flist, current_text:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
                     _this.props.board_this.sketchpad.setState({})
                 }), 
-                Api.app.service('event_logs').create({event:'select_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
+                // Api.app.service('event_logs').create({event:'select_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
             ])
         }else{
             for(var i in art_ids){
@@ -476,9 +476,9 @@ class MoodBoardAI extends MoodBoard{
         
         this.setState({groups}, function(){
             Api.app.service('groups').patch(key, {$set: {updated:'groups_relate_r', higher_group: standard_group.higher_group}})
-            .then(()=>{
-                Api.app.service('event_logs').create({event:'relate_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
-            })
+            // .then(()=>{
+            //     Api.app.service('event_logs').create({event:'relate_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
+            // })
         })
         
         
@@ -512,9 +512,9 @@ class MoodBoardAI extends MoodBoard{
 
         this.setState({groups}, function(){
             Api.app.service('groups').patch(key, {$set: {updated: 'groups_relate_u', higher_group: color}})
-            .then(()=>{
-                Api.app.service('event_logs').create({event: 'unrelate_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
-            })
+            // .then(()=>{
+            //     Api.app.service('event_logs').create({event: 'unrelate_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
+            // })
         })
         
         
@@ -531,9 +531,9 @@ class MoodBoardAI extends MoodBoard{
                 if(filtered.length==art_ids.length || art_ids.length-filtered.length==1){
                     // analytics.logEvent("group_delete", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group._id})
                     Api.app.service('groups').remove(group._id)
-                    .then(()=>{
-                        Api.app.service('event_logs').create({event: 'group_delete',board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group._id})
-                    })
+                    // .then(()=>{
+                    //     Api.app.service('event_logs').create({event: 'group_delete',board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group._id})
+                    // })
                 }else if(filtered.length>0){
                     for(var i in filtered){
                         _this.removeFromGroup(group._id)

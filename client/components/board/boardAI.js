@@ -101,7 +101,7 @@ class BoardAI extends Board{
                 location.reload();
             }
             console.log(analytics)
-            Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
+            // Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
             // analytics.logEvent("enter_board", {board_id, user_email, user_id})
             console.log('timeout before...', Api.app.service('boards').timeout)
             Api.app.service('boards').timeout = 60000
@@ -119,7 +119,7 @@ class BoardAI extends Board{
                     window.location.href='/boardlist'
                 }else{
                     this.setState({board_loaded: true})
-                    Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
+                    // Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
                     console.log(res[0])
                     for(var j in res[0].collaborators){
                         if(res[0].collaborators[j]!=user_id){

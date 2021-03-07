@@ -113,7 +113,7 @@ class MoodBoardSearchPaneAI extends Component{
         // analytics.logEvent("search", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.search_slider_values})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_images', searching: true}})
         .then(()=>{
-            Api.app.service('event_logs').create({event: 'search', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.search_slider_values})
+            // Api.app.service('event_logs').create({event: 'search', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.search_slider_values})
         })
     }
 
@@ -122,7 +122,7 @@ class MoodBoardSearchPaneAI extends Component{
         // analytics.logEvent("search_similar", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_similar_images', searching: true}})
         .then(()=>{
-            Api.app.service('event_logs').create({event: 'search_similar', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected})
+            // Api.app.service('event_logs').create({event: 'search_similar', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected})
         })
     }
 
@@ -131,7 +131,7 @@ class MoodBoardSearchPaneAI extends Component{
         // analytics.logEvent("search_random", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_random_images', searching: true}})
         .then(()=>{
-            Api.app.service('event_logs').create({event: 'search_random', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
+            // Api.app.service('event_logs').create({event: 'search_random', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
         })
     }
 
@@ -140,7 +140,7 @@ class MoodBoardSearchPaneAI extends Component{
         // analytics.logEvent("transfer_on_moodboard", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.generate_slider_values})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_generate_image', searching: true}})
         .then(()=>{
-            Api.app.service('event_logs').create({event: 'transfer_on_moodboard', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.generate_slider_values})
+            // Api.app.service('event_logs').create({event: 'transfer_on_moodboard', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.generate_slider_values})
         })
     }
 
