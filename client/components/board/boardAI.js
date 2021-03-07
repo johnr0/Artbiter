@@ -207,7 +207,8 @@ class BoardAI extends Board{
                                 var arts_promises = []
                                 for(var i in res){
                                     arts_promises.push(new Promise(function(resolve){
-                                        Api.app.service('arts').find({query:{_id:res[i]._id}})
+                                        Api.app.service('arts').find({query:{_id:res[i]._id,
+                                        $select: ['_id', 'position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height', 'enabled', 'labels']}})
                                         .then((res_art)=>{
                                             if(typeof resolve === 'function'){
                                                 resolve([res_art[0]])
