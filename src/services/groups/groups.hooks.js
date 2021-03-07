@@ -118,9 +118,11 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
     // var avg_styles = JSON.parse(response.data['avg_styles'])
     // console.log(avg_styles)
     var promises = []
+    var promise_patches = []
     for(var i in cavs){
       // console.log(cavs[i])
-      promises.push(context.app.service('groups').patch(i, {$set: {cav: cavs[i], updated: 'moodboard_group_cav_update'}}))
+      promise_patches.push(['patch', 'groups', i, {$set: {cav: cavs[i], updated: 'moodboard_group_cav_update'}}])
+      // promises.push(context.app.service('groups').patch(i, {$set: {cav: cavs[i], updated: 'moodboard_group_cav_update'}}))
     }
 
     context.app.service('group_models').find({query:{board_id: context.result.board_id}})
@@ -175,13 +177,19 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
       
     })
 
-    Promise.all(promises).then(data=>{
+    context.app.service('batch').create({calls: promise_patches})
+    .then(()=>{
       console.log('all', board_id)
 
       sliderImpact(board_id, context)
-    }).catch(function(err){
-      console.log('err')
     })
+    // Promise.all(promises).then(data=>{
+    //   console.log('all', board_id)
+
+    //   sliderImpact(board_id, context)
+    // }).catch(function(err){
+    //   console.log('err')
+    // })
   }, (error)=>{
     console.log('error')
     

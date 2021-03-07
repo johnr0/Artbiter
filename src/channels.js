@@ -367,7 +367,9 @@ module.exports = function(app) {
       var data_to_return = {}
       data_to_return.updated = data.updated
       if(data.updated!=undefined){
-        if(data.updated.indexOf('groups_position')!=-1){
+        if(data.updated=='moodboard_group_cav_update'){
+          return 
+        }else if(data.updated.indexOf('groups_position')!=-1){
           data_to_return._id = data._id
           data_to_return.board_id = data.board_id
           data_to_return.pos = data.pos
