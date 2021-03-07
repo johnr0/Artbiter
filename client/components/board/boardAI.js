@@ -235,11 +235,24 @@ class BoardAI extends Board{
                                     }})
                                     .then((res)=>{
                                         _this.setState({searched_arts_loaded: true})
+                                        var search_arts_promises = []
                                         for(var i in res){
-                                            searched_arts[res[i]._id] = res[i]
+                                            search_arts_promises.push( new Promise(function(resolve, reject){
+                                                Api.app.service('searched_arts').find({query: {_id: res[i]._id}})
+                                                .then((res_search)=>{
+                                                    searched_arts[res[i]._id] = res_search[0]
+                                                    _this.moodboard.setState({searched_arts:searched_arts})
+                                                })
+                                            }))
                                         }
-                                        console.log('searched arts', searched_arts)
-                                        _this.moodboard.setState({searched_arts:searched_arts})
+                                        
+
+
+                                        // for(var i in res){
+                                        //     searched_arts[res[i]._id] = res[i]
+                                        // }
+                                        // console.log('searched arts', searched_arts)
+                                        // _this.moodboard.setState({searched_arts:searched_arts})
 
                                         var texts = res0[0]['texts']
                                         // var sketchundo = res[0]['sketchundo']
