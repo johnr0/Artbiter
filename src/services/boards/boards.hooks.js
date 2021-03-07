@@ -101,7 +101,7 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
       var calls = []
       for(var i in res0){
         // context.app.service('searched_arts').remove(res0[i]._id)
-        calls.push('remove', 'searched_arts', res0[i]._id)
+        calls.push(['remove', 'searched_arts', res0[i]._id])
       }
       for(var i in returned_images){
         var searched_art = {
@@ -110,7 +110,7 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
           order: i,
         }
         // context.app.service('searched_arts').create(searched_art)
-        calls.push('create', 'searched_arts', searched_art)
+        calls.push(['create', 'searched_arts', searched_art])
       }
       // search end
       context.app.service('batch').create({calls:calls}).then(()=>{
