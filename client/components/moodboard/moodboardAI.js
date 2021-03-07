@@ -238,6 +238,8 @@ class MoodBoardAI extends MoodBoard{
                 $each: this.state.current_image.slice()
             }
             // analytics.logEvent("add_to_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
+            
+            
             Api.app.service('groups').patch(group_id, {$set:{updated:'groups_add', pos: pos}, $push:push})
             .then(()=>{
                 Api.app.service('event_logs').create({event: 'add_to_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
@@ -392,7 +394,7 @@ class MoodBoardAI extends MoodBoard{
                     console.log(this.getCurrentMouseOnBoard(ecopied))
                     _this.props.board_this.sketchpad.setState({})
                 }),
-                Api.app.service('event_logs').create({event: 'select_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
+                // Api.app.service('event_logs').create({event: 'select_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
             ])
         }
         

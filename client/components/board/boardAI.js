@@ -31,12 +31,15 @@ class BoardAI extends Board{
                     var groups = this.moodboard.state.groups
                     groups[data._id].pos = data.pos
                     this.moodboard.setState({groups})
-                }else if(data.updated == 'groups_add' || data.updated=='groups_remove'){
-                    var groups = this.moodboard.state.groups
-                    groups[data._id].pos = data.pos
-                    groups[data._id].art_ids = data.art_ids
-                    groups[data._id].user_info = data.user_info
-                    this.moodboard.setState({groups})
+                }else if(data.updated.indexOf('groups_add')!=-1 || data.updated.indexOf('groups_remove')!=-1){
+                    // if(data.updated.indexOf(this.state.user_id)!=-1){
+                        var groups = this.moodboard.state.groups
+                        groups[data._id].pos = data.pos
+                        groups[data._id].art_ids = data.art_ids
+                        groups[data._id].user_info = data.user_info
+                        this.moodboard.setState({groups})
+                    // }
+                    
                 }else if(data.updated.indexOf('groups_relate')!=-1){
                     var groups = this.moodboard.state.groups
                     groups[data._id].higher_group = data.higher_group

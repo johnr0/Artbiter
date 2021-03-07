@@ -397,11 +397,11 @@ module.exports = function(app) {
       
     })
 
-    app.service('disagreed_arts').publish((data)=>{
+    // app.service('disagreed_arts').publish((data)=>{
 
-      return [app.channel(`boards/${data.board_id}`).send(data)]
+    //   return [app.channel(`boards/${data.board_id}`).send(data)]
       
-    })
+    // })
   };
 
 
