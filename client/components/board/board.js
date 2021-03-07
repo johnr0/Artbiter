@@ -855,7 +855,7 @@ class Board extends Component{
         
         Api.app.service('boards').patch(this.state.board_id, {$set: set, $push: push}).then(()=>{
             Api.app.service('layers').remove(layer._id).then(()=>{
-                Api.app.service('sketchundos').create(sketchundo)
+                // Api.app.service('sketchundos').create(sketchundo)
             })
 
         })
@@ -885,7 +885,7 @@ class Board extends Component{
             layers: prev_layer
         }
         Api.app.service('boards').patch(this.state.board_id, patch).then(()=>{
-            Api.app.service('sketchundos').create(sketchundo)
+            // Api.app.service('sketchundos').create(sketchundo)
         })
     }
 
@@ -914,7 +914,7 @@ class Board extends Component{
         }
         Api.app.service('boards').patch(this.state.board_id, set2).then(()=>{
             Api.app.service('layers').patch(layer_id, {$set: set}).then(()=>{
-                Api.app.service('sketchundos').create(sketchundo)
+                // Api.app.service('sketchundos').create(sketchundo)
             })
         })
         
