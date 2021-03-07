@@ -6,7 +6,7 @@ module.exports = function (app) {
 
     };
 
-    app.use('sketchundos', new SketchUndos(options, app));
+    app.use('/sketchundos', new SketchUndos(options, app));
 
     const service = app.service('sketchundos');
 

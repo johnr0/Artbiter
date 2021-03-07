@@ -329,6 +329,9 @@ class SketchPad extends ProtoBoard {
         ctx.lineJoin = ctx.lineCap = 'round'
         
         console.log(this.state.brush_img)
+        var brush_cur = this.getCurrentMouseOnBoard(e)
+        // brush_cur[0] = brush_cur[0]+this.state.brush_size/this.state.boardlength/this.state.boardzoom/2
+        // brush_cur[1] = brush_cur[1]+this.state.brush_size/this.state.boardlength/this.state.boardzoom/2
         this.setState({action:'brush', brush_cur:this.getCurrentMouseOnBoard(e), cur_colored_brush_img: cur_colored_brush_img, brush_pre_canvas:brush_pre_canvas, origin_image: cur_image})
        
     }
@@ -349,6 +352,8 @@ class SketchPad extends ProtoBoard {
         brush_pre_ctx.clearRect(0,0,1000,1000);
 
         var brush_cur = this.getCurrentMouseOnBoard(e)
+        // brush_cur[0] = brush_cur[0]+this.state.brush_size/this.state.boardlength/this.state.boardzoom/2
+        // brush_cur[1] = brush_cur[1]+this.state.brush_size/this.state.boardlength/this.state.boardzoom/2
         // console.log(brush_cur, this.state.brush_cur)
 
         var dist = this.distanceBetween(brush_cur, this.state.brush_cur)
@@ -356,8 +361,8 @@ class SketchPad extends ProtoBoard {
         // console.log(dist, angle)
 
         for (var i=0; i<dist; i++){
-            var x = brush_cur[0]+(Math.sin(angle)*i)-25;
-            var y = brush_cur[1]+(Math.cos(angle)*i)-25;
+            var x = brush_cur[0]+(Math.sin(angle)*i)-this.state.brush_size/2;
+            var y = brush_cur[1]+(Math.cos(angle)*i)-this.state.brush_size/2;
             // console.log(x, y)
             brush_pre_ctx.drawImage(this.state.cur_colored_brush_img, x, y);
             // ctx.drawImage(this.state.cur_colored_brush_img, x, y);
@@ -1477,7 +1482,7 @@ class SketchPad extends ProtoBoard {
 
     renderBrushMark(){
         var height = this.state.brush_size/1000*this.state.boardlength*this.state.boardzoom
-        return (<img src={location.protocol+'//'+location.host+'/img/brush.png'} style={{height: height, position:'absolute', zorder:100000, pointerEvents: 'none', top: this.state.cur_mouse_pos[1]-15, left: this.state.cur_mouse_pos[0]-15}}></img>)
+        return (<img src={location.protocol+'//'+location.host+'/img/brush.png'} style={{height: height, position:'absolute', zorder:100000, pointerEvents: 'none', top: this.state.cur_mouse_pos[1]-this.state.brush_size/2*this.state.boardzoom, left: this.state.cur_mouse_pos[0]-this.state.brush_size/2*this.state.boardzoom}}></img>)
     }
 
     renderEraserMark(){

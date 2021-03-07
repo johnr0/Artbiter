@@ -79,7 +79,7 @@ class Board extends Component{
                 if(res0.length==0){
                     window.location.href='/boardlist'
                 }else{
-                    // Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
+                    Api.app.service('event_logs').create({event: 'enter_board', board_id, user_email, user_id})
                     console.log(res0[0])
                     var owner = res0[0].owner
                     for(var j in res0[0].collaborators){
@@ -1026,7 +1026,7 @@ class Board extends Component{
             // analytics.logEvent("add_an_art", {board_id: this.state.board_id, user_id:this.state.user_id, art_id:art_ids[i]})
             Api.app.service('arts').create(create)
             .then(()=>{
-                // Api.app.service('event_logs').create({event: 'add_an_art', board_id: this.state.board_id, user_id:this.state.user_id, art_id:art_ids[i]})
+                Api.app.service('event_logs').create({event: 'add_an_art', board_id: this.state.board_id, user_id:this.state.user_id, art_id:art_ids[i]})
             })
         }
         
@@ -1069,7 +1069,7 @@ class Board extends Component{
             // analytics.logEvent("remove_an_art", {board_id: this.state.board_id, user_id:this.state.user_id, art_id:arts[i]})
             Api.app.service('arts').remove(arts[i])
             .then(()=>{
-                // Api.app.service('event_logs').create({event:'remove_an_art', board_id: this.state.board_id, user_id:this.state.user_id, art_id:arts[i]})
+                Api.app.service('event_logs').create({event:'remove_an_art', board_id: this.state.board_id, user_id:this.state.user_id, art_id:arts[i]})
             })
         }
         for(var i in texts){
