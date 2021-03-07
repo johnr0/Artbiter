@@ -32,6 +32,8 @@ const labelAllImages = async context => {
             // promises = []
             var batch = []
             var label_result = JSON.parse(response.data['result'])
+            batch.push(['patch', 'boards', context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}}])
+            
             for(var key in label_result){
                 for(var j in l2t[0]){
                     if(l2t[0][j]!='_random'){
@@ -52,7 +54,6 @@ const labelAllImages = async context => {
                 
             }
             console.log('search done', context.arguments[0].board_id,)
-            batch.push(['patch', 'boards', context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}}])
             context.app.service('batch').create({calls: batch})
             // .then(()=>{
             //     context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
