@@ -76,7 +76,7 @@ class SketchpadUndo extends Component{
 
 
         return(<div className="undo_controller">
-            <div onClick={this.sketchUndo.bind(this)} style={{color: (this.undoSkip()[1])?'#eeeeee':'black'}}><i class='material-icons'>undo</i></div>
+            {/* <div onClick={this.sketchUndo.bind(this)} style={{color: (this.undoSkip()[1])?'#eeeeee':'black'}}><i class='material-icons'>undo</i></div> */}
         </div>)
     }
 }

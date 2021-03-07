@@ -4,7 +4,13 @@ const SketchUndoBeforeCreate = async context =>{
     context.app.service('sketchundos').find({query: {board_id: context.data.board_id, $sort: {date:1}}})
     .then((res)=>{
         if(res.length>20){
-            context.app.service('sketchundos').remove(res[0]._id)
+            context.app.service('sketchundos').find({query: {_id:res[0]._id}})
+            .then((res2)=>{
+                if(res2.length!=0){
+                    context.app.service('sketchundos').remove(res[0]._id)
+                }
+            })
+            // context.app.service('sketchundos').remove(res[0]._id)
         }
     })
     context.data.date = new Date()
@@ -48,7 +54,12 @@ function removeSketchundoFromBoard(sketchundo, context){
         }
         // console.log(idx, sketchundo_list.length)
         context.app.service('boards').patch(sketchundo.board_id, {$set: {sketchundo: sketchundo_list, undoable:true, updated:'sketchpad_undoable'}})
-        context.app.service('sketchundos').remove(sketchundo._id)
+        context.app.service('sketchundos').find({query: {_id:sketchundo._id}})
+        .then((res)=>{
+            if(res.length!=0){
+                context.app.service('sketchundos').remove(sketchundo._id)
+            }
+        })
     })
 }
 
