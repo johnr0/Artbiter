@@ -271,8 +271,8 @@ function averageStyles(styles, context){
 const createTrainCAV = async context => {
   console.log('art ids are ')
   console.log(context.result)
-  context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
-  .then(()=>{
+  // context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
+  // .then(()=>{
     context.app.service('arts').find({query: {_id: {$in:context.arguments[0].art_ids}}})
     .then((res)=>{
       // console.log('length is ', res.length,',', context.result._id)
@@ -304,7 +304,7 @@ const createTrainCAV = async context => {
       }
       averageStyles(styles, context)
     })
-  })
+  // })
   
   // context.app.service('boards').find({query: {_id: context.arguments[0].board_id}})
   // .then((res)=>{
@@ -322,8 +322,8 @@ const RelateCAV = async context => {
   if(context.result.updated=='groups_relate_r'){
     // console.log('relate 2')
     // console.log(context.result.higher_group)
-    context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
-    .then((res)=>{
+    // context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
+    // .then((res)=>{
       context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
       .then((res)=>{
         var art_ids = []
@@ -370,7 +370,7 @@ const RelateCAV = async context => {
         // })
         
       })
-    })
+    // })
     
 
     
@@ -386,8 +386,8 @@ const UnrelateCAV = async context => {
 
     context.app.service('groups').find({query:{_id: context.arguments[0]}})
     .then((res)=>{
-      context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: true, updated:'group_updating'}})
-      .then(()=>{
+      // context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: true, updated:'group_updating'}})
+      // .then(()=>{
         context.app.service('groups').find({query: {higher_group: res[0].higher_group}})
         .then((res2)=>{
           // console.log(res2.length)
@@ -454,7 +454,7 @@ const UnrelateCAV = async context => {
       })
       // console.log(res[0].higher_group)
       
-    })
+    // })
 
       
       
@@ -464,8 +464,8 @@ const UnrelateCAV = async context => {
 const AddRemoveArtCAV = async context => {
   // console.log('add remove')
   if(context.result.updated=='groups_add' || context.result.updated=='groups_remove'){
-    context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
-    .then((res)=>{
+    // context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
+    // .then((res)=>{
       context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
       .then((res)=>{
         var art_ids = []
@@ -511,7 +511,7 @@ const AddRemoveArtCAV = async context => {
           averageStyles(styles, context)
         })
       })
-    })
+    // })
     
   } 
 }
@@ -523,8 +523,8 @@ const RemoveGroupCAV = async context => {
     // console.log(res[0])
     context.app.service('groups').find({query: {higher_group: res[0].higher_group}})
     .then((res2)=>{
-      context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: true, updated:'group_updating'}})
-      .then(()=>{
+      // context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: true, updated:'group_updating'}})
+      // .then(()=>{
         // console.log(res2.length)
         var art_ids = []
 
@@ -632,7 +632,7 @@ const RemoveGroupCAV = async context => {
         
       // })
     })
-  })
+  // })
 }
 
 const groupStyleRemove = async context =>{

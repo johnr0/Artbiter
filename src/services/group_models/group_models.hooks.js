@@ -53,10 +53,10 @@ const labelAllImages = async context => {
             }
             console.log('search done', context.arguments[0].board_id,)
             // batch.push(['patch', 'boards', context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}}])
-            context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
-            .then(()=>{
-                context.app.service('batch').create({calls: batch})
-            })
+            // context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
+            // .then(()=>{
+            context.app.service('batch').create({calls: batch})
+            // })
             // context.app.service('batch').create({calls: batch})
             // .then(()=>{
             //     context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
