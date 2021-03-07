@@ -76,7 +76,7 @@ class MoodboardImageAI extends MoodboardImage{
         if(this.props.mother_state.control_state=='search_image_select'){
             if(this.props.art.enabled){
                 Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {search_image_selected: this.props.art_key, updated:'moodboard_search_image_select'}})
-                this.props.mother_this.setState({control_state: 'control_object'})
+                this.props.mother_this.setState({control_state: 'control_object', search_image_selected: this.props.art_key})
             }
         }else if(this.props.mother_state.control_state=='style-stamp' && down==false){
             if(this.props.art.enabled){

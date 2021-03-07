@@ -608,6 +608,7 @@ class MoodBoard extends ProtoBoard{
             console.log('color', value)
             var art_id=this.state.current_image[0]
             console.log('art_id', art_id)
+            var arts = this.state.arts
             var art = this.state.arts[art_id]
             console.log(art['color'])
             if(art['color']!=undefined){
@@ -622,7 +623,11 @@ class MoodBoard extends ProtoBoard{
                     canvas.fillRect(0,0,224,224)
 
                     var src = el.toDataURL()
-                    Api.app.service('arts').patch(art_id, {$set: {file:src, color: value, updated: 'moodboard_color_swatch_change'}})
+                    art['file']=src
+                    this.setState({arts}, function(){
+                        Api.app.service('arts').patch(art_id, {$set: {file:src, color: value, updated: 'moodboard_color_swatch_change'}})
+                    })
+                    
                 }
             }
         }

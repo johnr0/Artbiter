@@ -179,7 +179,7 @@ function generateImageWithScaling(content, styles, context){
       image: returned_image,
       opacity: 1,
       choosen_by: '',
-      updated: 'sketchpad_add_a_layer',
+      updated: 'sketchpad_add_a_layer_style',
     }
     var undo_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
     var push ={
@@ -211,8 +211,7 @@ function generateImageWithScaling(content, styles, context){
 
     context.app.service('boards').patch(context.arguments[0], {$set:set, $push:push}).then(()=>{
       context.app.service('layers').create(layer).then(()=>{
-        context.app.service('sketchundos').create(sketchundo)
-        // context.app.service('boards').patch(context.arguments[0], {$set:{updated: 'sketchpad_undoupdate'}, $pop: {sketchundo: -1}})
+        // context.app.service('sketchundos').create(sketchundo)
       })
     })
   

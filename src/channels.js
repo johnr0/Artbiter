@@ -62,7 +62,7 @@ module.exports = function(app) {
     // app.service('users').publish('created', () => app.channel('admins'));
     
     // With the userid and email organization from above you can easily select involved users
-    app.service('boards').publish((data) => {
+    app.service('boards').publish((data, hook) => {
         // console.log('owner', data.owner)
         var data_to_return = {}
         // console.log(data.updated)
@@ -278,33 +278,46 @@ module.exports = function(app) {
       return return_list;
     });
 
-    app.service('layers').publish((data)=>{
+    app.service('layers').publish((data, hook)=>{
       
       var data_to_return = {}
       data_to_return.updated = data.updated
-      if(data.updated.indexOf('sketchpad_layers_choosen')!=-1){
-        data_to_return._id = data._id
-        data_to_return.choosen_by = data.choosen_by
-        data_to_return.board_id = data.board_id
-      }else if(data.updated=='sketchpad_add_a_layer'){
-        data_to_return = data
-      }else if(data.updated=='sketchpad_layer_hide'){
-        data_to_return._id = data._id
-        data_to_return.hide = data.hide
+      // console.log(data)
+      if(data.updated!=undefined){
+        if(data.updated.indexOf('sketchpad_layers_choosen')!=-1){
+          data_to_return._id = data._id
+          data_to_return.choosen_by = data.choosen_by
+          data_to_return.board_id = data.board_id
+        }else if(data.updated.indexOf('sketchpad_add_a_layer')!=-1){
+          data_to_return = data
+          if(data.updated=='sketchpad_add_a_layer_style'){
+            return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
+          }
+        }else if(data.updated=='sketchpad_layer_hide'){
+          data_to_return._id = data._id
+          data_to_return.hide = data.hide
+        }else{
+          // console.log('layer1')
+          data_to_return = data
+          return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
+        }
       }else{
+        // console.log('layer2')
         data_to_return = data
+        return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
       }
+      
       // console.log(data.board_id)
 
 
-      return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
+      return [app.channel(`boards/${data.board_id}`).filter(connection=>connection.user._id!==hook.params.user._id).send(data_to_return)]
 
     
       
       
     })
 
-    app.service('arts').publish((data)=>{
+    app.service('arts').publish((data, hook)=>{
       
       var data_to_return = {}
       data_to_return.updated = data.updated
@@ -326,9 +339,11 @@ module.exports = function(app) {
       }else if(data.updated=='moodboard_update_arts_embedding'){
         data_to_return._id = data._id
         data_to_return.enabled = data.enabled
+        return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
       }else if(data.updated=='arts_label'){
         data_to_return._id = data._id
         data_to_return.labels = data.labels
+        return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
       }else{
         console.log('arts created?')
         data_to_return = JSON.parse(JSON.stringify(data))
@@ -340,14 +355,14 @@ module.exports = function(app) {
       // console.log(data.board_id)
 
 
-      return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
+      return [app.channel(`boards/${data.board_id}`).filter(connection=>connection.user._id!==hook.params.user._id).send(data_to_return)]
 
     
       
       
     })
 
-    app.service('groups').publish((data)=>{
+    app.service('groups').publish((data, hook)=>{
       
       var data_to_return = {}
       data_to_return.updated = data.updated
@@ -356,6 +371,7 @@ module.exports = function(app) {
           data_to_return._id = data._id
           data_to_return.board_id = data.board_id
           data_to_return.pos = data.pos
+          
         }else if(data.updated.indexOf('groups_add')!=-1 || data.updated.indexOf('groups_remove')!=-1){
           data_to_return._id = data._id
           data_to_return.board_id = data.board_id
@@ -386,9 +402,9 @@ module.exports = function(app) {
       }  
       
       // console.log(data.board_id)
-
-
-      return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
+      return [app.channel(`boards/${data.board_id}`).filter(connection=>connection.user._id!==hook.params.user._id).send(data_to_return)]
+      // return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
+      
     })
 
     app.service('searched_arts').publish((data)=>{

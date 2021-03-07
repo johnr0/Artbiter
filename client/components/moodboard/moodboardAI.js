@@ -189,12 +189,19 @@ class MoodBoardAI extends MoodBoard{
         // var search_slider_values = this.state.search_slider_values
         // search_slider_values[id]=0
         // analytics.logEvent("create_a_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: id, group_name: name})
-        Api.app.service('groups').create(a_group)
-        .then(()=>{
-            Api.app.service('event_logs').create({event:'create_a_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: id, group_name: name})
+        var groups = this.state.groups
+
+        groups[id] = a_group
+        this.setState({groups, action:'idle'}, function(){
+            Api.app.service('groups').create(a_group)
+            .then(()=>{
+                Api.app.service('event_logs').create({event:'create_a_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: id, group_name: name})
+            })
         })
+
+        
         // Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
-        this.setState({action:'idle'})
+        // this.setState({action:'idle'})
 
     }
 
@@ -202,6 +209,7 @@ class MoodBoardAI extends MoodBoard{
         e.stopPropagation()
         e.preventDefault()
         console.log('add?')
+        var groups = this.state.groups
         var group = this.state.groups[group_id]
         // var art_ids = group.art_ids.slice()
         // art_ids = art_ids.concat(this.state.current_image)
@@ -222,28 +230,40 @@ class MoodBoardAI extends MoodBoard{
                 pos[3] = position[3]
             }
         }
+        group.pos= pos
+        for(var i in this.state.current_image){
+            group.art_ids.push(this.state.current_image[i])
+        }
+
         if(group.user_info[this.props.board_this.state.board_id]==undefined){
             var set = {updated:'groups_add', pos: pos}
-            set['user_info.'+this.props.board_this.state.user_id] = {
-                arts: this.state.current_image.slice()
-            }
-            // analytics.logEvent("add_to_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
-            Api.app.service('groups').patch(group_id, {$set: set, $push:{art_ids: {$each: this.state.current_image.slice()}}})
-            .then(()=>{
-                Api.app.service('event_logs').create({event:'add_to_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
+            // set['user_info.'+this.props.board_this.state.user_id] = {
+            //     arts: this.state.current_image.slice()
+            // }
+            groups[group_id] = group
+            this.setState({groups}, function(){
+                // analytics.logEvent("add_to_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
+                Api.app.service('groups').patch(group_id, {$set: set, $push:{art_ids: {$each: this.state.current_image.slice()}}})
+                .then(()=>{
+                    Api.app.service('event_logs').create({event:'add_to_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
+                })
             })
+            
         }else{
             var push = {art_ids: {$each: this.state.current_image.slice()}}
             push['user_info.'+this.props.board_this.state.user_id+'.arts'] = {
                 $each: this.state.current_image.slice()
             }
             // analytics.logEvent("add_to_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
+            groups[group_id] = group
             
-            
-            Api.app.service('groups').patch(group_id, {$set:{updated:'groups_add', pos: pos}, $push:push})
-            .then(()=>{
-                Api.app.service('event_logs').create({event: 'add_to_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
+            this.setState({groups}, function(){
+                Api.app.service('groups').patch(group_id, {$set:{updated:'groups_add', pos: pos}, $push:push})
+                .then(()=>{
+                    Api.app.service('event_logs').create({event: 'add_to_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
+                })
             })
+            
         }
         // Api.app.service('groups').patch(group_id, {$set:{updated:'groups_add', pos: pos}, $push:{art_ids: {$each: this.state.current_image.slice()}}})
 
@@ -256,6 +276,7 @@ class MoodBoardAI extends MoodBoard{
         }
         
         console.log('add?')
+        var groups = this.state.groups
         var group = this.state.groups[group_id]
         var art_ids = group.art_ids.slice()
         var pos = [Number.MAX_VALUE, Number.MAX_VALUE, Number.MIN_VALUE, Number.MIN_VALUE]
@@ -263,6 +284,8 @@ class MoodBoardAI extends MoodBoard{
         for(var i in group.user_info){
             pull['user_info.'+i+'.arts'] = {$in: this.state.current_image.slice()}
         }
+
+        
 
         for(var i in art_ids){
             var art_id = art_ids[i]
@@ -282,12 +305,21 @@ class MoodBoardAI extends MoodBoard{
                 }
             } 
         }
+        group.pos= pos
+        for(var i in this.state.current_image){
+            group.art_ids.splice(group.art_ids.indexOf(this.state.current_image[i]),1)
+        }
+        groups[group_id] = group
+        this.setState({groups: groups}, function(){
+            Api.app.service('groups').patch(group_id, {$set:{updated:'groups_remove', pos: pos}, $pull:pull})
+            .then(()=>{
+                Api.app.service('event_logs').create({event: 'remove_from_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, removed_arts: this.state.current_image.slice()})
+            })
+        })
+
         // analytics.logEvent("remove_from_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, removed_arts: this.state.current_image.slice()})
         
-        Api.app.service('groups').patch(group_id, {$set:{updated:'groups_remove', pos: pos}, $pull:pull})
-        .then(()=>{
-            Api.app.service('event_logs').create({event: 'remove_from_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, removed_arts: this.state.current_image.slice()})
-        })
+        
 
     }
 
@@ -317,10 +349,17 @@ class MoodBoardAI extends MoodBoard{
 
         // Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
         // analytics.logEvent("delete_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
-        Api.app.service('groups').remove(group_id)
-        .then(()=>{
-            Api.app.service('event_logs').create({event:'delete_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
-        })
+        var groups = this.state.groups
+        delete groups[group_id]
+
+        this.setState({groups}, function(){
+            Api.app.service('groups').remove(group_id)
+            .then(()=>{
+                Api.app.service('event_logs').create({event:'delete_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
+            })
+        })  
+        
+        
         // Api.app.service('groups').remove({query: {group_id:group_id}})
     }
 
@@ -431,10 +470,18 @@ class MoodBoardAI extends MoodBoard{
         // }
         // Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
         // analytics.logEvent("relate_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
-        Api.app.service('groups').patch(key, {$set: {updated:'groups_relate_r', higher_group: standard_group.higher_group}})
-        .then(()=>{
-            Api.app.service('event_logs').create({event:'relate_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
+        var groups= this.state.groups
+        
+        groups[key].higher_group = groups[key2].higher_group
+        
+        this.setState({groups}, function(){
+            Api.app.service('groups').patch(key, {$set: {updated:'groups_relate_r', higher_group: standard_group.higher_group}})
+            .then(()=>{
+                Api.app.service('event_logs').create({event:'relate_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
+            })
         })
+        
+        
     }
 
     unrelateGroup(key,e){
@@ -457,10 +504,20 @@ class MoodBoardAI extends MoodBoard{
 
         // }
         // analytics.logEvent("unrelate_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
-        Api.app.service('groups').patch(key, {$set: {updated: 'groups_relate_u', higher_group: this.getRandomColor()}})
-        .then(()=>{
-            Api.app.service('event_logs').create({event: 'unrelate_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
+        var color = this.getRandomColor()
+
+        var groups = this.state.groups
+
+        groups[key].higher_group = color
+
+        this.setState({groups}, function(){
+            Api.app.service('groups').patch(key, {$set: {updated: 'groups_relate_u', higher_group: color}})
+            .then(()=>{
+                Api.app.service('event_logs').create({event: 'unrelate_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
+            })
         })
+        
+        
     }
 
 

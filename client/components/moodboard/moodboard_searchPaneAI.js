@@ -7,17 +7,26 @@ class MoodBoardSearchPaneAI extends Component{
     toggleSearchPane(e){
         e.stopPropagation()
         e.preventDefault()
-        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {
-            $set: {updated: 'moodboard_search_pane_toggle', searchPane: !this.props.mother_state.searchPane}
-        })
+        var value = !this.props.mother_state.searchPane
+        var _this = this
+        this.props.mother_this.setState({searchPane:value}, function(){
+            Api.app.service('boards').patch(_this.props.mother_this.props.board_this.state.board_id, {
+                $set: {updated: 'moodboard_search_pane_toggle', searchPane: value}
+            })
+        })  
+        
     }
 
     selectSearchImageChoose(){
+        var _this = this
         if(this.props.mother_state.control_state=='control_object'){
             if(this.props.mother_state.current_text.length==0 && this.props.mother_state.current_image.length==1){
 
                 if(this.props.mother_state.arts[this.props.mother_state.current_image[0]].enabled){
-                    Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {search_image_selected: this.props.mother_state.current_image[0], updated:'moodboard_search_image_select'}})
+                    this.props.mother_this.setState({search_image_selected:this.props.mother_state.current_image[0]}, function(){
+                        Api.app.service('boards').patch(_this.props.mother_this.props.board_this.state.board_id, {$set: {search_image_selected: _this.props.mother_state.current_image[0], updated:'moodboard_search_image_select'}})
+                    })
+                    
                     return 
                 }
                 // return
@@ -92,7 +101,11 @@ class MoodBoardSearchPaneAI extends Component{
 
 
     searchModeToggle(mode){
-        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_mode_toggle', searchMode: mode}})
+        var _this = this
+        this.props.mother_this.setState({searchMode:mode}, function(){
+            Api.app.service('boards').patch(_this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_mode_toggle', searchMode: mode}})
+        })
+        
     }
 
     search(){
