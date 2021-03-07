@@ -230,7 +230,9 @@ class BoardAI extends Board{
                                     _this.moodboard.setState({groups:groups})
 
                                     var searched_arts = _this.moodboard.state.searched_arts
-                                    Api.app.service('searched_arts').find({query: {board_id: board_id}})
+                                    Api.app.service('searched_arts').find({query: {board_id: board_id, 
+                                        $select:['_id']
+                                    }})
                                     .then((res)=>{
                                         _this.setState({searched_arts_loaded: true})
                                         for(var i in res){
