@@ -149,7 +149,7 @@ function trainCAV(embeddings, context, board_id, added_id=undefined){
           console.log('group model find')
           context.app.service('group_models').find({query:{_id:{$in: [context.result.board_id+'_'+_id]}}})
           .then((res_fin)=>{
-            console.log('group model create')
+            console.log('group model create', res_fin.length)
             if(res_fin.length==0){
               // console.log('source of error?')
               context.app.service('group_models').create({ '_id': context.result.board_id+'_'+_id, board_id: context.result.board_id, 
