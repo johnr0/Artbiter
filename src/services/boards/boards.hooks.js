@@ -98,8 +98,10 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
     // TODO show returned images... 
     context.app.service('searched_arts').find({query: {board_id: context.result._id}})
     .then((res0)=>{
+      var calls = []
       for(var i in res0){
-        context.app.service('searched_arts').remove(res0[i]._id)
+        // context.app.service('searched_arts').remove(res0[i]._id)
+        calls.push('remove', 'searched_arts', res0[i]._id)
       }
       for(var i in returned_images){
         var searched_art = {
@@ -107,10 +109,14 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
           board_id: context.result._id,
           order: i,
         }
-        context.app.service('searched_arts').create(searched_art)
+        // context.app.service('searched_arts').create(searched_art)
+        calls.push('create', 'searched_arts', searched_art)
       }
       // search end
-      context.app.service('boards').patch(context.result._id, {$set: {searching:false, updated:'moodboard_search_done'}})
+      context.app.service('batch').create({calls:calls}).then(()=>{
+        context.app.service('boards').patch(context.result._id, {$set: {searching:false, updated:'moodboard_search_done'}})
+      })
+      
     })
     
   }, (error)=>{
