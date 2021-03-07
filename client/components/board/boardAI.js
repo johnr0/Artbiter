@@ -148,7 +148,7 @@ class BoardAI extends Board{
                         Api.app.service('layers').find({query: {board_id: board_id}})
                         .then((res)=>{
                             console.log(res)
-                            this.setState({layers_loaded: true})
+                            _this.setState({layers_loaded: true})
                             for(var li in res){
                                 var layer_dict = _this.sketchpad.state.layer_dict
                                 layer_dict[res[li]._id] = res[li]
@@ -201,7 +201,7 @@ class BoardAI extends Board{
                                 $select: ['position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height', 'enabled', 'labels']
                             }})
                             .then((res)=>{
-                                this.setState({arts_loaded: true})
+                                _this.setState({arts_loaded: true})
                                 for(var i in res){
                                     var art = res[i]
                                     arts[art._id] = art
@@ -219,7 +219,7 @@ class BoardAI extends Board{
                                     $select: ['_id', 'art_ids', 'group_name', 'higher_group', 'board_id', 'pos', 'user_info', 'updated'],
                                 }})
                                 .then((res)=>{
-                                    this.setState({groups_loaded: true})
+                                    _this.setState({groups_loaded: true})
                                     for(var i in res){
                                         var group = res[i]
                                         groups[group._id] = group
@@ -229,7 +229,7 @@ class BoardAI extends Board{
                                     var searched_arts = _this.moodboard.state.searched_arts
                                     Api.app.service('searched_arts').find({query: {board_id: board_id}})
                                     .then((res)=>{
-                                        this.setState({searched_arts_loaded: true})
+                                        _this.setState({searched_arts_loaded: true})
                                         for(var i in res){
                                             searched_arts[res[i]._id] = res[i]
                                         }
