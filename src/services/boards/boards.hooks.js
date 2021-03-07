@@ -113,9 +113,8 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
         calls.push(['create', 'searched_arts', searched_art])
       }
       // search end
-      context.app.service('batch').create({calls:calls}).then(()=>{
-        context.app.service('boards').patch(context.result._id, {$set: {searching:false, updated:'moodboard_search_done'}})
-      })
+      calls.push(['patch', 'boards', context.result._id, {$set: {searching:false, updated:'moodboard_search_done'}}])
+      context.app.service('batch').create({calls:calls})
       
     })
     
