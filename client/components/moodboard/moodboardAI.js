@@ -34,6 +34,8 @@ class MoodBoardAI extends MoodBoard{
 
         label_art: undefined,
 
+        groupupdatetime: Date.now(), 
+
 
 
     }
@@ -192,7 +194,7 @@ class MoodBoardAI extends MoodBoard{
         var groups = this.state.groups
 
         groups[id] = a_group
-        this.setState({groups, action:'idle'}, function(){
+        this.setState({groups, action:'idle', groupupdatetime: Date.now()}, function(){
             Api.app.service('groups').create(a_group)
             // .then(()=>{
                 // Api.app.service('event_logs').create({event:'create_a_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: id, group_name: name})
@@ -257,7 +259,7 @@ class MoodBoardAI extends MoodBoard{
             // analytics.logEvent("add_to_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
             groups[group_id] = group
             
-            this.setState({groups}, function(){
+            this.setState({groups, groupupdatetime: Date.now()}, function(){
                 Api.app.service('groups').patch(group_id, {$set:{updated:'groups_add', pos: pos}, $push:push})
                 // .then(()=>{
                     // Api.app.service('event_logs').create({event: 'add_to_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
@@ -310,7 +312,7 @@ class MoodBoardAI extends MoodBoard{
             group.art_ids.splice(group.art_ids.indexOf(this.state.current_image[i]),1)
         }
         groups[group_id] = group
-        this.setState({groups: groups}, function(){
+        this.setState({groups: groups, groupupdatetime: Date.now()}, function(){
             Api.app.service('groups').patch(group_id, {$set:{updated:'groups_remove', pos: pos}, $pull:pull})
             // .then(()=>{
                 // Api.app.service('event_logs').create({event: 'remove_from_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, removed_arts: this.state.current_image.slice()})
@@ -352,7 +354,7 @@ class MoodBoardAI extends MoodBoard{
         var groups = this.state.groups
         delete groups[group_id]
 
-        this.setState({groups}, function(){
+        this.setState({groups, groupupdatetime: Date.now()}, function(){
             Api.app.service('groups').remove(group_id)
             // .then(()=>{
             //     Api.app.service('event_logs').create({event:'delete_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
@@ -474,7 +476,7 @@ class MoodBoardAI extends MoodBoard{
         
         groups[key].higher_group = groups[key2].higher_group
         
-        this.setState({groups}, function(){
+        this.setState({groups, groupupdatetime: Date.now()}, function(){
             Api.app.service('groups').patch(key, {$set: {updated:'groups_relate_r', higher_group: standard_group.higher_group}})
             // .then(()=>{
             //     Api.app.service('event_logs').create({event:'relate_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
@@ -510,7 +512,7 @@ class MoodBoardAI extends MoodBoard{
 
         groups[key].higher_group = color
 
-        this.setState({groups}, function(){
+        this.setState({groups, groupupdatetime: Date.now()}, function(){
             Api.app.service('groups').patch(key, {$set: {updated: 'groups_relate_u', higher_group: color}})
             // .then(()=>{
             //     Api.app.service('event_logs').create({event: 'unrelate_group', board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: key, higher_group:this.state.groups[key].higher_group})
@@ -658,6 +660,14 @@ class MoodBoardAI extends MoodBoard{
             var deletable = false
             if(filtered.length>0 && filtered.length == current_image.length && filtered.length == art_ids.length && loaded){
                 deletable = true
+            }
+
+            if(Date.now()-this.state.groupupdatetime<5000){
+                removable = false
+                addable = false
+                deletable = false
+                relatable = false
+                unrelatable = false
             }
 
             return (<g>
