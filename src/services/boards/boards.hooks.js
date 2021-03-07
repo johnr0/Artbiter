@@ -92,11 +92,11 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
   .then((res0)=>{
     var calls = []
     for(var i in res0){
-      // context.app.service('searched_arts').remove(res0[i]._id)
-      calls.push(['remove', 'searched_arts', res0[i]._id])
+      context.app.service('searched_arts').remove(res0[i]._id)
+      // calls.push(['remove', 'searched_arts', res0[i]._id])
     }
-    context.app.service('batch').create({calls:calls})
-    .then(()=>{
+    // context.app.service('batch').create({calls:calls})
+    // .then(()=>{
       axios.post(context.app.get('ml_server')+'searchImages', {
         search_start_image_embedding: JSON.stringify(search_start_image_embedding),
         cavs: JSON.stringify(cavs),
@@ -119,7 +119,7 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
       }, (error)=>{
         console.log('error')
       })
-    })
+    // })
   })
 
   // axios.post(context.app.get('ml_server')+'searchImages', {
