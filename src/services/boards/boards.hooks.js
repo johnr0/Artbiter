@@ -87,40 +87,75 @@ function sliderImpact(board_id, context){
 
 
 function searchImages(search_start_image_embedding, cavs, search_slider_values, context){
-  axios.post(context.app.get('ml_server')+'searchImages', {
-    search_start_image_embedding: JSON.stringify(search_start_image_embedding),
-    cavs: JSON.stringify(cavs),
-    search_slider_values: JSON.stringify(search_slider_values)
-  }).then((response)=>{
-    var returned_images = JSON.parse(response.data['returned_images'])
-    // console.log('returned images:', returned_images.length)
 
-    // TODO show returned images... 
-    context.app.service('searched_arts').find({query: {board_id: context.result._id}})
-    .then((res0)=>{
-      var calls = []
-      for(var i in res0){
-        // context.app.service('searched_arts').remove(res0[i]._id)
-        calls.push(['remove', 'searched_arts', res0[i]._id])
-      }
-      for(var i in returned_images){
-        var searched_art = {
-          image: returned_images[i],
-          board_id: context.result._id,
-          order: i,
+  context.app.service('searched_arts').find({query: {board_id: context.result._id}})
+  .then((res0)=>{
+    var calls = []
+    for(var i in res0){
+      // context.app.service('searched_arts').remove(res0[i]._id)
+      calls.push(['remove', 'searched_arts', res0[i]._id])
+    }
+    context.app.service('batch').create({calls:calls})
+    .then(()=>{
+      axios.post(context.app.get('ml_server')+'searchImages', {
+        search_start_image_embedding: JSON.stringify(search_start_image_embedding),
+        cavs: JSON.stringify(cavs),
+        search_slider_values: JSON.stringify(search_slider_values)
+      }).then((response)=>{
+        var returned_images = JSON.parse(response.data['returned_images'])
+        var calls = []
+        for(var i in returned_images){
+          var searched_art = {
+            image: returned_images[i],
+            board_id: context.result._id,
+            order: i,
+          }
+          // context.app.service('searched_arts').create(searched_art)
+          calls.push(['create', 'searched_arts', searched_art])
         }
-        // context.app.service('searched_arts').create(searched_art)
-        calls.push(['create', 'searched_arts', searched_art])
-      }
-      // search end
-      calls.push(['patch', 'boards', context.result._id, {$set: {searching:false, updated:'moodboard_search_done'}}])
-      context.app.service('batch').create({calls:calls})
-      
+        // search end
+        calls.push(['patch', 'boards', context.result._id, {$set: {searching:false, updated:'moodboard_search_done'}}])
+        context.app.service('batch').create({calls:calls})
+      }, (error)=>{
+        console.log('error')
+      })
     })
-    
-  }, (error)=>{
-    console.log('error')
   })
+
+  // axios.post(context.app.get('ml_server')+'searchImages', {
+  //   search_start_image_embedding: JSON.stringify(search_start_image_embedding),
+  //   cavs: JSON.stringify(cavs),
+  //   search_slider_values: JSON.stringify(search_slider_values)
+  // }).then((response)=>{
+  //   var returned_images = JSON.parse(response.data['returned_images'])
+  //   // console.log('returned images:', returned_images.length)
+
+  //   // TODO show returned images... 
+  //   context.app.service('searched_arts').find({query: {board_id: context.result._id}})
+  //   .then((res0)=>{
+  //     var calls = []
+  //     for(var i in res0){
+  //       // context.app.service('searched_arts').remove(res0[i]._id)
+  //       calls.push(['remove', 'searched_arts', res0[i]._id])
+  //     }
+  //     for(var i in returned_images){
+  //       var searched_art = {
+  //         image: returned_images[i],
+  //         board_id: context.result._id,
+  //         order: i,
+  //       }
+  //       // context.app.service('searched_arts').create(searched_art)
+  //       calls.push(['create', 'searched_arts', searched_art])
+  //     }
+  //     // search end
+  //     calls.push(['patch', 'boards', context.result._id, {$set: {searching:false, updated:'moodboard_search_done'}}])
+  //     context.app.service('batch').create({calls:calls})
+      
+  //   })
+    
+  // }, (error)=>{
+  //   console.log('error')
+  // })
 }
 
 function generateImage(content, content_weight, styles, style_weights, context){
