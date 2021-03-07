@@ -871,7 +871,7 @@ class MoodBoardAI extends MoodBoard{
                         {this.renderGrouper()}
                         {/* {this.state.control_state=='style-stamp' && <MoodboardStyleSketchControlAI ref={'stylecontrol'} mother_this={this} mother_state={this.state}></MoodboardStyleSketchControlAI>} */}
                     </svg>
-                    {this.props.board_this.renderCollaboratorsOnMoodBoard()}
+                    {/* {this.props.board_this.renderCollaboratorsOnMoodBoard()} */}
                     {this.renderLabels()}
                     
 

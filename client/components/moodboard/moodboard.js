@@ -1154,7 +1154,7 @@ class MoodBoard extends ProtoBoard{
                         
                         
                     </svg>
-                    {this.props.board_this.renderCollaboratorsOnMoodBoard()}
+                    {/* {this.props.board_this.renderCollaboratorsOnMoodBoard()} */}
                     
 
                 </div>

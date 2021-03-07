@@ -266,7 +266,7 @@ class SketchPadAI extends SketchPad{
                     {this.renderAdjuster()}
                     {/* {this.renderLasso()} */}
                 </svg>
-                {this.props.board_this.renderCollaboratorsOnSketchpad()}
+                {/* {this.props.board_this.renderCollaboratorsOnSketchpad()} */}
                 
             </div>
             <SketchpadMainControllerAI mother_state={this.state} mother_this={this}></SketchpadMainControllerAI>

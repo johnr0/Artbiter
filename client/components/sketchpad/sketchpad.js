@@ -1528,7 +1528,7 @@ class SketchPad extends ProtoBoard {
                     {this.renderAdjuster()}
                     {/* {this.renderLasso()} */}
                 </svg>
-                {this.props.board_this.renderCollaboratorsOnSketchpad()}
+                {/* {this.props.board_this.renderCollaboratorsOnSketchpad()} */}
                 
             </div>
             <SketchpadMainController mother_state={this.state} mother_this={this}></SketchpadMainController>
