@@ -299,31 +299,32 @@ class BoardAI extends Board{
                                                 }
                                                 
                                                 current_collaborators[user_id] = {
-                                                    sketch_pos:[-1,-1],
-                                                    moodboard_pos: [-1, -1],
+                                                    // sketch_pos:[-1,-1],
+                                                    // moodboard_pos: [-1, -1],
                                                     active: true
                                                 }
                                                 var set = {}
                                                 set['current_collaborators.'+user_id] = current_collaborators[user_id]
                                                 set['updated']='current_collaborators.'+user_id
                                                 console.log(set)
+                                                _this.setState({loaded:true, current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email}, function(){
+                                                    // _this.sketchpad.setState({sketchundo: sketchundo})
+                                                        // , function(){
+                                                    //     var promises = []
+                                                    //     for(var i in layers){
+                                                    //         promises.push(_this.loadALayer(layers[i]))
+                                                    //     }
+                                                    //     Promise.all(promises)
+                                                    // })
+                                                    _this.moodboard.setState({texts:texts})
+                                                    
+                                                    // console.log('done')
+                                                })
                                                 // console.log(layers, arts, texts, sketchundo)
                                                 Api.app.service('boards').update(board_id, {$set: set})
-                                                .then((res)=>{
-                                                    _this.setState({loaded:true, current_collaborators: current_collaborators, board_id: board_id, user_id: user_id, user_email:user_email}, function(){
-                                                        // _this.sketchpad.setState({sketchundo: sketchundo})
-                                                            // , function(){
-                                                        //     var promises = []
-                                                        //     for(var i in layers){
-                                                        //         promises.push(_this.loadALayer(layers[i]))
-                                                        //     }
-                                                        //     Promise.all(promises)
-                                                        // })
-                                                        _this.moodboard.setState({texts:texts})
-                                                        
-                                                        // console.log('done')
-                                                    })
-                                                })
+                                                // .then((res)=>{
+                                                    
+                                                // })
                                             })
 
 
