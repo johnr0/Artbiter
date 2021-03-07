@@ -51,12 +51,13 @@ const labelAllImages = async context => {
                 // promises.push(context.app.service('arts').patch(key, {$set: set}))
                 
             }
+            batch.push(['patch', 'boards', context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}}])
             context.app.service('batch').create({calls: batch})
-            .then(()=>{
-                context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
-            }, (err)=>{
-                console.log(err)
-            })
+            // .then(()=>{
+            //     context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
+            // }, (err)=>{
+            //     console.log(err)
+            // })
             // Promise.all(promises)
             // .then(function(){
             //     context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
