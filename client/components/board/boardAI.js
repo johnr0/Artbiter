@@ -237,15 +237,30 @@ class BoardAI extends Board{
                                         _this.setState({searched_arts_loaded: true})
                                         var search_arts_promises = []
                                         for(var i in res){
-                                            search_arts_promises.push( new Promise(function(resolve, reject){
+                                            search_arts_promises.push(new Promise(function(resolve, reject){
                                                 Api.app.service('searched_arts').find({query: {_id: res[i]._id}})
                                                 .then((res_search)=>{
-                                                    searched_arts[res[i]._id] = res_search[0]
-                                                    _this.moodboard.setState({searched_arts:searched_arts})
+                                                    // searched_arts[res[i]._id] = res_search[0]
+                                                    // _this.moodboard.setState({searched_arts:searched_arts})
+                                                    // return searched_arts
+                                                    if(typeof resolve === 'function'){
+                                                        resolve([res_search[0]])
+                                                    }else{
+                                                        resolve.push(res_search[0])
+                                                    }
+                                                    // return res_search[0]
                                                 })
                                             }))
                                         }
                                         
+                                        Promise.all(search_arts_promises).then((values)=>{
+                                            console.log('sssearch?', values)
+                                            for(var idx in values){
+                                                var searched = values[idx][0]
+                                                searched_arts[searched._id] = searched
+                                            }
+                                            _this.moodboard.setState({searched_arts})
+                                        })
 
 
                                         // for(var i in res){
