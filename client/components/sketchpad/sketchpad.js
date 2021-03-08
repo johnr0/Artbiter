@@ -1482,7 +1482,7 @@ class SketchPad extends ProtoBoard {
 
     renderBrushMark(){
         var height = this.state.brush_size/1000*this.state.boardlength*this.state.boardzoom
-        return (<img src={location.protocol+'//'+location.host+'/img/brush.png'} style={{height: height, position:'absolute', zorder:100000, pointerEvents: 'none', top: this.state.cur_mouse_pos[1]-this.state.brush_size/2*this.state.boardzoom, left: this.state.cur_mouse_pos[0]-this.state.brush_size/2*this.state.boardzoom}}></img>)
+        return (<img src={location.protocol+'//'+location.host+'/img/brush.png'} style={{height: height, position:'absolute', zorder:100000, pointerEvents: 'none', top: this.state.cur_mouse_pos[1]-height/2, left: this.state.cur_mouse_pos[0]-height/2}}></img>)
     }
 
     renderEraserMark(){

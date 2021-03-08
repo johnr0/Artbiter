@@ -112,36 +112,36 @@ class MoodBoardSearchPaneAI extends Component{
         
         // analytics.logEvent("search", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.search_slider_values})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_images', searching: true}})
-        .then(()=>{
-            // Api.app.service('event_logs').create({event: 'search', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.search_slider_values})
-        })
+        
     }
 
     search_similar(){
         
         // analytics.logEvent("search_similar", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_similar_images', searching: true}})
-        .then(()=>{
-            // Api.app.service('event_logs').create({event: 'search_similar', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected})
-        })
+
     }
 
     search_random(){
         
         // analytics.logEvent("search_random", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
         Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_search_random_images', searching: true}})
-        .then(()=>{
-            // Api.app.service('event_logs').create({event: 'search_random', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
-        })
+
     }
 
     generate(){
+        var dogen = false
+        for(var k in this.props.mother_state.generate_slider_values){
+            if(this.props.mother_state.generate_slider_values[k]!=0){
+                dogen=true
+                break
+            }
+        }
+        if(dogen){
+            // analytics.logEvent("transfer_on_moodboard", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.generate_slider_values})
+            Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_generate_image', searching: true}})
+        }
         
-        // analytics.logEvent("transfer_on_moodboard", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.generate_slider_values})
-        Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated: 'moodboard_generate_image', searching: true}})
-        .then(()=>{
-            // Api.app.service('event_logs').create({event: 'transfer_on_moodboard', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id, seach_image_selected: this.props.mother_state.search_image_selected, sliders: this.props.mother_state.generate_slider_values})
-        })
     }
 
     addSearchedImageToMoodboard(val){
@@ -414,6 +414,20 @@ class MoodBoardSearchPaneAI extends Component{
             group_exist= false
         }
 
+        var dogen = false
+        if(this.props.mother_state!=undefined){
+            if(this.props.mother_state.generate_slider_values!=undefined){
+                for(var k in this.props.mother_state.generate_slider_values){
+                    if(this.props.mother_state.generate_slider_values[k]!=0){
+                        dogen=true
+                        break
+                    }
+                }
+            }
+        }
+        
+        
+
         var paddingTop = 0
 
         if(document.getElementById('moodboard')!=undefined){
@@ -517,7 +531,7 @@ class MoodBoardSearchPaneAI extends Component{
                     <div className='col s6 moodboard_search_pane_subpane' style={{position:'relative'}}>
                         <div style={{position: 'absolute', top: '-30px'}}>
                             {this.props.mother_state.searchMode=='search' && (art_exist&&group_exist) && <div className='btn tiny-btn' onPointerUp={this.search.bind(this)}>Run Search</div>}
-                            {this.props.mother_state.searchMode=='generate' && (art_exist&&group_exist) && <div className='btn tiny-btn' onPointerUp={this.generate.bind(this)}>Run Generation</div>}
+                            {this.props.mother_state.searchMode=='generate' && (art_exist&&group_exist) && <div className='btn tiny-btn' onPointerUp={this.generate.bind(this)} disabled={!dogen}>Run Generation</div>}
                         </div>
                         <div style={{position: 'absolute', top: '-30px', right: '13'}}>
                             {this.props.mother_state.searchMode=='search' && art_exist && <div className='btn tiny-btn' style={{marginRight:'5px'}} onPointerUp={this.search_similar.bind(this)}>Similar</div>}

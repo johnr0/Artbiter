@@ -270,7 +270,8 @@ function averageStyles(styles, context){
 
 const createTrainCAV = async context => {
   console.log('art ids are ')
-  console.log(context.result)
+  // console.log(context.result)
+  context.app.service('event_logs').create({event: 'create_concept', board_id: context.result.board_id, user_id: context.params.user._id})
   // context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
   // .then(()=>{
     context.app.service('arts').find({query: {_id: {$in:context.arguments[0].art_ids}}})
@@ -324,6 +325,8 @@ const RelateCAV = async context => {
     // console.log(context.result.higher_group)
     // context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
     // .then((res)=>{
+      // console.log(context.result.board_id, context.params.user._id)
+      context.app.service('event_logs').create({event: 'relate_concept', board_id: context.result.board_id, user_id: context.params.user._id})
       context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
       .then((res)=>{
         var art_ids = []
@@ -384,9 +387,10 @@ const UnrelateCAV = async context => {
   if(context.arguments[1]['$set'].updated=='groups_relate_u'){
     // console.log(context)
    
-
+    
     context.app.service('groups').find({query:{_id: context.arguments[0]}})
     .then((res)=>{
+      context.app.service('event_logs').create({event: 'unrelate_concept', board_id: res[0].board_id, user_id: context.params.user._id})
       // context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: true, updated:'group_updating'}})
       // .then(()=>{
         context.app.service('groups').find({query: {higher_group: res[0].higher_group}})
@@ -467,6 +471,11 @@ const AddRemoveArtCAV = async context => {
   if(context.result.updated=='groups_add' || context.result.updated=='groups_remove'){
     // context.app.service('boards').patch(context.result.board_id, {$set:{group_updating: true, updated:'group_updating'}})
     // .then((res)=>{
+      if(context.result.updated=='groups_add'){
+        context.app.service('event_logs').create({event: 'concept_add', board_id: context.result.board_id, user_id: context.params.user._id})
+      }else if(context.result.updated=='groups_remove'){
+        context.app.service('event_logs').create({event: 'concept_remove', board_id: context.result.board_id, user_id: context.params.user._id})
+      }
       context.app.service('groups').find({query: {higher_group: context.result.higher_group}})
       .then((res)=>{
         var art_ids = []
@@ -522,7 +531,7 @@ const RemoveGroupCAV = async context => {
   context.app.service('groups').find({query:{_id: context.arguments[0]}})
   .then((res)=>{
     // console.log(res[0])
-
+    context.app.service('event_logs').create({event: 'remove_concept', board_id: res[0].board_id, user_id: context.params.user._id})
     context.app.service('boards').find({query: {_id: res[0].board_id}})
     .then((res_board)=>{
       var labels = JSON.parse(JSON.stringify(res_board[0].labels))

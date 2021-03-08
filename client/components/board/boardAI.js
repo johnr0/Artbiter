@@ -133,6 +133,9 @@ class BoardAI extends Board{
 
                     // propage board contents to sketchpad and moodboard
                     var labels = res[0]['labels']
+                    if(labels==undefined){
+                        labels = {}
+                    }
                     var layers = res[0]['layers']
                     var sketchundo = res[0]['sketchundo']
                     // _this.sketchpad.setState({layers: layers, sketchundo: sketchundo}, function(){

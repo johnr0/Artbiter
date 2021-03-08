@@ -391,9 +391,7 @@ class SketchpadStyleStampControllerAI2 extends Component{
             
             // analytics.logEvent("transfer_on_sketch", {board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
             Api.app.service('boards').patch(this.props.mother_this.props.board_this.state.board_id, {$set: {updated:'sketchpad_style_apply', content: content, styles: value}})
-            // .then(()=>{
-            //     Api.app.service('event_logs').create({event: 'transfer_on_sketch', board_id: this.props.mother_this.props.board_this.state.board_id, user_id:this.props.mother_this.props.board_this.state.user_id})
-            // })
+            
             
         })
     }
