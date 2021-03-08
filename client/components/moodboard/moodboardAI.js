@@ -343,7 +343,7 @@ class MoodBoardAI extends MoodBoard{
 
         // Api.app.service('boards').patch(this.props.board_this.state.board_id, {$set:{search_slider_values: search_slider_values, updated: 'moodboard_search_slider_change'}})
         // analytics.logEvent("delete_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id})
-        var groups = this.state.groups
+        var groups = JSON.parse(JSON.stringify(this.state.groups))
         delete groups[group_id]
 
         this.setState({groups, groupupdatetime: Date.now()}, function(){
@@ -518,6 +518,9 @@ class MoodBoardAI extends MoodBoard{
                 var filtered = art_ids.filter(value => _this.state.current_image.includes(value))
                 if(filtered.length==art_ids.length || art_ids.length-filtered.length==1){
                     // analytics.logEvent("group_delete", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group._id})
+                    var groups = JSON.parse(JSON.stringify(_this.state.groups))
+                    delete groups[group._id]
+                    _this.setState({groups})
                     Api.app.service('groups').remove(group._id)
                     
                 }else if(filtered.length>0){
