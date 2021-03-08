@@ -348,6 +348,7 @@ const RelateCAV = async context => {
               embeddings[group._id].push(art_embeddings[art_id])
             }
           }
+
           // console.log(embeddings, 'embeddings')
           trainCAV(embeddings, context, res[0].board_id)
         })
@@ -521,93 +522,108 @@ const RemoveGroupCAV = async context => {
   context.app.service('groups').find({query:{_id: context.arguments[0]}})
   .then((res)=>{
     // console.log(res[0])
-    context.app.service('groups').find({query: {higher_group: res[0].higher_group}})
-    .then((res2)=>{
-      // context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: true, updated:'group_updating'}})
-      // .then(()=>{
-        // console.log(res2.length)
-        var art_ids = []
 
-        if(res2.length==1){
-          context.app.service('group_models').find({query:{_id: res[0].board_id+'_'+res[0].higher_group}})
-          .then((res_gm)=>{
-            if(res_gm.length>0){
-              context.app.service('group_models').remove(res[0].board_id+'_'+res[0].higher_group)
-            }
-          })
-          
+    context.app.service('boards').find({query: {_id: res[0].board_id}})
+    .then((res_board)=>{
+      var labels = JSON.parse(JSON.stringify(res_board[0].labels))
+      for(var key in labels){
+        if(labels[key][context.arguments[0]]!=undefined){
+          delete labels[key][context.arguments[0]]
         }
-        
-        for(var i in res2){
-          var group = res2[i]
-          if(group._id!=context.arguments[0]){
-            art_ids = art_ids.concat(group.art_ids)
-          }
-          
-        }
+      }
+      context.app.service('boards').patch(res_board[0]._id, {$set:{updated:'labelAllImages', labels: labels}})
+      .then(()=>{
+          context.app.service('groups').find({query: {higher_group: res[0].higher_group}})
+      .then((res2)=>{
+        // context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: true, updated:'group_updating'}})
+        // .then(()=>{
+          // console.log(res2.length)
+          var art_ids = []
 
-        context.app.service('arts').find({query:{board_id: res[0].board_id}})
-        .then((res_arts)=>{
-          // var promises = []
-          var batch = []
-          for(var k in res_arts){
-            if(res_arts[k].labels!=undefined){
-              var labels = JSON.parse(JSON.stringify(res_arts[k].labels))
-              // console.log(labels, context.arguments[0])
-              if(labels[context.arguments[0]]!=undefined){
-                var unset = {}
-                var set = {}
-                unset['labels.'+context.arguments[0]] =1
-                set['updated'] = 'arts_label'
-                // promises.push(context.app.service('arts').patch(res_arts[k]._id, {$set:set, $unset: unset}))
-                batch.push(['patch', 'arts', res_arts[k]._id, {$set:set, $unset: unset}])
+          if(res2.length==1){
+            context.app.service('group_models').find({query:{_id: res[0].board_id+'_'+res[0].higher_group}})
+            .then((res_gm)=>{
+              if(res_gm.length>0){
+                context.app.service('group_models').remove(res[0].board_id+'_'+res[0].higher_group)
               }
-              
-            }
-          }
-          context.app.service('batch').create({calls:batch})
-          .then(function(){
-            context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
-          })
-          
-
-        })
-
-        context.app.service('arts').find({query:{_id:{$in:art_ids}}})
-        .then((res3)=>{
-          var art_embeddings = {}
-          for(var j in res3){
-            art_embeddings[res3[j]._id] = res3[j].embedding
-            // remove the group label from images
+            })
             
           }
-
-          var embeddings = {}
           
           for(var i in res2){
             var group = res2[i]
-            // console.log(group._id, context.arguments[0])
             if(group._id!=context.arguments[0]){
-              // console.log('proce...')
-              embeddings[group._id] = []
-              for(var j in group.art_ids){
-                var art_id = group.art_ids[j]
-                // console.log(art_id, 'fourth')
-                embeddings[group._id].push(art_embeddings[art_id])
-              }
-              // console.log('resres000', res[0].board_id)
-              
+              art_ids = art_ids.concat(group.art_ids)
             }
             
           }
-          console.log(Object.keys(embeddings))
-          if(Object.keys(embeddings).length>0){
-            console.log(Object.keys(embeddings).length, '??')
-              trainCAV(embeddings, context, res[0].board_id)
-          }
-          
+
+          context.app.service('arts').find({query:{board_id: res[0].board_id}})
+          .then((res_arts)=>{
+            // var promises = []
+            var batch = []
+            for(var k in res_arts){
+              if(res_arts[k].labels!=undefined){
+                var labels = JSON.parse(JSON.stringify(res_arts[k].labels))
+                // console.log(labels, context.arguments[0])
+                if(labels[context.arguments[0]]!=undefined){
+                  var unset = {}
+                  var set = {}
+                  unset['labels.'+context.arguments[0]] =1
+                  set['updated'] = 'arts_label'
+                  // promises.push(context.app.service('arts').patch(res_arts[k]._id, {$set:set, $unset: unset}))
+                  batch.push(['patch', 'arts', res_arts[k]._id, {$set:set, $unset: unset}])
+                }
+                
+              }
+            }
+            context.app.service('batch').create({calls:batch})
+            .then(function(){
+              context.app.service('boards').patch(res[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
+            })
+            
+
+          })
+
+          context.app.service('arts').find({query:{_id:{$in:art_ids}}})
+          .then((res3)=>{
+            var art_embeddings = {}
+            for(var j in res3){
+              art_embeddings[res3[j]._id] = res3[j].embedding
+              // remove the group label from images
+              
+            }
+
+            var embeddings = {}
+            
+            for(var i in res2){
+              var group = res2[i]
+              // console.log(group._id, context.arguments[0])
+              if(group._id!=context.arguments[0]){
+                // console.log('proce...')
+                embeddings[group._id] = []
+                for(var j in group.art_ids){
+                  var art_id = group.art_ids[j]
+                  // console.log(art_id, 'fourth')
+                  embeddings[group._id].push(art_embeddings[art_id])
+                }
+                // console.log('resres000', res[0].board_id)
+                
+              }
+              
+            }
+            console.log(Object.keys(embeddings))
+            if(Object.keys(embeddings).length>0){
+              console.log(Object.keys(embeddings).length, '??')
+                trainCAV(embeddings, context, res[0].board_id)
+            }
+            
+          })
         })
       })
+    })
+
+    
       
       
 

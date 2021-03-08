@@ -111,7 +111,7 @@ class BoardAI extends Board{
             Api.app.service('groups').timeout = 60000
             console.log('timeout after...', Api.app.service('boards').timeout)
             Api.app.service('boards').find({query: {_id: board_id,
-                $select: ['name', 'owner', 'undoable', 'texts', 'collaborators', 'sketchundo','current_collaborators', 'layers', 'searchMode', 'searchPane', 'search_image_selected', 'search_slider_values', 'search_slider_distances', 'generate_slider_values', 'agreementPane', 'agreement_userSelection']
+                $select: ['name', 'owner', 'undoable', 'texts', 'collaborators', 'labels', 'sketchundo','current_collaborators', 'layers', 'searchMode', 'searchPane', 'search_image_selected', 'search_slider_values', 'search_slider_distances', 'generate_slider_values', 'agreementPane', 'agreement_userSelection']
             }})
             .then((res0)=>{
                 var res = res0
@@ -132,6 +132,7 @@ class BoardAI extends Board{
                     }
 
                     // propage board contents to sketchpad and moodboard
+                    var labels = res[0]['labels']
                     var layers = res[0]['layers']
                     var sketchundo = res[0]['sketchundo']
                     // _this.sketchpad.setState({layers: layers, sketchundo: sketchundo}, function(){
@@ -208,7 +209,7 @@ class BoardAI extends Board{
                                 for(var i in res){
                                     arts_promises.push(new Promise(function(resolve){
                                         Api.app.service('arts').find({query:{_id:res[i]._id,
-                                        $select: ['_id', 'position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height', 'enabled', 'labels']}})
+                                        $select: ['_id', 'position', 'ratio', 'choosen_by', 'updated', 'board_id', '_id', 'file', 'color', 'width', 'height', 'enabled']}})
                                         .then((res_art)=>{
                                             if(typeof resolve === 'function'){
                                                 resolve([res_art[0]])
@@ -224,6 +225,9 @@ class BoardAI extends Board{
                                     for(var idx in values){
                                         var art = values[idx][0]
                                         arts[art._id] = art
+                                        if(labels[art._id]!=undefined){
+                                            art.labels = labels[art._id]
+                                        }
                                     }
 
                                     _this.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, 

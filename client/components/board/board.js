@@ -716,6 +716,16 @@ class Board extends Component{
                 _this.sketchpad.setState({undoable: data.undoable, sketchundo:data.sketchundo})
             }else if(updated.indexOf('sketchpad_undo_start')!=-1){
                 _this.sketchpad.setState({undoable: data.undoable})
+            }else if(updated.indexOf('labelAllImages')!=-1){
+                var labels = data.labels
+                var arts = _this.moodboard.state.arts
+                console.log(arts, labels)
+                for(var i in labels){
+                    if(arts[i]!=undefined){
+                        arts[i].labels = labels[i]
+                    }
+                    
+                }
             }
         })
 

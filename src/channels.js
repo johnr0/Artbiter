@@ -263,6 +263,11 @@ module.exports = function(app) {
         }else if(data.updated.indexOf('sketchpad_undo_start')!=-1){
           data_to_return['updated']=data.updated
           data_to_return['undoable']=data.undoable
+        }else if(data.updated=='labelAllImages'){
+          data_to_return['updated']=data.updated
+          data_to_return['labels']=data.labels
+        }else if(data.updated=='artlabelremoval'){
+          return
         }else{
           data_to_return = data
           

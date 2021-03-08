@@ -30,32 +30,46 @@ const labelAllImages = async context => {
             dec: JSON.stringify(dec),
         }).then((response)=>{
             // promises = []
-            var batch = []
-            var label_result = JSON.parse(response.data['result'])
-            for(var key in label_result){
-                for(var j in l2t[0]){
-                    if(l2t[0][j]!='_random'){
-                        if(label_result[key][l2t[0][j]]==undefined){
-                            label_result[key][l2t[0][j]] = 0
+            context.app.service('boards').find({query: {_id: context.arguments[0].board_id}})
+            .then((res_board)=>{
+                var board = res_board[0]
+                var cur_label = board.labels
+                if(cur_label==undefined){
+                    cur_label = {}
+                  }
+                var label_result = JSON.parse(response.data['result'])
+                for(var key in label_result){
+                    for(var j in l2t[0]){
+                        if(l2t[0][j]!='_random'){
+                            if(label_result[key][l2t[0][j]]==undefined){
+                                label_result[key][l2t[0][j]] = 0
+                            }
+                            
                         }
-                        
                     }
+                    
+                    // var set = {}
+                    for(key2 in label_result[key]){
+                        if(cur_label[key]==undefined){
+                            cur_label[key]={}
+                        }
+                        cur_label[key][key2] = label_result[key][key2]
+                        // set['labels.'+key2] = label_result[key][key2]
+                    }
+                    // set['updated'] = 'arts_label'
+                    // batch.push(['patch', 'arts', key, {$set:set}])
+                    
                 }
-                var set = {}
-                for(key2 in label_result[key]){
-                    set['labels.'+key2] = label_result[key][key2]
-                }
-                // var set = {labels: JSON.parse(JSON.stringify(label_result[key]))}
-                set['updated'] = 'arts_label'
-                batch.push(['patch', 'arts', key, {$set:set}])
-                // promises.push(context.app.service('arts').patch(key, {$set: set}))
-                
-            }
-            console.log('search done', context.arguments[0].board_id,)
+                console.log(label_result, 'label_result')
+                console.log('search done', context.arguments[0].board_id,)
+                context.app.service('boards').patch(context.arguments[0].board_id, {$set:{labels: cur_label, updated:'labelAllImages'}})
+            })
+            
+            
             // batch.push(['patch', 'boards', context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}}])
             // context.app.service('boards').patch(context.arguments[0].board_id, {$set:{group_updating: false, updated:'group_updating'}})
             // .then(()=>{
-            context.app.service('batch').create({calls: batch})
+            // context.app.service('batch').create({calls: batch})
             // })
             // context.app.service('batch').create({calls: batch})
             // .then(()=>{
