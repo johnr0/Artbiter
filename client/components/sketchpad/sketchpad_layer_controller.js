@@ -38,6 +38,7 @@ class SketchpadLayerController extends Component{
             console.log(ypos)
             var promises = []
             if(layerChanged){
+                console.log(layers[idx], prev_current_layer)
                 if(prev_current_layer!=undefined){
                     promises.push(_this.props.mother_this.props.board_this.ChooseLayers([layers[idx]],[prev_current_layer]))
                 }else{

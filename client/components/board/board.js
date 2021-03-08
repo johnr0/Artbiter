@@ -1146,12 +1146,14 @@ class Board extends Component{
     ChooseLayers(layer_idxs, d_layer_idxs){
         var layers = this.sketchpad.state.layers.slice()
         // console.log(layer_idxs, d_layer_idxs)
+        var layer_dict = this.sketchundo_send.state.layer_dict
         for(var i in layer_idxs){
             var patch={}
             patch['updated'] = 'sketchpad_layers_choosen'
             var layer_id = layer_idxs[i]
             patch['choosen_by']=this.state.user_id
             console.log('layer id is.... ' ,layer_id)
+            layer_dict[layer_id].choosen_by = this.state.user_id
             Api.app.service('layers').patch(layer_id, {$set:patch})
         }
         for(var i in d_layer_idxs){
@@ -1159,8 +1161,10 @@ class Board extends Component{
             patch['updated'] = 'sketchpad_layers_choosen'
             var layer_id = d_layer_idxs[i]
             patch['choosen_by']=''
+            layer_dict[layer_id].choosen_by = ''
             Api.app.service('layers').patch(layer_id, {$set:patch})
         }
+        this.sketchpad.setState({layer_dict})
     }
 
 
