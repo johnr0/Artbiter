@@ -1146,7 +1146,7 @@ class Board extends Component{
     ChooseLayers(layer_idxs, d_layer_idxs){
         var layers = this.sketchpad.state.layers.slice()
         // console.log(layer_idxs, d_layer_idxs)
-        var layer_dict = this.sketchundo_send.state.layer_dict
+        var layer_dict = this.sketchpad.state.layer_dict
         for(var i in layer_idxs){
             var patch={}
             patch['updated'] = 'sketchpad_layers_choosen'
