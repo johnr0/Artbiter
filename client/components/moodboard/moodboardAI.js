@@ -582,10 +582,10 @@ class MoodBoardAI extends MoodBoard{
         return Object.keys(this.state.groups).map((key, idx)=>{
             var group= this.state.groups[key]
             var pos = group.pos
-            var backx = (((pos[0]>pos[2])?pos[2]:pos[0])*this.state.boardlength-10)*this.state.boardzoom
-            var backy = (((pos[1]>pos[3])?pos[3]:pos[1])*this.state.boardlength-10)*this.state.boardzoom
-            var width = (Math.abs(pos[0]-pos[2])*this.state.boardlength+20)*this.state.boardzoom
-            var height = (Math.abs(pos[1]-pos[3])*this.state.boardlength+20)*this.state.boardzoom
+            var backx = (((pos[0]>pos[2])?pos[2]:pos[0])*this.state.boardlength)*this.state.boardzoom-10
+            var backy = (((pos[1]>pos[3])?pos[3]:pos[1])*this.state.boardlength)*this.state.boardzoom-10
+            var width = (Math.abs(pos[0]-pos[2])*this.state.boardlength)*this.state.boardzoom+20
+            var height = (Math.abs(pos[1]-pos[3])*this.state.boardlength)*this.state.boardzoom+20
 
             return (<g>
                 <rect x={backx} y={backy}  width={width} height={height} fill={group.higher_group} fillOpacity={0.5} rx={10}></rect>
