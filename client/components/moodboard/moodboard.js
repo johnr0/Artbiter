@@ -298,8 +298,15 @@ class MoodBoard extends ProtoBoard{
         image.onload = function(){
             var xpixo = pageX - document.getElementById(_this.state.boardname).offsetLeft+ counter*10
             var ypixo = pageY - document.getElementById(_this.state.boardname).offsetTop+counter*10
-            var ypix = pageY - document.getElementById(_this.state.boardname).offsetTop+100+counter*10
-            var xpix = pageX - document.getElementById(_this.state.boardname).offsetLeft+ 100/this.height*this.width+counter*10
+            var w=100
+            var h=100
+            if(this.width>this.height){
+                h = 100/this.width*this.height
+            }else{
+                w = 100/this.height*this.width
+            }
+            var ypix = pageY - document.getElementById(_this.state.boardname).offsetTop+h+counter*10
+            var xpix = pageX - document.getElementById(_this.state.boardname).offsetLeft+ w+counter*10
             var cur = _this.getPositionOnBoard(xpix, ypix)
             var origin = _this.getPositionOnBoard(xpixo, ypixo)
 
@@ -401,8 +408,11 @@ class MoodBoard extends ProtoBoard{
             
                 var reader = new FileReader();
                 reader.onload = function(){
-                    _this.addAnImage(reader.result, document.getElementById(_this.state.boardname).offsetLeft+document.getElementById(_this.state.boardname).querySelector('.boardrender').offsetLeft+horizontal_offset,
-                    document.getElementById(_this.state.boardname).offsetTop+document.getElementById(_this.state.boardname).querySelector('.boardrender').offsetTop,
+                    console.log(document.getElementById(_this.state.boardname).offsetLeft+document.getElementById(_this.state.boardname).querySelector('.boardrender').offsetLeft+horizontal_offset)
+                    var offLeft = document.getElementById(_this.state.boardname).offsetLeft+document.getElementById(_this.state.boardname).querySelector('.boardrender').offsetLeft+horizontal_offset+document.getElementById(_this.state.boardname).querySelector('.boardrender').clientWidth/2
+                    var offTop = document.getElementById(_this.state.boardname).offsetTop+document.getElementById(_this.state.boardname).querySelector('.boardrender').offsetTop+document.getElementById(_this.state.boardname).querySelector('.boardrender').clientHeight/2
+                    _this.addAnImage(reader.result, offLeft,
+                    offTop,
                     _this.state.arts, counter, resolve)
                 }
                 reader.readAsDataURL(it)
