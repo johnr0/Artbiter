@@ -649,13 +649,13 @@ class MoodBoardAI extends MoodBoard{
                 deletable = true
             }
 
-            if(Date.now()-this.state.groupupdatetime<5000){
-                removable = false
-                addable = false
-                deletable = false
-                relatable = false
-                unrelatable = false
-            }
+            // if(Date.now()-this.state.groupupdatetime<5000){
+            //     removable = false
+            //     addable = false
+            //     deletable = false
+            //     relatable = false
+            //     unrelatable = false
+            // }
 
             return (<g>
                 <g>
