@@ -555,7 +555,7 @@ class MoodBoard extends ProtoBoard{
         ///
         var promises = [ 
             this.props.board_this.ChooseArtsTexts([],[],this.state.current_image.slice(0), this.state.current_text.slice(0)),
-            this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids)
+            setTimeout(this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids), 50)
         ]
         var _this = this
         if(del_texts.length>0){
