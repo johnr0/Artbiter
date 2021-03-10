@@ -111,7 +111,7 @@ class BoardAI extends Board{
             Api.app.service('groups').timeout = 60000
             console.log('timeout after...', Api.app.service('boards').timeout)
             Api.app.service('boards').find({query: {_id: board_id,
-                $select: ['name', 'owner', 'undoable', 'texts', 'collaborators', 'labels', 'sketchundo','current_collaborators', 'layers', 'searchMode', 'searchPane', 'search_image_selected', 'search_slider_values', 'search_slider_distances', 'generate_slider_values', 'agreementPane', 'agreement_userSelection']
+                $select: ['name', 'owner', 'undoable', 'texts', 'collaborators', 'labels', 'sketchundo','current_collaborators', 'layers', 'searchMode', 'searchPane', 'search_image_selected', 'search_slider_values', 'search_slider_distances', 'search_scroll','generate_slider_values', 'agreementPane', 'agreement_userSelection']
             }})
             .then((res0)=>{
                 var res = res0
@@ -174,6 +174,8 @@ class BoardAI extends Board{
                             var search_slider_distances = {}
                             var generate_slider_values = {}
 
+                            var search_scroll = 0
+
                             var agreementPane=false
                             var agreement_userSelection = {}
                             
@@ -195,7 +197,9 @@ class BoardAI extends Board{
                             if(res0[0].generate_slider_values!=undefined){
                                 generate_slider_values = res0[0].generate_slider_values
                             }
-                            
+                            if(res0[0].search_scroll!=undefined){
+                                search_scroll = res0[0].search_scroll
+                            }
 
                             if(res0[0].agreementPane!=undefined){
                                 agreementPane = res0[0].agreementPane
@@ -235,7 +239,7 @@ class BoardAI extends Board{
 
                                     _this.moodboard.setState({arts: arts, searchPane: searchPane, search_image_selected: search_image_selected, 
                                         search_slider_values:search_slider_values, search_slider_distances: search_slider_distances, searchMode: searchMode,
-                                        generate_slider_values: generate_slider_values, 
+                                        generate_slider_values: generate_slider_values, search_scroll: search_scroll, 
                                         agreementPane: agreementPane, agreement_userSelection: agreement_userSelection})
 
 
@@ -324,7 +328,10 @@ class BoardAI extends Board{
                                                     //     Promise.all(promises)
                                                     // })
                                                     _this.moodboard.setState({texts:texts})
-                                                    
+                                                    var md_search = document.getElementById('moodboard_searched_results')
+                                                    if(md_search!=undefined){
+                                                        md_search.scrollTop= md_search.scrollHeight*search_scroll
+                                                    }
                                                     // console.log('done')
                                                 })
                                                 // console.log(layers, arts, texts, sketchundo)

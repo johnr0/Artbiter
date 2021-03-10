@@ -371,6 +371,7 @@ class MoodboardImage extends Component{
                 height: (_this.props.mother_state.crop[3]-_this.props.mother_state.crop[1]) * art.height, 
                 position: [x1, y1, x2, y2],
             }
+            arts[_this.props.art_key].choosen_by = ''
             Promise.all([
                 _this.props.mother_this.props.board_this.ChooseArtsTexts([],[],_this.props.mother_state.current_image, _this.props.mother_state.current_text),
                 _this.props.mother_this.props.board_this.AddArts([arts[id]],[id]),

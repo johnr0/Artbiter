@@ -726,6 +726,12 @@ class Board extends Component{
                     }
                     
                 }
+            }else if(updated.indexOf('moodboard_search_scroll')!=-1){
+                var search_scroll = data.search_scroll
+                var md_search = document.getElementById('moodboard_searched_results')
+                if(md_search!=undefined){
+                    md_search.scrollTop= md_search.scrollHeight*search_scroll
+                }
             }
         })
 
@@ -1129,6 +1135,7 @@ class Board extends Component{
         //     // arts[art_id].choosen_by=''
         //     Api.app.service('arts').patch(art_id, {$set:{choosen_by: '', updated: 'moodboard_arts_texts_choosen'}})
         // }
+        console.log(d_art_ids)
         Api.app.service('arts').patch(null, {$set:{choosen_by: '', updated:'moodboard_arts_texts_choosen'}}, {query: {_id: {$in: d_art_ids}}})
         for (var i in d_text_ids){
             var text_id = d_text_ids[i]

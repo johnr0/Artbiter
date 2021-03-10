@@ -36,6 +36,7 @@ class MoodboardImageAI extends MoodboardImage{
         if(arts[this.props.art_key].choosen_by==this.props.mother_this.props.board_this.state.user_id){
             var pos = [Number.MAX_VALUE, Number.MAX_VALUE, Number.MIN_VALUE, Number.MIN_VALUE]
             var current_image = this.props.mother_state.current_image
+
             current_image.splice(current_image.indexOf(this.props.art_key), 1)
             var _this = this
             for (var i in current_image){
@@ -54,8 +55,9 @@ class MoodboardImageAI extends MoodboardImage{
                     pos[3] = cur_pos[3]    
                 }
             }
-        
+            arts[this.props.art_key].choosen_by = ''
             var ratio = (pos[2]-pos[0])/(pos[3]-pos[1])
+            this.props.mother_this.setState({arts})
             Promise.all([
                 this.props.mother_this.props.board_this.ChooseArtsTexts([],[], [this.props.art_key],[]),
                 this.props.mother_this.setState({current_image:current_image, current_selected_pos: pos, current_selected_ratio: ratio}, function(){

@@ -268,6 +268,10 @@ module.exports = function(app) {
           data_to_return['labels']=data.labels
         }else if(data.updated=='artlabelremoval'){
           return
+        }else if(data.updated=='moodboard_search_scroll'){
+          data_to_return['updated']=data.updated
+          data_to_return['search_scroll'] = data.search_scroll
+          return [app.channel(`boards/${data._id}`).filter(connection=>connection.user._id!==hook.params.user._id).send(data_to_return)]
         }else{
           data_to_return = data
           

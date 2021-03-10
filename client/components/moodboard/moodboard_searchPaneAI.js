@@ -3,6 +3,9 @@ import Api from '../../middleware/api'
 import interpolate from 'color-interpolate'
 
 class MoodBoardSearchPaneAI extends Component{
+    state={
+        scrollTimeOut: undefined, 
+    }
 
     toggleSearchPane(e){
         e.stopPropagation()
@@ -381,11 +384,11 @@ class MoodBoardSearchPaneAI extends Component{
         // console.log(searched_arts)
 
         return searched_arts.map((val,idx)=>{
-            return (<div style={{display:'inline-block', padding: '3px', position: 'relative'}}>
+            return (<div style={{display:'block', width:'fit-content', padding: '3px', position: 'relative', height: '100%', height:'100%'}}>
                 <div className='btn' style={{position: 'absolute', top: '10px', right: '10px', width:'30px', height:'30px', fontSize:'30', lineHeight:'26px', padding: 0}}
                     onPointerDown={this.addSearchedImageToMoodboard.bind(this, val)}
                 >+</div>
-                <img src={val[1]} style={{maxHeight: '100%', maxWidth: '100%'}}></img>
+                <img src={val[1]} style={{ maxWidth: '100%', maxHeight:'100%'}}></img>
             </div>)
         })
         // return Object.keys(this.props.mother_state.searched_arts).map((key, idx)=>{
@@ -399,6 +402,22 @@ class MoodBoardSearchPaneAI extends Component{
 
     searchWheel(e){
         e.stopPropagation()
+        // console.log(e.target.value)
+        clearTimeout(this.state.scrollTimeOut)
+        // if(this.state.scrollTimeOut!= undefined){
+        //     clearTimeout(this.state.scrollTimeOut)
+        //     this.setState({scrollTimeOut: undefined})
+        // }
+        var _this = this
+        var scrollTimeOut = setTimeout(function(){
+            var scrolled = document.getElementById('moodboard_searched_results')
+            if(scrolled!=undefined){
+                console.log(scrolled.scrollTop/scrolled.scrollHeight)
+                Api.app.service('boards').patch(_this.props.mother_this.props.board_this.state.board_id, {$set: {updated:'moodboard_search_scroll', search_scroll: scrolled.scrollTop/scrolled.scrollHeight}})
+            }
+            
+        }, 250)
+        this.setState({scrollTimeOut: scrollTimeOut})
     }
 
     render(){
@@ -539,7 +558,7 @@ class MoodBoardSearchPaneAI extends Component{
                             {this.props.mother_state.searchMode=='generate' && art_exist && !group_exist && <div className='btn tiny-btn' style={{marginRight:'5px'}} onPointerUp={this.search_similar.bind(this)}>Similar</div>}
                             {this.props.mother_state.searchMode=='generate' && (!art_exist||!group_exist) && <div className='btn tiny-btn' onPointerUp={this.search_random.bind(this)}>Random</div>}
                         </div>
-                        <div className='moodboard_search_pane_subpane_div' style={{overflowY: 'auto'}} onWheel={this.searchWheel.bind(this)}>
+                        <div id="moodboard_searched_results" className='moodboard_search_pane_subpane_div' style={{overflowY: 'auto'}} onWheel={this.searchWheel.bind(this)}>
                             {this.renderSearchedArts()}
                         </div>
                     </div>
