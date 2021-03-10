@@ -576,17 +576,17 @@ class MoodBoard extends ProtoBoard{
         var id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         var text = {
             text: '',
-            fontsize: 0.02, 
-            position: [pos[0], pos[1], pos[0]+0.2, pos[1]+0.023],
-            ratio: 0.2/0.023,
-            height_font_ratio: 0.02/0.023, 
+            fontsize: 0.04/this.state.boardzoom, 
+            position: [pos[0], pos[1], pos[0]+0.2/this.state.boardzoom, pos[1]+0.046/this.state.boardzoom],
+            ratio: 0.2/0.046,
+            height_font_ratio: 0.04/0.046, 
             choosen_by: this.props.board_this.state.user_id, 
         }
         texts[id] = text
         Promise.all([
             this.props.board_this.AddAText(id, text),
             this.setState({control_state: 'control_object', texts: texts, current_text:[id], current_image: [],
-            current_selected_pos:[pos[0], pos[1], pos[0]+0.2, pos[1]+0.023], current_selected_ratio:1/3}, function(){
+            current_selected_pos:[pos[0], pos[1], pos[0]+0.2/this.state.boardzoom, pos[1]+0.046/this.state.boardzoom], current_selected_ratio:1/3}, function(){
                 setTimeout(function(){
                     document.getElementById('textarea_'+id).focus()}, 50);
             })

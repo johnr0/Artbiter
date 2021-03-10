@@ -847,13 +847,15 @@ class MoodBoardAI extends MoodBoard{
                             this.renderImageHandle()
                         }
                         {this.renderImages()}
+                        {this.renderTexts()}
+                        {this.rendereditingTexts()}
                         {this.state.control_state=='control_object'&&(this.state.current_image.length>0||this.state.current_text.length>0)&&this.state.current_selected_pos!=undefined && 
                             this.renderImageHandle2()
                         }
-                        {this.renderTexts()}
+                        
                         
                         {/* {this.renderSelfs()} */}
-                        {this.rendereditingTexts()}
+                        
                         {this.renderGroupFront()}
                         {this.renderGrouper()}
                         {/* {this.state.control_state=='style-stamp' && <MoodboardStyleSketchControlAI ref={'stylecontrol'} mother_this={this} mother_state={this.state}></MoodboardStyleSketchControlAI>} */}

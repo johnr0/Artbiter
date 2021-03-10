@@ -679,7 +679,10 @@ class Board extends Component{
                     // }else 
                     if(item.indexOf('text_')!=-1){
                         item = item.split('_')[1]
-                        md_texts[item].choosen_by = texts[item].choosen_by
+                        if(texts[item]!=undefined && md_texts[item]!=undefined){
+                            md_texts[item].choosen_by = texts[item].choosen_by
+                        }
+                        
                     }
                 }
                 _this.moodboard.setState({texts:md_texts})
@@ -1064,6 +1067,7 @@ class Board extends Component{
         for(var i in text_ids){
             patch['texts.'+text_ids[i]+'.position'] = texts[i].position
             patch['texts.'+text_ids[i]+'.fontsize'] = texts[i].fontsize
+            patch['texts.'+text_ids[i]+'.ratio'] = texts[i].ratio
             patch['texts.'+text_ids[i]+'.text'] = texts[i].text
             patch['updated'] = patch['updated']+'.text_'+text_ids[i]
         }
