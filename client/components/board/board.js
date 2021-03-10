@@ -1054,7 +1054,7 @@ class Board extends Component{
 
     }
 
-    UpdateArtsTexts(arts, art_ids, texts, text_ids){
+    UpdateArtsTexts(arts, art_ids, texts, text_ids, function2=undefined, function2_params=undefined){
         var patch = {}
         patch['updated'] = 'moodboard_update_arts_texts'
         
@@ -1072,10 +1072,17 @@ class Board extends Component{
             patch['texts.'+text_ids[i]+'.text'] = texts[i].text
             patch['updated'] = patch['updated']+'.text_'+text_ids[i]
         }
+        var _this = this
         console.log(patch)
         if(Object.keys(patch).length>1){
             console.log('patched')
             Api.app.service('boards').patch(this.state.board_id, {$set:patch})
+            .then(()=>{
+                
+                if(function2!=undefined){
+                    function2(function2_params[0], function2_params[1], function2_params[2], function2_params[3], _this)
+                }
+            })
         }
         
         
@@ -1119,7 +1126,13 @@ class Board extends Component{
         Api.app.service('boards').patch(this.state.board_id, {$set:patch})
     }
 
-    ChooseArtsTexts(art_ids, text_ids, d_art_ids, d_text_ids){
+    ChooseArtsTexts(art_ids, text_ids, d_art_ids, d_text_ids, sub_this = undefined){
+        var _this
+        if(sub_this!=undefined){
+            _this = sub_this
+        }else{
+            _this = this
+        }
         // console.log('chooseartstexts', art_ids)
         var patch={}
         // var arts = this.moodboard.state.arts
@@ -1130,11 +1143,11 @@ class Board extends Component{
         //     // arts[art_id].choosen_by=this.state.user_id
         //     Api.app.service('arts').patch(art_id, {$set:{choosen_by: this.state.user_id, updated:'moodboard_arts_texts_choosen'}})
         // }
-        Api.app.service('arts').patch(null, {$set:{choosen_by: this.state.user_id, updated:'moodboard_arts_texts_choosen'}}, {query: {_id: {$in: art_ids}}})
+        Api.app.service('arts').patch(null, {$set:{choosen_by: _this.state.user_id, updated:'moodboard_arts_texts_choosen'}}, {query: {_id: {$in: art_ids}}})
         for (var i in text_ids){
             var text_id = text_ids[i]
             patch['updated'] = patch['updated']+'.text_'+text_id
-            patch['texts.'+text_id+'.choosen_by'] = this.state.user_id
+            patch['texts.'+text_id+'.choosen_by'] = _this.state.user_id
         }
         // for(var i in d_art_ids){
         //     var art_id = d_art_ids[i]
@@ -1150,7 +1163,7 @@ class Board extends Component{
         }
         console.log(patch)
         if(Object.keys(patch).length>1){
-            Api.app.service('boards').patch(this.state.board_id, {$set:patch})
+            Api.app.service('boards').patch(_this.state.board_id, {$set:patch})
         }   
 
         // this.moodboard.setState({arts:arts})

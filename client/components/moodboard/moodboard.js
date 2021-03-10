@@ -553,10 +553,18 @@ class MoodBoard extends ProtoBoard{
             arts[this.state.current_image[i]].choosen_by=''
         }
         ///
-        var promises = [ 
-            this.props.board_this.ChooseArtsTexts([],[],this.state.current_image.slice(0), this.state.current_text.slice(0)),
-            setTimeout(this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids), 50)
-        ]
+        var promises
+        if(replace_texts.length>0){
+            promises = [ 
+                // this.props.board_this.ChooseArtsTexts([],[],this.state.current_image.slice(0), this.state.current_text.slice(0)),
+                this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids, this.props.board_this.ChooseArtsTexts, [[],[],this.state.current_image.slice(0), this.state.current_text.slice(0)])
+            ]
+        }else{
+            promises = [ 
+                this.props.board_this.ChooseArtsTexts([],[],this.state.current_image.slice(0), this.state.current_text.slice(0))
+            ]
+        }
+        
         var _this = this
         if(del_texts.length>0){
             promises.push(this.props.board_this.RemoveArtsTexts([], del_texts))
