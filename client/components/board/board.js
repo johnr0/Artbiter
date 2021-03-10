@@ -1074,6 +1074,7 @@ class Board extends Component{
         }
         console.log(patch)
         if(Object.keys(patch).length>1){
+            console.log('patched')
             Api.app.service('boards').patch(this.state.board_id, {$set:patch})
         }
         
