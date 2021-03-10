@@ -62,11 +62,12 @@ module.exports = function(app) {
     // app.service('users').publish('created', () => app.channel('admins'));
     
     // With the userid and email organization from above you can easily select involved users
-    console.log('getting...', data.updated)
+    
     app.service('boards').publish((data, hook) => {
         // console.log('owner', data.owner)
         var data_to_return = {}
         // console.log(data.updated)
+        console.log('getting...', data.updated)
         if(data.updated.indexOf('sketchpad_update_a_layer')!=-1){
           data_to_return['updated']=data.updated
           data_to_return['undoable'] = data.undoable
