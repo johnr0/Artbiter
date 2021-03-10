@@ -133,6 +133,7 @@ module.exports = function(app) {
             data_to_return['texts'][text_id] = data.texts[text_id]
           }
         }else if(data.updated.indexOf('moodboard_update_arts_texts')!=-1){
+          console.log('getting...', data.updated)
           data_to_return['updated'] = data.updated
           data_to_return['arts'] = {}
           data_to_return['texts']={}
