@@ -630,6 +630,7 @@ class Board extends Component{
                 _this.moodboard.setState({texts:md_texts})
             }else if(updated.indexOf('moodboard_update_arts_texts')!=-1){
                 var texts = data.texts
+                console.log('getting...', data)
                 var ids = updated.split('.')
                 var md_texts = _this.moodboard.state.texts
                 // var art = arts[art_id]
