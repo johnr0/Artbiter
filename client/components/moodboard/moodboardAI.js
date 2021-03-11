@@ -35,7 +35,7 @@ class MoodBoardAI extends MoodBoard{
         label_art: undefined,
 
         groupupdatetime: Date.now(), 
-
+        now: Date.now(),
 
 
     }
@@ -241,7 +241,7 @@ class MoodBoardAI extends MoodBoard{
             //     arts: this.state.current_image.slice()
             // }
             groups[group_id] = group
-            this.setState({groups}, function(){
+            this.setState({groups, groupupdatetime: Date.now()}, function(){
                 // analytics.logEvent("add_to_group", {board_id: this.props.board_this.state.board_id, user_id:this.props.board_this.state.user_id, group_id: group_id, added_arts: this.state.current_image.slice()})
                 Api.app.service('groups').patch(group_id, {$set: set, $push:{art_ids: {$each: this.state.current_image.slice()}}})
                
@@ -649,13 +649,13 @@ class MoodBoardAI extends MoodBoard{
                 deletable = true
             }
 
-            // if(Date.now()-this.state.groupupdatetime<5000){
-            //     removable = false
-            //     addable = false
-            //     deletable = false
-            //     relatable = false
-            //     unrelatable = false
-            // }
+            if(this.state.now-this.state.groupupdatetime<3000){
+                removable = false
+                addable = false
+                deletable = false
+                relatable = false
+                unrelatable = false
+            }
 
             return (<g>
                 <g>

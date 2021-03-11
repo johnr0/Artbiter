@@ -89,6 +89,10 @@ class MoodBoard extends ProtoBoard{
             console.log('runnning?')
             _this.pasteImages(e);
         })
+
+        window.setInterval(function(){
+            _this.setState({now: Date.now()})
+        }, 1000)
     }
 
     zoom_board_wheel(e){
