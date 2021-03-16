@@ -152,7 +152,9 @@ class MoodBoardSearchPaneAI extends Component{
         var arts = this.props.mother_state.arts
         var pos = this.props.mother_this.getPositionOnBoard(document.getElementById('moodboard').offsetWidth/2, document.getElementById('moodboard').offsetHeight/2, true)
         var position = [pos[0], pos[1], pos[0], pos[1]]
-        
+        for(var i in this.props.mother_state.current_image){
+            arts[this.props.mother_state.current_image[i]].choosen_by=''
+        }
         console.log(val[1])
         var image=new Image();
         var _this = this

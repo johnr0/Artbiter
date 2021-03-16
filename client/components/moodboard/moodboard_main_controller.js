@@ -11,6 +11,10 @@ class MoodBoardMainController extends Component{
         if(true){
             console.log(control_state)
             if(control_state!='control_object'){
+                var arts = this.props.mother_state.arts
+                for(var i in this.props.mother_state.current_image){
+                    arts[this.props.mother_state.current_image[i]].choosen_by=''
+                }
                 var promises = [this.props.mother_this.props.board_this.ChooseArtsTexts([],[],this.props.mother_state.current_image.slice(0), this.props.mother_state.current_text.slice(0))]
                 
                 var del_texts = []
@@ -26,6 +30,7 @@ class MoodBoardMainController extends Component{
                         replace_texts.push(this.props.mother_state.texts[key])
                     }
                 }
+                this.props.mother_this.setState({arts:arts})
                 promises.push(this.props.mother_this.props.board_this.UpdateArtsTexts([],[], replace_texts, replace_text_ids))
                 if(del_texts.length>0){
                     promises.push(this.props.mother_this.props.board_this.RemoveArtsTexts([], del_texts))

@@ -184,9 +184,12 @@ class MoodBoard extends ProtoBoard{
         var _this = this
         var pageX = e.pageX
         var pageY = e.pageY
+        for(var i in this.state.current_image){
+            arts[this.state.current_image[i]].choosen_by=''
+        }
         var current_image = []
         this.props.board_this.ChooseArtsTexts([],[], this.state.current_image.slice(0), this.state.current_text.slice(0))
-        this.setState({current_image:[], current_text: [], current_selected_pos: undefined, current_selected_ratio: undefined}, function(){
+        this.setState({arts, current_image:[], current_text: [], current_selected_pos: undefined, current_selected_ratio: undefined}, function(){
             console.log(files)
             var counter=0
             var promises = []
@@ -370,8 +373,12 @@ class MoodBoard extends ProtoBoard{
     pasteImages(e){
         // console.log(e.clipboardData.items)
         var _this = this
+        var arts = this.state.arts
+        for(var i in this.state.current_image){
+            arts[this.state.current_image[i]].choosen_by=''
+        }
         this.props.board_this.ChooseArtsTexts([],[], this.state.current_image.slice(0), this.state.current_text.slice(0))
-        this.setState({current_image:[], current_text: [],current_selected_pos: undefined, current_selected_ratio: undefined},function(){
+        this.setState({arts, current_image:[], current_text: [],current_selected_pos: undefined, current_selected_ratio: undefined},function(){
             window.navigator.clipboard.read().then((items)=>{
                 console.log(items)
                 var promises = []

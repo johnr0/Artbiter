@@ -1257,6 +1257,11 @@ class Board extends Component{
         var pos = this.moodboard.getPositionOnBoard(0, document.getElementById('moodboard').offsetHeight/2, true)
         var pos0 = Math.max(pos[0], 0)
         
+        for(var i in this.moodboard.state.current_image){
+            arts[this.moodboard.state.current_image[i]].choosen_by=''
+        }
+        
+
         console.log(pos0, pos)
         arts[id] = {
             file: image,
@@ -1266,6 +1271,7 @@ class Board extends Component{
             width: 512,
             height: 512,
         }
+
 
         Promise.all([
             _this.ChooseArtsTexts([],[],_this.moodboard.state.current_image, _this.moodboard.state.current_text),
