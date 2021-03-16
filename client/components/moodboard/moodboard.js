@@ -101,8 +101,8 @@ class MoodBoard extends ProtoBoard{
             var boardzoom_new = this.state.boardzoom+e.deltaY/100
             if(boardzoom_new<0.5){
                 this.setState({boardzoom: 0.5})
-            }else if(boardzoom_new>10){
-                this.setState({boardzoom: 10})
+            }else if(boardzoom_new>15){
+                this.setState({boardzoom: 15})
             }else{
                 this.setState({boardzoom: boardzoom_new})
             }
