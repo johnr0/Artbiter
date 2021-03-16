@@ -10,6 +10,7 @@ const turnImageToEmbedding = async context => {
   // console.log(context.app.get('ml_server'))
 
   // console.log(image)
+  context.app.service('event_logs').create({event: 'create_an_art', board_id: context.arguments[0].board_id, user_id: context.params.user._id})
 
   axios.post(context.app.get('ml_server')+'image_to_embedding', {
     image: image,
@@ -66,6 +67,8 @@ const turnColorChangeToEmbedding = async context =>{
 }
 
 const artStyleRemove = async context =>{
+  context.app.service('event_logs').create({event: 'remove_an_art', board_id: context.arguments[0].board_id, user_id: context.params.user._id})
+
   context.app.service('art_styles').find({query: {art_id: context.arguments[0]}})
   .then((res)=>{
     if(res.length>0){
