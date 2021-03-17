@@ -1169,6 +1169,7 @@ class SketchPad extends ProtoBoard {
         this.setState({control_state:'move-layer', action:'idle'}, function(){
             this.initializeMoveLayer()
         })
+        this.props.board_this.moodboard.setState({control_state:'control_object'})
     }
 
 
