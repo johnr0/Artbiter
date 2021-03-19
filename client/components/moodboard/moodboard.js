@@ -98,7 +98,7 @@ class MoodBoard extends ProtoBoard{
     zoom_board_wheel(e){
         // console.log(e.deltaY)
         if(this.state.action=='idle' || this.state.action=='image_selected' || this.state.action=='text_selected' || this.state.action=='objects_selected'){
-            var boardzoom_new = this.state.boardzoom+e.deltaY/100
+            var boardzoom_new = this.state.boardzoom-e.deltaY/100
             if(boardzoom_new<0.5){
                 this.setState({boardzoom: 0.5})
             }else if(boardzoom_new>15){

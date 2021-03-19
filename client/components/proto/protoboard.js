@@ -39,7 +39,7 @@ class ProtoBoard extends Component {
     zoom_board_wheel(e){
         // console.log(e.deltaY)
         if(this.state.action=='idle'){
-            var boardzoom_new = this.state.boardzoom+e.deltaY/100
+            var boardzoom_new = this.state.boardzoom-e.deltaY/100
             if(boardzoom_new<0.5){
                 this.setState({boardzoom: 0.5})
             }else if(boardzoom_new>10){
