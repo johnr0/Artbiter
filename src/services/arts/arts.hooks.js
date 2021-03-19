@@ -67,11 +67,12 @@ const turnColorChangeToEmbedding = async context =>{
 }
 
 const artStyleRemove = async context =>{
-  context.app.service('event_logs').create({event: 'remove_an_art', board_id: context.arguments[0].board_id, user_id: context.params.user._id})
+  
 
   context.app.service('art_styles').find({query: {art_id: context.arguments[0]}})
   .then((res)=>{
     if(res.length>0){
+      context.app.service('event_logs').create({event: 'remove_an_art', board_id: res[0].board_id, user_id: context.params.user._id})
       context.app.service('boards').find({query:{_id: res[0].board_id}})
       .then((res2)=>{
         var labels= JSON.parse(JSON.stringify(res2[0].labels))

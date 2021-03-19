@@ -526,7 +526,7 @@ class Board extends Component{
                                 
                                 // this.sketchpad.initializeMoveLayer();
                                 this.sketchpad.setState({control_state: 'move'})
-                                this.moodboard.setState({control_state: 'control_object'})
+                                this.moodboard.setState({control_state: 'control_object', action: 'idle'})
                             }   
                             
                         }
