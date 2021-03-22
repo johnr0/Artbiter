@@ -116,7 +116,7 @@ module.exports = {
       all: [],
       find: [ ],
       get: [],
-      create: [SketchUndoBeforeCreate],
+      create: [],
       update: [],
       patch: [],
       remove: []
@@ -126,7 +126,7 @@ module.exports = {
       all: [],
       find: [],
       get: [],
-      create: [SketchUndoAfterCreate],
+      create: [],
       update: [],
       patch: [Undo],
       remove: []
