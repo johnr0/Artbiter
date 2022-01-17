@@ -150,8 +150,8 @@ class Board extends Component{
                                 console.log(noone)
                                 if(noone){
                                     console.log('harabangtang', Object.keys(_this.moodboard.state.arts))
-                                    this.ChooseArtsTexts([],[],Object.keys(_this.moodboard.state.arts), Object.keys(_this.moodboard.state.texts))
-                                    this.ChooseLayers([],_this.sketchpad.layers)
+                                    _this.ChooseArtsTexts([],[],Object.keys(_this.moodboard.state.arts), Object.keys(_this.moodboard.state.texts))
+                                    _this.ChooseLayers([],_this.sketchpad.layers)
                                 }
                                 
                                 current_collaborators[user_id] = {
