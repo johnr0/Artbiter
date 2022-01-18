@@ -16,6 +16,7 @@ const layerPatch = async context =>{
       //   // context.app.service('sketchundos').create(sketchundo)
       // })
       Canvas=require('canvas')
+      console.log('reach?')
       context.app.service('layers').find({query: {_id: context.arguments[0]}})
       .then((res)=>{
         
