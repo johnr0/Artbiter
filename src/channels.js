@@ -308,8 +308,23 @@ module.exports = function(app) {
         }else if(data.updated=='sketchpad_layer_hide'){
           data_to_return._id = data._id
           data_to_return.hide = data.hide
+        }else if(data.updated=='sketchpad_update_a_layer'){
+          // console.log(data)
+          // data_to_return = data
+
+        }else if(data.updated=='sketchpad_efficiently_update_a_layer'){
+          // console.log(data.diff)
+          data_to_return.diff = data.diff
+          data_to_return.diff_x = data.diff_x
+          data_to_return.diff_y = data.diff_y
+          data_to_return.updated = data.updated
+          data_to_return._id = data._id
+          data_to_return.choosen_by = data.choosen_by
+          data_to_return.board_id = data.board_id
+          return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
         }else{
           // console.log('layer1')
+          
           data_to_return = data
           return [app.channel(`boards/${data.board_id}`).send(data_to_return)]
         }

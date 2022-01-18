@@ -307,27 +307,49 @@ class Board extends Component{
             if(updated.indexOf('sketchpad_layers_choosen')!=-1){
                 layer_dict[data._id].choosen_by = data.choosen_by
                 this.sketchpad.setState({layer_dict})
-            }else if(updated.indexOf('sketchpad_update_a_layer')!=-1 || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
+            }
+            // else if(updated.indexOf('sketchpad_update_a_layer')!=-1 || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
+                
+            //     if(layer_dict[data._id].choosen_by != this.state.user_id || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
+            //         layer_dict[data._id].image = data.image
+            //         this.sketchpad.setState({layer_dict}, function(){
+            //             var el = document.getElementById('sketchpad_canvas_'+data._id)
+            //             var ctx = el.getContext('2d')
+            //             var temp_el = document.getElementById('temp_canvas')
+            //             var temp_ctx = temp_el.getContext('2d')
+            //             var im = new Image()
+            //             im.src = data.image
+            //             im.onload=function(){
+            //                 console.log('first')
+            //                 temp_ctx.drawImage(im, 0,0,1000,1000)
+            //                 ctx.clearRect(0,0,1000,1000)
+            //                 ctx.drawImage(im, 0,0,1000,1000)
+            //                 temp_ctx.clearRect(0,0,1000,1000)
+            //             }   
+            //         })
+            //     }
+            // }
+            else if(updated.indexOf('sketchpad_efficiently_update_a_layer')!=-1 || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
                 
                 if(layer_dict[data._id].choosen_by != this.state.user_id || updated.indexOf('sketchpad_undo_update_a_layer')!=-1){
-                    layer_dict[data._id].image = data.image
-                    this.sketchpad.setState({layer_dict}, function(){
-                        var el = document.getElementById('sketchpad_canvas_'+data._id)
-                        var ctx = el.getContext('2d')
-                        var temp_el = document.getElementById('temp_canvas')
-                        var temp_ctx = temp_el.getContext('2d')
-                        var im = new Image()
-                        im.src = data.image
-                        im.onload=function(){
-                            console.log('first')
-                            temp_ctx.drawImage(im, 0,0,1000,1000)
-                            ctx.clearRect(0,0,1000,1000)
-                            ctx.drawImage(im, 0,0,1000,1000)
-                            temp_ctx.clearRect(0,0,1000,1000)
-                        }   
-                    })
+                    var el = document.getElementById('sketchpad_canvas_'+data._id)
+                    var ctx = el.getContext('2d')
+                    var im = new Image()
+                    // console.log(data)
+                    im.onload=function(){
+                        ctx.clearRect(data.diff_x, data.diff_y, im.width, im.height)
+                        ctx.drawImage(im, data.diff_x, data.diff_y, im.width, im.height)
+                        layer_dict[data._id].image = el.toDataURL()
+                        _this.sketchpad.setState({layer_dict})
+                    }
+                    im.src = data.diff
+                    
+                
+
+                    
                 }
-            }else if(updated.indexOf('sketchpad_layer_hide')!=-1 || updated.indexOf('sketchpad_undo_layer_hide')!=-1){
+            }
+            else if(updated.indexOf('sketchpad_layer_hide')!=-1 || updated.indexOf('sketchpad_undo_layer_hide')!=-1){
                 layer_dict[data._id].hide = data.hide
                 this.sketchpad.setState({layer_dict})
             }
@@ -787,6 +809,8 @@ class Board extends Component{
             cond: cond,
             selection: selection
         }
+
+        console.log(image.data)
 
         set['sketchundo'] =sketchundo
 
