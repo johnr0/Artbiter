@@ -55,8 +55,8 @@ class ProtoBoard extends Component {
     moveMouse(e){
             // console.log(this.state.move_board_init, this.state.move_board_mouse_init)
             // console.log(this.state.move_board_init[0]-(e.pageX-this.state.move_board_mouse_init[0])/100/this.state.boardzoom)
-            var boardX = this.state.move_board_init[0]-(e.pageX-this.state.move_board_mouse_init[0])/500/this.state.boardzoom
-            var boardY = this.state.move_board_init[1]-(e.pageY-this.state.move_board_mouse_init[1])/500/this.state.boardzoom
+            var boardX = this.state.move_board_init[0]-(e.pageX-this.state.move_board_mouse_init[0])/this.state.boardwidth/this.state.boardzoom
+            var boardY = this.state.move_board_init[1]-(e.pageY-this.state.move_board_mouse_init[1])/this.state.boardheight/this.state.boardzoom
             if (boardX<0.1){
                 boardX = 0.1
             }else if(boardX>0.9){
