@@ -5,6 +5,7 @@ const layerPatch = async context =>{
       var sketchundo = context.arguments[1]['$set']['sketchundo']
       context.arguments[1]['$set']['sketchundo'] = undefined
       context.arguments[1]['$set']['diff'] = undefined
+      console.log('layer updated!')
       // console.log(sketchundo)
       // context.app.service('layers').find({query: {_id: context.arguments[0]}})
       // .then((res)=>{
