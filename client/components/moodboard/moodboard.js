@@ -374,12 +374,13 @@ class MoodBoard extends ProtoBoard{
         // console.log(e.clipboardData.items)
         var _this = this
         var arts = this.state.arts
+        var _window = window
         for(var i in this.state.current_image){
             arts[this.state.current_image[i]].choosen_by=''
         }
         this.props.board_this.ChooseArtsTexts([],[], this.state.current_image.slice(0), this.state.current_text.slice(0))
         this.setState({arts, current_image:[], current_text: [],current_selected_pos: undefined, current_selected_ratio: undefined},function(){
-            window.navigator.clipboard.read().then((items)=>{
+            _window.navigator.clipboard.read().then((items)=>{
                 console.log(items)
                 var promises = []
                 var counter = 0

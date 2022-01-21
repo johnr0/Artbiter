@@ -48,6 +48,8 @@ const layerPatch = async context =>{
             ymin = 1000
             ys = []
 
+            // later, this "addition" pipeline can be improved, but let's leave it for now...
+
             for (var i=0; i<length; i += 4){
               if(oriData[i]!=newData[i]||oriData[i+1]!=newData[i+1]||oriData[i+2]!=newData[i+2]||oriData[i+3]!=newData[i+3]){
                 x = (i/4)%1000
