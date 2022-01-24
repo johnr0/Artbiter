@@ -1309,12 +1309,18 @@ class SketchPad extends ProtoBoard {
 
                 return (<g style={{transformOrigin: this.state.rotateCenter[0]/1000*this.state.boardlength*this.state.boardzoom+'px '+this.state.rotateCenter[1]/1000*this.state.boardlength*this.state.boardzoom+'px', transform: 'rotate('+this.state.lasso_rot_deg+'deg)'}}>
                     <path 
-                    d={path} fill='transparent' stroke='#333333' strokeDasharray='5, 5'></path>
+                    d={path} fill='transparent' stroke='white' strokeDasharray='5, 2' strokeWidth={4}></path>
+                    <path 
+                    d={path} fill='transparent' stroke='#333333' strokeDasharray='5, 2' strokeWidth={2}></path>
                 </g>
                 )
             }else{
-                return (<path 
-                d={path} fill='transparent' stroke='#333333' strokeDasharray='5, 5'></path>)
+                return (<g>
+                    <path 
+                    d={path} fill='transparent' stroke='white' strokeDasharray='5, 2' strokeWidth={4}></path>
+                    <path 
+                    d={path} fill='transparent' stroke='#333333' strokeDasharray='5, 2' strokeWidth={2}></path>
+                </g>)
             }
             
         }
