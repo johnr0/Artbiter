@@ -158,10 +158,11 @@ function searchImages(search_start_image_embedding, cavs, search_slider_values, 
   // })
 }
 
-function generateImage(content, content_weight, styles, style_weights, context){
-  console.log('run this how?')
+function generateImage(content_image, content, content_weight, styles, style_weights, context){
+  // console.log('run this how?', content_image)
   // console.log(JSON.stringify(content))
   axios.post(context.app.get('ml_server')+'generateImage', {
+    content_image: content_image,
     content: JSON.stringify(content),
     content_weight: content_weight,
     styles: JSON.stringify(styles),
@@ -375,8 +376,13 @@ const boardGenerateImage = async context =>{
           .then((art_styles)=>{
             console.log('pass2?')
             var art_style = art_styles[0].style
+            context.app.service('arts').find({query: {_id: search_start_image}})
+            .then((art)=>{
+              // console.log(art)
+              generateImage(art[0].file, art_style, art_weight, styles_of_groups, generate_slider_values, context)
+            })
 
-            generateImage(art_style, art_weight, styles_of_groups, generate_slider_values, context)
+            
           })
         })
       })
