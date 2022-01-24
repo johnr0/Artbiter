@@ -239,10 +239,11 @@ class SketchPadAI extends SketchPad{
         <h2>Sketch Pad</h2>
         <div className={'panel_collapser'} style={{left: 'calc(100% - 31px)', top: 7.25}} onPointerDown={this.collapseSketchpad.bind(this)}>◀</div>
         <div id='sketchpad' className='sketchpad select_disabled' onWheel={this.zoom_board_wheel.bind(this)} 
-            onPointerOut={this.moveBoardEnd.bind(this)}
+            // onPointerOut={this.moveBoardEnd.bind(this)}
+            onPointerUp={this.sketchPadMouseMoveEnd.bind(this)} 
             onPointerMove={this.sketchPadMouseMove.bind(this)}> 
             <div className={'boardrender'} onPointerDown={this.sketchPadMouseMoveInit.bind(this)} onPointerUp={this.sketchPadMouseMoveEnd.bind(this)} 
-                onPointerOut={this.sketchPadMouseMoveOut.bind(this)}
+                // onPointerOut={this.sketchPadMouseMoveOut.bind(this)}
                 // onPointerOut={this.props.board_this.setSketchpadPosition.bind(this.props.board_this, -1, -1)}
 
             
