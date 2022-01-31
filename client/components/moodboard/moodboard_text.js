@@ -46,14 +46,16 @@ class MoodBoardText extends Component{
     }
 
     select_new_text(e){
-        
+        var ecopied = {pageX: e.pageX, pageY: e.pageY}
         var texts = this.props.mother_state.texts
             if(texts[this.props.text_key].choosen_by==''){
                 var pos = texts[this.props.text_key].position.slice()
             var ratio = texts[this.props.text_key].ratio
-            console.log(ratio)
+            console.log('sliced', this.props.mother_state.current_image.slice(0))
             var _this = this
             Promise.all([
+                // this.props.mother_this
+                // this.props.mother_this.props.board_this.ChooseArtsTexts([],[this.props.text_key],this.props.mother_state.current_image.slice(0),this.props.mother_state.current_text.slice(0)),
                 this.props.mother_this.props.board_this.ChooseArtsTexts([],[this.props.text_key],this.props.mother_state.current_image.slice(0),this.props.mother_state.current_text.slice(0)),
                 this.props.mother_this.setState({current_text:[this.props.text_key], current_image:[], current_selected_pos: pos, current_selected_ratio: ratio}, function(){
                     _this.props.mother_this.object_moving_init(e)

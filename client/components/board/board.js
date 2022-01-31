@@ -1159,7 +1159,7 @@ class Board extends Component{
         }
         // console.log('chooseartstexts', art_ids)
         var patch={}
-        // var arts = this.moodboard.state.arts
+        var arts = _this.moodboard.state.arts
         patch['updated'] = 'moodboard_arts_texts_choosen'
         var unset={}
         // for(var i in art_ids){
@@ -1173,11 +1173,11 @@ class Board extends Component{
             patch['updated'] = patch['updated']+'.text_'+text_id
             patch['texts.'+text_id+'.choosen_by'] = _this.state.user_id
         }
-        // for(var i in d_art_ids){
-        //     var art_id = d_art_ids[i]
-        //     // arts[art_id].choosen_by=''
+        for(var i in d_art_ids){
+            var art_id = d_art_ids[i]
+            arts[art_id].choosen_by=''
         //     Api.app.service('arts').patch(art_id, {$set:{choosen_by: '', updated: 'moodboard_arts_texts_choosen'}})
-        // }
+        }
         console.log(d_art_ids)
         Api.app.service('arts').patch(null, {$set:{choosen_by: '', updated:'moodboard_arts_texts_choosen'}}, {query: {_id: {$in: d_art_ids}}})
         for (var i in d_text_ids){
