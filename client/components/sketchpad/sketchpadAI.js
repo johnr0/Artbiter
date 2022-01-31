@@ -272,7 +272,7 @@ class SketchPadAI extends SketchPad{
             </div>
             <SketchpadMainControllerAI mother_state={this.state} mother_this={this}></SketchpadMainControllerAI>
             <SketchpadLayerController mother_state={this.state} mother_this={this}></SketchpadLayerController>
-            {this.state.undoable!=false && <SketchpadUndo mother_state={this.state} mother_this={this}></SketchpadUndo>}
+            {/* {this.state.undoable!=false && <SketchpadUndo mother_state={this.state} mother_this={this}></SketchpadUndo>} */}
             <SketchpadStyleStampControllerAI2 ref={c=>this.stylestampcontroller=c} mother_state={this.state} mother_this={this}></SketchpadStyleStampControllerAI2>
             
         </div>

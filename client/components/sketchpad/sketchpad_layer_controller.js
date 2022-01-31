@@ -179,6 +179,7 @@ class SketchpadLayerController extends Component{
     layerDone(e){
         console.log(this.state.mouse_y_pos, this.state.y_init_pos, idx, this.props.mother_state.current_layer)
         e.stopPropagation()
+        this.props.mother_this.sketchPadMouseMoveEnd(e)
         if(this.state.mouse_y_pos!=this.state.y_init_pos && this.props.mother_state.layers.length>1){
             var prev_layer = this.props.mother_state.layers.slice()
             var new_layer = []

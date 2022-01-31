@@ -401,7 +401,7 @@ class BoardAI extends Board{
 
     render(){
         return (
-            <div id='board_whole' style={{flex: 'auto', width: '100%', position:'relative'}} className='row'>
+            <div id='board_whole' style={{flex: 'auto', width: '100%', position:'relative'}} className='row' onPointerUp={this.handleMouseUp.bind(this)}>
     
                 <SketchPadAI board_this={this} board_state={this.state} ref={c=>this.sketchpad=c}></SketchPadAI>
                 <MoodBoardAI board_this={this} board_state={this.state} ref={c=>this.moodboard=c}></MoodBoardAI>

@@ -46,6 +46,8 @@ class MoodBoard extends ProtoBoard{
 
         messageCount: 0,
 
+        copied: false, 
+
     }
 
     // TODO: Getting images from clip board...
@@ -63,31 +65,38 @@ class MoodBoard extends ProtoBoard{
                 }else if(e.key=="Backspace"){
                     console.log('delete')
                     _this.delete_object()
-                }else if(e.key=="Control"){
-                    _this.setState({control_down: true})
-                }else if(e.key=='v'){
-                    if(_this.state.control_down){
-                        _this.pasteImages(e)
-                    }
                 }
+                // else if(e.key=="Control"){
+                //     _this.setState({control_down: true})
+                // }else if(e.key=='v'){
+                //     if(_this.state.control_down){
+                //         _this.pasteImages(e)
+                //     }
+                // }
             }
             
         })
 
         document.addEventListener('keyup', function(e){
             e = e||window.event;
-            // console.log('up?')
+            console.log('up?', e.key)
             if(e.key=="Shift"){
                 _this.setState({shift_down: false})
                 console.log('shiftup')
-            }if(e.key=='Control'){
-                _this.setState({control_down:false})
+            }else if(e.key=='Control'||e.key=='Meta'){
+                _this.setState({control_down:false, copied: false})
+            }else if(e.key=='v'){
+                _this.setState({copied:false})
             }
         })
 
         window.addEventListener('paste', function(e){
             console.log('runnning?')
-            _this.pasteImages(e);
+            if(_this.state.copied==false){
+                _this.pasteImages(e);
+                _this.setState({copied:true})
+            }
+            
         })
 
         window.setInterval(function(){

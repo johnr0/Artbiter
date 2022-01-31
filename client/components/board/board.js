@@ -1437,10 +1437,18 @@ class Board extends Component{
         this.moodboard=el
     }
 
+    handleMouseUp(e){
+        if(this.moodboard.state.action!='idle'){
+            this.moodboard.moodBoardMouseEnd(e)
+        }else if(this.sketchpad.state.action!='idle'){
+            this.sketchpad.sketchPadMouseMoveEnd(e)
+        }
+    }
+
 
     render(){
         return (
-        <div id='board_whole' style={{flex: 'auto', width: '100%', position:'relative'}} className='row'>
+        <div id='board_whole' style={{flex: 'auto', width: '100%', position:'relative'}} className='row' onPointerUp={this.handleMouseUp.bind(this)}>
 
             <SketchPad board_this={this} board_state={this.state} ref={c => this.sketchpad=c}></SketchPad>
             <MoodBoard board_this={this} board_state={this.state} ref={c => this.moodboard=c}></MoodBoard>
