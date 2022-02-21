@@ -1181,15 +1181,17 @@ class MoodBoard extends ProtoBoard{
                     
                     <svg width={this.state.boardzoom*this.state.boardlength} height={this.state.boardzoom*this.state.boardlength}>
                         
-                        {this.renderTexts()}
+                        
                         {this.state.control_state=='control_object'&&(this.state.current_image.length>0||this.state.current_text.length>0)&&this.state.current_selected_pos!=undefined && 
                             this.renderImageHandle()
                         }
                         {this.renderImages()}
+                        {this.renderTexts()}
+                        {this.rendereditingTexts()}
                         {this.state.control_state=='control_object'&&(this.state.current_image.length>0||this.state.current_text.length>0)&&this.state.current_selected_pos!=undefined && 
                             this.renderImageHandle2()
                         }
-                        {this.rendereditingTexts()}
+                        
                         
                         
                     </svg>
